@@ -1,87 +1,75 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap/register";
-import { DUR, EASE, MQ, SCROLL } from "@/lib/gsap/motion";
+import { DUR, EASE, MQ } from "@/lib/gsap/motion";
 import { onPreloaderDone } from "@/lib/preloader";
 import BiLabel from "@/components/site/BiLabel";
 import { hero } from "@/content/copy";
 
 /*
- * Hero — §A6 #1, MINIMAL variant (v1). Flat #111214, 100vh, normal scroll —
- * no pin, no curtain-wipe (smoke variant is a deferred WebGL pass).
+ * Hero — panel layout (user-directed redesign, 2026-07-19; replaces the
+ * §A6 #1 minimal centered-name variant).
  *
- * Choreography (§A7):
- *  #6 Name parallax — scrubbed y = scrollY × −0.38, capped past 1.6 × vh.
- *  #3 Intro reveals — meta row + scroll cue rise from bottom after preload.
- * Reduced-motion branch: no parallax, intro elements shown instantly (the
- * markup renders visible by default; only the motion branch hides it first).
+ * One viewport: a raised #1d1d21 panel (the dark equivalent of the
+ * reference's white box) holding the intro text + autoplaying showreel,
+ * with the giant "ADNAAN DASOO" spanned edge-to-edge beneath it.
+ *
+ * The preloader's pill clip-expands INTO this panel's exact rect
+ * ([data-hero-panel] is the measurement target), then the inner elements
+ * ([data-hero-intro]) rise in on markPreloaderDone. Reduced motion: all
+ * content visible statically; the reel holds its first frame.
+ *
+ * The showreel mask: a staircase clip-path — the top-left and
+ * bottom-right corner strips are cut away (union-of-two-offset-rects
+ * silhouette from the reference).
  */
+
+/** Staircase mask — % steps tuned to the reference (~48% wide, ~8% deep) */
+const REEL_CLIP =
+  "polygon(0 8%, 46% 8%, 46% 0, 100% 0, 100% 92%, 54% 92%, 54% 100%, 0 100%)";
+
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  const reelRef = useRef<HTMLVideoElement>(null);
+
+  // Autoplay the reel muted-on-loop only for motion-ok visitors; reduced
+  // motion keeps the first frame as a still (§A10).
+  useEffect(() => {
+    if (window.matchMedia(MQ.reduced).matches) return;
+    reelRef.current?.play().catch(() => {
+      /* autoplay blocked — first frame remains */
+    });
+  }, []);
 
   useGSAP(
     () => {
       const section = sectionRef.current;
       if (!section) return;
-
-      const name = section.querySelector<HTMLElement>("[data-min-name]");
       const introEls = gsap.utils.toArray<HTMLElement>(
         section.querySelectorAll("[data-hero-intro]"),
       );
 
       const mm = gsap.matchMedia();
 
-      /*
-       * Default motion branch (§A7 rule): full design for everyone who has
-       * not opted into reduced motion. Parallax stays on at mobile widths
-       * too (§A6 #1b), so the only gate is the motion preference.
-       */
+      // Default motion branch: elements rise in over the panel once the
+      // preloader's pill has expanded into it (§ preloader handoff).
       mm.add(MQ.motionOk, () => {
-        // §A7 #6 — minimal-name parallax. Linear scrub over the hero's
-        // scroll span: y reaches −(1.6·vh × 0.38) at end "+=160%", which is
-        // equivalent to y = scrollY × −0.38 stopping past 1.6 × vh.
-        if (name) {
-          // will-change only while the parallax branch is live (§A10)
-          gsap.set(name, { willChange: "transform" });
-          gsap.to(name, {
-            y: () =>
-              SCROLL.heroNameCapVh * window.innerHeight * SCROLL.heroNameFactor,
-            ease: EASE.none,
-            scrollTrigger: {
-              trigger: section,
-              start: "top top",
-              end: "+=160%",
-              scrub: true,
-              invalidateOnRefresh: true,
-            },
-          });
-        }
-
-        // §A7 #3 — intro reveals: meta row + scroll cue from bottom
-        // (+32px, opacity 0→1), fired once the preloader hands off.
-        // The name itself gets NO intro — the preloader's difference-blend
-        // name lands exactly on it, so it must sit still from first paint.
-        gsap.set(introEls, { y: 32, autoAlpha: 0 });
+        gsap.set(introEls, { y: 24, autoAlpha: 0 });
         const offPreloader = onPreloaderDone(() => {
           gsap.to(introEls, {
             y: 0,
             autoAlpha: 1,
             duration: DUR.intro,
             ease: EASE.outQuart,
-            stagger: 0.06,
+            stagger: 0.08,
           });
         });
-
-        return () => {
-          offPreloader();
-          if (name) gsap.set(name, { clearProps: "will-change" });
-        };
+        return () => offPreloader();
       });
 
-      // Reduced-motion branch (§A7): intentionally empty — no parallax
-      // transform, and the intro elements simply keep their default
-      // (visible) styles, i.e. instant show.
+      // Reduced-motion branch: intentionally empty — the markup renders
+      // visible by default, i.e. instant show.
     },
     { scope: sectionRef },
   );
@@ -91,63 +79,77 @@ export default function Hero() {
       id="hero"
       ref={sectionRef}
       aria-label="Hero"
-      data-hero-v="minimal"
-      className="relative z-(--z-section) flex h-screen items-center justify-center bg-bg"
+      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-[clamp(84px,13vh,150px)] max-b700:px-3"
     >
-      {/* Dead-center stacked lowercase name — the page's single <h1>.
-          The preloader's mix-blend name lands exactly here (seamless handoff),
-          so it is visible from first paint with no intro animation. */}
-      <div data-min-name className="relative z-(--z-hero-inner)">
-        <h1 className="font-normal text-ink text-[clamp(32px,2.7vw,58px)]/[1.12] tracking-[-0.01em]">
-          <span className="block">{hero.nameLines[0]}</span>
-          <span className="ml-[1.15em] block">{hero.nameLines[1]}</span>
-        </h1>
-      </div>
-
-      {/* Bottom-left meta — BiLabel at the 36px gutter */}
-      <div data-hero-intro className="absolute bottom-6.5 left-9 z-(--z-hero-inner)">
-        <BiLabel latin={hero.metaLatin} ja={hero.metaJa} />
-      </div>
-
-      {/* Bottom-right meta — two-line right-aligned location */}
-      <p
-        data-hero-intro
-        className="absolute right-9 bottom-6.5 z-(--z-hero-inner) text-right text-[16px]/[1.4] font-normal text-text-50"
+      {/* Raised panel — the preloader pill expands into exactly this rect */}
+      <div
+        data-hero-panel=""
+        className="relative grid min-h-0 flex-1 grid-cols-2 overflow-hidden rounded-(--radius-media) bg-raise-2 max-b700:grid-cols-1"
       >
-        {hero.locationLines.map((line) => (
-          <span key={line} className="block">
-            {line}
+        {/* LEFT — eyebrow + intro statements + scroll cue */}
+        <div className="flex flex-col p-7 max-b700:p-5">
+          <div data-hero-intro="">
+            <BiLabel latin={hero.metaLatin} ja={hero.metaJa} />
+          </div>
+
+          <div
+            data-hero-intro=""
+            className="mt-9 flex max-w-[24ch] flex-col gap-[0.9em] font-medium text-ink text-[clamp(20px,1.75vw,30px)] leading-[1.3] tracking-[-0.012em]"
+          >
+            {hero.intro.map((line) => (
+              <p key={line}>{line}</p>
+            ))}
+          </div>
+
+          {/* Scroll cue — bottom-left of the panel, like the reference */}
+          <div
+            data-hero-intro=""
+            className="mt-auto text-[12px] leading-[1.5] font-normal tracking-[0.06em] text-muted-2 uppercase"
+          >
+            <span className="block">{hero.scrollCue}</span>
+            <span className="block">{hero.scrollCueSub}</span>
+          </div>
+        </div>
+
+        {/* RIGHT — showreel label + masked autoplaying reel */}
+        <div className="relative flex flex-col border-l border-line-055 p-7 max-b700:border-t max-b700:border-l-0 max-b700:p-5">
+          <span
+            data-hero-intro=""
+            className="text-[12px] leading-none font-normal tracking-[0.06em] text-ink-2 uppercase"
+          >
+            {hero.showreelLabel}
+          </span>
+
+          <div data-hero-intro="" className="mt-6 flex justify-end pr-2">
+            {/* Staircase-masked reel — no controls, no timestamp */}
+            <video
+              ref={reelRef}
+              src={hero.showreelSrc}
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className="aspect-[16/10] w-[min(32vw,560px)] bg-slot-2 object-cover max-b700:w-full"
+              style={{ clipPath: REEL_CLIP }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Giant name — every glyph its own span, justify-between so the word
+          spans the full gutter width at any viewport (the h1 keeps a clean
+          accessible name; glyphs are presentational) */}
+      <h1
+        aria-label="Adnaan Dasoo"
+        data-hero-intro=""
+        className="flex items-end justify-between pt-2 pb-1 font-semibold whitespace-nowrap text-ink select-none text-[clamp(40px,10.8vw,230px)] leading-[0.8] tracking-[-0.01em]"
+      >
+        {hero.giantName.split("").map((ch, i) => (
+          <span key={`${ch}-${i}`} aria-hidden="true">
+            {ch === " " ? " " : ch}
           </span>
         ))}
-      </p>
-
-      {/* Center-bottom scroll cue — hidden ≤700px (§A6 #1b) */}
-      <div
-        data-hero-intro
-        aria-hidden="true"
-        className="absolute bottom-6.5 left-1/2 z-(--z-hero-inner) flex -translate-x-1/2 items-center gap-3 max-b700:hidden"
-      >
-        <span className="text-[18px]/[1.4] font-normal text-text-50">
-          {hero.scrollCue}
-        </span>
-        {/* TODO(assets §A8): the reference arrow is a CSS-masked
-            uploads/arrow-mask.png (ratio 349:541, height 26px, scaleX(-1)).
-            The PNG is not bundled yet — this inline SVG down-curving arrow is
-            a stand-in at the same box/transform; swap it for the masked PNG
-            when assets land. */}
-        <svg
-          viewBox="0 0 349 541"
-          className="h-6.5 w-auto -scale-x-100 text-text-50"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={30}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M232 34 C244 214 208 376 118 496" />
-          <path d="M64 420 L118 496 L212 462" />
-        </svg>
-      </div>
+      </h1>
     </section>
   );
 }

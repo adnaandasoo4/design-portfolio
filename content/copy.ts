@@ -15,11 +15,23 @@ export const preloader = {
   line2: "first touch",
 };
 
+/*
+ * Hero — panel layout (user-directed redesign, 2026-07-19): raised panel
+ * with intro text + showreel, giant name spanned across the bottom.
+ */
 export const hero = {
-  nameLines: ["adnaan", "dasoo"],
+  /** Left-panel intro statements (short declarative + supporting line) */
+  intro: [
+    "I close the gap between design and engineering.",
+    "Visual identities and digital products — built end-to-end and refined until the details disappear.",
+  ],
+  showreelLabel: "see showreel",
+  showreelSrc: "/assets/brand-reel.mp4",
+  scrollCueSub: "and learn more",
+  /** Giant bottom name — spanned edge-to-edge like the reference */
+  giantName: "ADNAAN DASOO",
   metaLatin: "designer  ×  engineer",
   metaJa: "デザイナー × エンジニア",
-  locationLines: ["baltimore, md", "39°17'N 76°36'W"],
   scrollCue: "scroll down",
 };
 
@@ -78,8 +90,7 @@ export const footer = {
     "デザインとエンジニアリングを、同じ基準で。最初のアイデアから完成まで、一緒に作りましょう。",
   backToTop: "back to top",
   reelPoster: "/assets/reel-poster.png",
-  /** Real reel mp4 pending (§A8) — poster-only until supplied */
-  reelSrc: null as string | null,
+  reelSrc: "/assets/brand-reel.mp4" as string | null,
 };
 
 export const nav = {
