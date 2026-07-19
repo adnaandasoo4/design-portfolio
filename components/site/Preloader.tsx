@@ -16,8 +16,8 @@ import { preloader as copy } from "@/content/copy";
  * rounded image frame INLINE in the text. Six stills HARD-CUT through the
  * frame (equal 250ms beats, the first visible from first paint, hands
  * still last); the 7th cut is the solid #1d1d21
- * panel color; the hands still before it holds a double beat. 300ms later
- * that color frame clip-expands directly into the hero panel's exact rect
+ * panel color, which holds a double beat (500ms), then
+ * clip-expands directly into the hero panel's exact rect
  * (0.65s, ease-in-out-quint, radius unwinding to the panel's square
  * corners), covering the still-visible welcome line on the way. The stage
  * background matches the site, so at finish the
@@ -41,10 +41,10 @@ const SLIDES = [1, 2, 3, 4, 6, 5].map((n) => `/assets/preload-${n}.jpg`);
 /* ---- Choreography timing (s) ---- */
 /** Equal hard-cut beats, first still from t=0 */
 const CASCADE_STEP = 0.25;
-/** The LAST still (hands) holds 2× the beat of the others… */
-const COLOR_AT = (SLIDES.length - 1) * CASCADE_STEP + CASCADE_STEP * 2;
-/** …then the solid color frame lands and expands shortly after */
-const EXPAND_AT = COLOR_AT + 0.3;
+/** The solid color frame (7th cut) lands after the six equal-beat stills… */
+const COLOR_AT = SLIDES.length * CASCADE_STEP;
+/** …and HOLDS for 2× a beat before expanding */
+const EXPAND_AT = COLOR_AT + CASCADE_STEP * 2;
 /** Fast expansion — it swallows the (still-visible) welcome line */
 const EXPAND_DUR = 0.65;
 /** Finish fires as the expansion completes */

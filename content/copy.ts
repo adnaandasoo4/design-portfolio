@@ -25,9 +25,7 @@ export const hero = {
     "I am a designer × engineer.",
     "I help brands find their visual identity — and build the digital products that carry it everywhere.",
   ],
-  showreelLabel: "see showreel",
-  showreelSrc: "/assets/brand-reel.mp4",
-  scrollCueSub: "and learn more",
+  showreelSrc: "/assets/slider-video-02.mp4",
   /** Giant bottom name — spanned edge-to-edge like the reference */
   giantName: "ADNAAN DASOO",
   scrollCue: "scroll down",

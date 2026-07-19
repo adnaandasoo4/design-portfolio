@@ -72,7 +72,7 @@ export default function Hero() {
       id="hero"
       ref={sectionRef}
       aria-label="Hero"
-      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-[clamp(140px,24vh,280px)] max-b700:px-3"
+      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-[clamp(130px,22vh,255px)] max-b700:px-3"
     >
       {/* Raised panel — square corners, flush to the viewport bottom; the
           preloader's color frame expands into exactly this rect */}
@@ -80,10 +80,10 @@ export default function Hero() {
         data-hero-panel=""
         className="relative flex min-h-0 flex-1 flex-col bg-raise-2"
       >
-        {/* Content row */}
-        <div className="grid min-h-0 flex-1 grid-cols-2 max-b700:grid-cols-1">
-          {/* LEFT — intro statements; scroll cue anchored middle-left */}
-          <div className="relative flex flex-col p-7 max-b700:p-5">
+        {/* Content row — scroll cue centered along the bottom */}
+        <div className="relative grid min-h-0 flex-1 grid-cols-2 max-b700:grid-cols-1">
+          {/* LEFT — intro statements */}
+          <div className="flex flex-col p-7 max-b700:p-5">
             <div
               data-hero-intro=""
               className="flex max-w-[38ch] flex-col gap-[0.8em] font-medium text-ink text-[clamp(21px,1.9vw,34px)] leading-[1.3] tracking-[-0.012em]"
@@ -92,20 +92,10 @@ export default function Hero() {
                 <p key={line}>{line}</p>
               ))}
             </div>
-
-            {/* Scroll cue — bottom-left of its half, lowercase */}
-            <div
-              data-hero-intro=""
-              className="absolute bottom-7 left-7 text-[15px] leading-[1.5] font-normal tracking-[0.04em] text-muted-2"
-            >
-              <span className="block">{hero.scrollCue}</span>
-              <span className="block">{hero.scrollCueSub}</span>
-            </div>
           </div>
 
-          {/* RIGHT — reel top-right with hover cutoff bars; label anchored
-              bottom-right */}
-          <div className="relative flex flex-col border-l border-line-055 p-7 max-b700:border-t max-b700:border-l-0 max-b700:p-5">
+          {/* RIGHT — reel top-right with hover cutoff bars */}
+          <div className="flex flex-col p-7 max-b700:p-5">
             <div data-hero-intro="" className="flex justify-end">
               {/* group: on hover, panel-colored bars slide in from the LEFT
                   (top edge) and RIGHT (bottom edge) — stepped cutoff view */}
@@ -129,19 +119,16 @@ export default function Hero() {
                 />
               </div>
             </div>
-
-            {/* Showreel label — bottom-right of its half, lowercase */}
-            <span
-              data-hero-intro=""
-              className="absolute right-7 bottom-7 text-[15px] leading-none font-normal tracking-[0.04em] text-ink-2"
-            >
-              {hero.showreelLabel}
-            </span>
           </div>
-        </div>
 
-        {/* Line break above the name (reference) */}
-        <div aria-hidden="true" className="h-px w-full bg-line-09" />
+          {/* Scroll cue — one line, centered at the bottom of the panel */}
+          <span
+            data-hero-intro=""
+            className="absolute bottom-7 left-1/2 -translate-x-1/2 text-[15px] leading-none font-normal tracking-[0.04em] text-muted-2"
+          >
+            {hero.scrollCue}
+          </span>
+        </div>
 
         {/* Giant name — HK Grotesk Wide, ON the panel; every glyph its own
             span, justify-between so the word spans the panel width at any
