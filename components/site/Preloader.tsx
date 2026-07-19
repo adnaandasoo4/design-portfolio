@@ -268,7 +268,7 @@ export default function Preloader() {
       <div
         data-pre-panel=""
         aria-hidden="true"
-        className="absolute inset-0 z-20 bg-panel opacity-0"
+        className="absolute inset-0 z-20 bg-raise-2 opacity-0"
         style={{ clipPath: "inset(50% 50% 50% 50%)" }}
       />
     </div>
