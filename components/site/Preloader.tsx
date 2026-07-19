@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { gsap, useGSAP } from "@/lib/gsap/register";
-import { EASE, DUR } from "@/lib/gsap/motion";
+import { EASE } from "@/lib/gsap/motion";
 import { markPreloaderDone } from "@/lib/preloader";
 import { preloader as copy } from "@/content/copy";
 
@@ -16,10 +16,11 @@ import { preloader as copy } from "@/content/copy";
  * rounded image frame INLINE in the text. Six stills HARD-CUT through the
  * frame (equal 250ms beats, the first visible from first paint, hands
  * still last); the 7th cut is the solid #1d1d21
- * panel color, on which beat the welcome line clears out. 300ms later that
- * color frame clip-expands directly into the hero panel's exact rect
- * (0.9s, ease-in-out-quint, radius unwinding to the panel's square
- * corners). The stage background matches the site, so at finish the
+ * panel color; the hands still before it holds a double beat. 300ms later
+ * that color frame clip-expands directly into the hero panel's exact rect
+ * (0.65s, ease-in-out-quint, radius unwinding to the panel's square
+ * corners), covering the still-visible welcome line on the way. The stage
+ * background matches the site, so at finish the
  * overlay swaps to transparent and the proxy fades over the identical real
  * panel — an invisible handoff — while the hero's elements rise in on top.
  *
@@ -38,16 +39,16 @@ import { preloader as copy } from "@/content/copy";
 const SLIDES = [1, 2, 3, 4, 6, 5].map((n) => `/assets/preload-${n}.jpg`);
 
 /* ---- Choreography timing (s) ---- */
-/** Every still gets an EQUAL beat — hard cut every 250ms, first from t=0 */
+/** Equal hard-cut beats, first still from t=0 */
 const CASCADE_STEP = 0.25;
-/** The solid color frame (7th cut) — the welcome line hides on this beat */
-const COLOR_AT = SLIDES.length * CASCADE_STEP;
-/** Expansion starts 300ms after the color frame lands */
+/** The LAST still (hands) holds 2× the beat of the others… */
+const COLOR_AT = (SLIDES.length - 1) * CASCADE_STEP + CASCADE_STEP * 2;
+/** …then the solid color frame lands and expands shortly after */
 const EXPAND_AT = COLOR_AT + 0.3;
-/** Welcome line fades as the color frame takes over */
-const TEXT_FADE = 0.2;
-/** Finish fires +900ms after expansion starts (= expansion end) */
-const FINISH_AT = EXPAND_AT + DUR.rect;
+/** Fast expansion — it swallows the (still-visible) welcome line */
+const EXPAND_DUR = 0.65;
+/** Finish fires as the expansion completes */
+const FINISH_AT = EXPAND_AT + EXPAND_DUR;
 const FADE_OUT = 0.55;
 /** Hard fallback if image decode() stalls or 404s (ms) */
 const DECODE_FALLBACK_MS = 1200;
@@ -119,7 +120,6 @@ export default function Preloader() {
       /* ---- Full-motion timeline ---- */
       const slides = gsap.utils.toArray<HTMLElement>("[data-pre-slide]", root);
       const frame = root.querySelector<HTMLElement>("[data-pre-frame]");
-      const line = root.querySelector<HTMLElement>("[data-pre-line]");
       const proxy = root.querySelector<HTMLElement>("[data-pre-panel]");
 
       const tl = gsap.timeline({ paused: true });
@@ -131,8 +131,8 @@ export default function Preloader() {
       });
 
       // 7th cut: the solid panel-color frame snaps in (via the proxy layer,
-      // clipped to the frame's exact rounded rect) and the welcome line
-      // clears out so the expansion plays over a clean stage.
+      // clipped to the frame's exact rounded rect). The welcome line stays
+      // put — the fast expansion simply covers it.
       if (frame && proxy) {
         tl.call(
           () => {
@@ -149,16 +149,10 @@ export default function Preloader() {
           COLOR_AT,
         );
       }
-      if (line) {
-        tl.to(
-          line,
-          { autoAlpha: 0, duration: TEXT_FADE, ease: "power1.out" },
-          COLOR_AT,
-        );
-      }
 
       // Expansion: the color frame grows directly into the hero panel's
-      // exact rect (square corners — radius unwinds to 0 mid-flight).
+      // exact rect (square corners — radius unwinds to 0 mid-flight),
+      // swallowing the welcome line on the way.
       if (frame && proxy) {
         tl.call(
           () => {
@@ -171,7 +165,7 @@ export default function Preloader() {
               clipPath: p
                 ? `inset(${p.top}px ${vw - p.right}px ${vh - p.bottom}px ${p.left}px round 0px)`
                 : "inset(0px 0px 0px 0px round 0px)",
-              duration: DUR.rect,
+              duration: EXPAND_DUR,
               ease: EASE.inOutQuint,
             });
           },

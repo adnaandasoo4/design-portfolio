@@ -72,7 +72,7 @@ export default function Hero() {
       id="hero"
       ref={sectionRef}
       aria-label="Hero"
-      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-[clamp(120px,20vh,230px)] max-b700:px-3"
+      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-[clamp(140px,24vh,280px)] max-b700:px-3"
     >
       {/* Raised panel — square corners, flush to the viewport bottom; the
           preloader's color frame expands into exactly this rect */}
@@ -86,27 +86,27 @@ export default function Hero() {
           <div className="relative flex flex-col p-7 max-b700:p-5">
             <div
               data-hero-intro=""
-              className="flex max-w-[38ch] flex-col gap-[0.8em] font-medium text-ink text-[clamp(18px,1.55vw,27px)] leading-[1.35] tracking-[-0.01em]"
+              className="flex max-w-[38ch] flex-col gap-[0.8em] font-medium text-ink text-[clamp(21px,1.9vw,34px)] leading-[1.3] tracking-[-0.012em]"
             >
               {hero.intro.map((line) => (
                 <p key={line}>{line}</p>
               ))}
             </div>
 
-            {/* Scroll cue — middle of the left edge, lowercase */}
+            {/* Scroll cue — bottom-left of its half, lowercase */}
             <div
               data-hero-intro=""
-              className="absolute top-1/2 left-7 -translate-y-1/2 text-[13px] leading-[1.5] font-normal tracking-[0.04em] text-muted-2"
+              className="absolute bottom-7 left-7 text-[15px] leading-[1.5] font-normal tracking-[0.04em] text-muted-2"
             >
               <span className="block">{hero.scrollCue}</span>
               <span className="block">{hero.scrollCueSub}</span>
             </div>
           </div>
 
-          {/* RIGHT — reel (centered) with hover cutoff bars; label anchored
-              middle-right */}
-          <div className="relative flex flex-col justify-center border-l border-line-055 p-7 max-b700:border-t max-b700:border-l-0 max-b700:p-5">
-            <div data-hero-intro="" className="flex justify-center">
+          {/* RIGHT — reel top-right with hover cutoff bars; label anchored
+              bottom-right */}
+          <div className="relative flex flex-col border-l border-line-055 p-7 max-b700:border-t max-b700:border-l-0 max-b700:p-5">
+            <div data-hero-intro="" className="flex justify-end">
               {/* group: on hover, panel-colored bars slide in from the LEFT
                   (top edge) and RIGHT (bottom edge) — stepped cutoff view */}
               <div className="group relative aspect-[16/10] w-[min(38vw,660px)] overflow-hidden rounded-(--radius-media) max-b700:w-full">
@@ -130,10 +130,10 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Showreel label — middle of the right edge, lowercase */}
+            {/* Showreel label — bottom-right of its half, lowercase */}
             <span
               data-hero-intro=""
-              className="absolute top-1/2 right-7 -translate-y-1/2 text-[13px] leading-none font-normal tracking-[0.04em] text-ink-2"
+              className="absolute right-7 bottom-7 text-[15px] leading-none font-normal tracking-[0.04em] text-ink-2"
             >
               {hero.showreelLabel}
             </span>
@@ -145,11 +145,14 @@ export default function Hero() {
 
         {/* Giant name — HK Grotesk Wide, ON the panel; every glyph its own
             span, justify-between so the word spans the panel width at any
-            viewport (the h1 keeps a clean accessible name) */}
+            viewport. Size is computed from the face's measured advance
+            width ("ADNAAN DASOO" ≈ 9.1em in HKGW SemiBold, ÷9.25 for a 2%
+            hinting margin), so the glyphs themselves fill the width and the
+            justify slack stays sub-letter-spacing. */}
         <h1
           aria-label="Adnaan Dasoo"
           data-hero-intro=""
-          className="flex items-end justify-between px-4 pt-1 font-hkgw font-semibold whitespace-nowrap text-ink uppercase select-none text-[clamp(38px,9.8vw,210px)] leading-[0.94]"
+          className="flex items-end justify-between px-2 pt-1 font-hkgw font-semibold whitespace-nowrap text-ink uppercase select-none text-[clamp(38px,calc((100vw-88px)/9.25),260px)] leading-[0.94]"
         >
           {hero.giantName.split("").map((ch, i) => (
             <span key={`${ch}-${i}`} aria-hidden="true">
