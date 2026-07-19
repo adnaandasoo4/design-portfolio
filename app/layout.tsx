@@ -6,6 +6,7 @@
  */
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/lib/gsap/SmoothScroll";
 import Nav from "@/components/site/Nav";
@@ -15,6 +16,24 @@ import RouteVeil from "@/components/site/RouteVeil";
 const manrope = Manrope({
   variable: "--font-manrope-next",
   subsets: ["latin"],
+  display: "swap",
+});
+
+/* HK Grotesk Wide (§A3) — display face for the giant hero name only */
+const hkGroteskWide = localFont({
+  src: [
+    {
+      path: "./fonts/HKGroteskWide-SemiBold.otf",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "./fonts/HKGroteskWide-Regular.otf",
+      weight: "400",
+      style: "normal",
+    },
+  ],
+  variable: "--font-hkgw-next",
   display: "swap",
 });
 
@@ -73,7 +92,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={manrope.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${manrope.variable} ${hkGroteskWide.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Theme init before paint — avoids FOUC (§A5 Theme toggle) */}
         <script

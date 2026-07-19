@@ -13,14 +13,14 @@ import { preloader as copy } from "@/content/copy";
  *
  * Off-black #111214 stage (identical to the site surface); a centered white
  * Manrope line — "it's all (frame) about the / first touch" — with a small
- * rounded image frame INLINE in the text. Seven stills fade through the
- * frame (opacity 0→1, ~0.5s each, staggered 380 + i·120 ms). Then, 300ms
- * after the last still: the welcome line fades and a raised #1d1d21 PILL
- * clip-expands from the frame's exact rect into the hero panel's exact rect
- * (0.9s, ease-in-out-quint, radius morphs 999px → the panel's 10px). The
- * stage background matches the site, so at finish the overlay swaps to
- * transparent and the proxy fades over the identical real panel — an
- * invisible handoff — while the hero's elements rise in on top.
+ * rounded image frame INLINE in the text. Six stills HARD-CUT through the
+ * frame (one every 200ms from 380ms); the 7th cut is the solid #1d1d21
+ * panel color, on which beat the welcome line clears out. 300ms later that
+ * color frame clip-expands directly into the hero panel's exact rect
+ * (0.9s, ease-in-out-quint, radius unwinding to the panel's square
+ * corners). The stage background matches the site, so at finish the
+ * overlay swaps to transparent and the proxy fades over the identical real
+ * panel — an invisible handoff — while the hero's elements rise in on top.
  *
  * Gating: cascade starts only after all stills decode() (hard 1200ms
  * fallback). Scroll locked + page inert for the duration; released on
@@ -31,18 +31,19 @@ import { preloader as copy } from "@/content/copy";
  * full page load.
  */
 
-/** Slide stills, shown in order through the inline frame. */
-const SLIDES = [1, 2, 3, 4, 5, 6, 7].map((n) => `/assets/preload-${n}.jpg`);
+/** Slide stills — 6 photos; the 7th "slide" is the solid panel color. */
+const SLIDES = [1, 2, 3, 4, 5, 6].map((n) => `/assets/preload-${n}.jpg`);
 
 /* ---- Choreography timing (s) ---- */
-const CASCADE_START = 0.38; // first slide at 380ms
-const CASCADE_STEP = 0.12; // + i·120ms → 380, 500, …, 1100ms
-const SLIDE_FADE = 0.5; // per-slide opacity fade (ease-out)
-/** Pill expansion starts 300ms after the last slide: 380 + 7·120 + 300 */
-const EXPAND_AT = CASCADE_START + SLIDES.length * CASCADE_STEP + 0.3;
-/** Welcome line fades as the pill takes over */
-const TEXT_FADE = 0.25;
-/** Finish fires +900ms after expansion starts (= expansion end): 2420ms */
+const CASCADE_START = 0.38; // first cut at 380ms
+const CASCADE_STEP = 0.2; // HARD CUT to the next still every 200ms
+/** The solid color frame (7th cut) — the welcome line hides on this beat */
+const COLOR_AT = CASCADE_START + SLIDES.length * CASCADE_STEP;
+/** Expansion starts 300ms after the color frame lands */
+const EXPAND_AT = COLOR_AT + 0.3;
+/** Welcome line fades as the color frame takes over */
+const TEXT_FADE = 0.2;
+/** Finish fires +900ms after expansion starts (= expansion end) */
 const FINISH_AT = EXPAND_AT + DUR.rect;
 const FADE_OUT = 0.55;
 /** Hard fallback if image decode() stalls or 404s (ms) */
@@ -119,45 +120,51 @@ export default function Preloader() {
       const proxy = root.querySelector<HTMLElement>("[data-pre-panel]");
 
       const tl = gsap.timeline({ paused: true });
-      // Cascade: stills fade through the inline frame at 380 + i·120 ms
+      // Cascade: HARD CUTS — each still snaps in over the previous one
       slides.forEach((slide, i) => {
-        tl.to(
-          slide,
-          { opacity: 1, duration: SLIDE_FADE, ease: "power1.out" },
-          CASCADE_START + i * CASCADE_STEP,
-        );
+        tl.set(slide, { opacity: 1 }, CASCADE_START + i * CASCADE_STEP);
       });
 
-      // Welcome line hands off to the pill
-      if (line) {
-        tl.to(
-          line,
-          { autoAlpha: 0, duration: TEXT_FADE, ease: "power1.out" },
-          EXPAND_AT,
-        );
-      }
-
-      // Pill → panel: measured at runtime so the clip starts on the inline
-      // frame's exact rect and lands on the hero panel's exact rect.
+      // 7th cut: the solid panel-color frame snaps in (via the proxy layer,
+      // clipped to the frame's exact rounded rect) and the welcome line
+      // clears out so the expansion plays over a clean stage.
       if (frame && proxy) {
         tl.call(
           () => {
             const f = frame.getBoundingClientRect();
-            const panel = document.querySelector("[data-hero-panel]");
-            const p = panel?.getBoundingClientRect();
-            const endRadius = panel
-              ? getComputedStyle(panel).borderRadius || "10px"
-              : "10px";
+            const radius = getComputedStyle(frame).borderRadius || "0px";
             const vw = window.innerWidth;
             const vh = window.innerHeight;
             gsap.set(proxy, {
               opacity: 1,
-              clipPath: `inset(${f.top}px ${vw - f.right}px ${vh - f.bottom}px ${f.left}px round 999px)`,
+              clipPath: `inset(${f.top}px ${vw - f.right}px ${vh - f.bottom}px ${f.left}px round ${radius})`,
             });
+          },
+          [],
+          COLOR_AT,
+        );
+      }
+      if (line) {
+        tl.to(
+          line,
+          { autoAlpha: 0, duration: TEXT_FADE, ease: "power1.out" },
+          COLOR_AT,
+        );
+      }
+
+      // Expansion: the color frame grows directly into the hero panel's
+      // exact rect (square corners — radius unwinds to 0 mid-flight).
+      if (frame && proxy) {
+        tl.call(
+          () => {
+            const panel = document.querySelector("[data-hero-panel]");
+            const p = panel?.getBoundingClientRect();
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
             gsap.to(proxy, {
               // Fallback: expand to the full viewport if the panel is absent
               clipPath: p
-                ? `inset(${p.top}px ${vw - p.right}px ${vh - p.bottom}px ${p.left}px round ${endRadius})`
+                ? `inset(${p.top}px ${vw - p.right}px ${vh - p.bottom}px ${p.left}px round 0px)`
                 : "inset(0px 0px 0px 0px round 0px)",
               duration: DUR.rect,
               ease: EASE.inOutQuint,
@@ -254,14 +261,14 @@ export default function Preloader() {
         <span>{copy.line2}</span>
       </div>
 
-      {/* Pill→panel proxy — starts clipped to the inline frame (fully
-          rounded), expands to the hero panel's rect, then fades over the
-          identical real panel beneath */}
+      {/* Color-frame → panel proxy — snaps in clipped to the inline frame's
+          rect (the "7th slide"), expands to the hero panel's rect, then
+          fades over the identical real panel beneath */}
       <div
         data-pre-panel=""
         aria-hidden="true"
         className="absolute inset-0 bg-raise-2 opacity-0"
-        style={{ clipPath: "inset(50% 50% 50% 50% round 999px)" }}
+        style={{ clipPath: "inset(50% 50% 50% 50%)" }}
       />
     </div>
   );

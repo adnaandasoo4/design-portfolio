@@ -22,16 +22,14 @@ export const preloader = {
 export const hero = {
   /** Left-panel intro statements (short declarative + supporting line) */
   intro: [
-    "I close the gap between design and engineering.",
-    "Visual identities and digital products — built end-to-end and refined until the details disappear.",
+    "I am a designer × engineer.",
+    "I help brands find their visual identity — and build the digital products that carry it everywhere.",
   ],
   showreelLabel: "see showreel",
   showreelSrc: "/assets/brand-reel.mp4",
   scrollCueSub: "and learn more",
   /** Giant bottom name — spanned edge-to-edge like the reference */
   giantName: "ADNAAN DASOO",
-  metaLatin: "designer  ×  engineer",
-  metaJa: "デザイナー × エンジニア",
   scrollCue: "scroll down",
 };
 
