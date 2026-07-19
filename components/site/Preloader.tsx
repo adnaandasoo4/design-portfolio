@@ -29,9 +29,8 @@ const SLIDES = [1, 2, 3, 4, 5, 6, 7].map((n) => `/assets/preload-${n}.jpg`);
 
 /* ---- Choreography timing (s) ---- */
 const CASCADE_START = 0.38; // first slide at 380ms
-const CASCADE_STEP = 0.12; // + i·120ms
-const SLIDE_FADE = 0.5; // per-slide opacity fade
-/** Dark layer snaps over the frame right after the last slide lands */
+const CASCADE_STEP = 0.75; // hard cut to the next still every 750ms
+/** Dark layer snaps over the frame after the last slide's full beat */
 const DARK_AT = CASCADE_START + SLIDES.length * CASCADE_STEP;
 /** …then expands to the full viewport 300ms later */
 const EXPAND_AT = DARK_AT + 0.3;
@@ -114,13 +113,10 @@ export default function Preloader() {
       const expand = root.querySelector<HTMLElement>("[data-pre-expand]");
 
       const tl = gsap.timeline({ paused: true });
-      // Cascade: slides fade through the inline frame at 380 + i·120 ms
+      // Cascade: HARD CUTS — each still snaps in over the previous one
+      // every 750ms (no crossfade)
       slides.forEach((slide, i) => {
-        tl.to(
-          slide,
-          { opacity: 1, duration: SLIDE_FADE, ease: EASE.std },
-          CASCADE_START + i * CASCADE_STEP,
-        );
+        tl.set(slide, { opacity: 1 }, CASCADE_START + i * CASCADE_STEP);
       });
       // Dark layer snaps over the frame (reads as the final slide), then
       // clip-expands to the full viewport. The rect is measured at runtime
@@ -199,7 +195,7 @@ export default function Preloader() {
       {/* Welcome line — Manrope, lowercase, ink-on-white, frame inline */}
       <div
         aria-hidden="true"
-        className="flex flex-col items-center gap-[0.15em] text-center font-medium text-bg text-[clamp(24px,2.6vw,40px)] leading-[1.3] tracking-[-0.01em]"
+        className="flex flex-col items-center gap-[0.15em] text-center font-medium text-bg text-[clamp(28px,3.3vw,52px)] leading-[1.3] tracking-[-0.01em]"
       >
         <span className="flex items-center gap-[0.4em]">
           <span>{copy.line1Before}</span>
@@ -207,7 +203,7 @@ export default function Preloader() {
           {/* Inline slide frame — the stills cascade through here */}
           <span
             data-pre-frame=""
-            className="relative inline-block h-[1.18em] w-[1.72em] overflow-hidden rounded-[0.3em] bg-bg/8"
+            className="relative inline-block h-[1.35em] w-[2.05em] overflow-hidden rounded-[0.3em] bg-bg/8"
           >
             {SLIDES.map((src, i) => (
               <span
