@@ -140,10 +140,17 @@ export default function Preloader() {
             const radius = getComputedStyle(frame).borderRadius || "0px";
             const vw = window.innerWidth;
             const vh = window.innerHeight;
+            // 1px overdraw: getBoundingClientRect is fractional, and a
+            // clip landing between device pixels leaves a hairline of the
+            // still visible around the color frame. Expanding the clip a
+            // touch past the frame (and hiding the frame's contents) makes
+            // the color fill clean to the edge.
+            const PAD = 1;
             gsap.set(proxy, {
               opacity: 1,
-              clipPath: `inset(${f.top}px ${vw - f.right}px ${vh - f.bottom}px ${f.left}px round ${radius})`,
+              clipPath: `inset(${f.top - PAD}px ${vw - f.right - PAD}px ${vh - f.bottom - PAD}px ${f.left - PAD}px round ${radius})`,
             });
+            gsap.set(frame, { autoAlpha: 0 });
           },
           [],
           COLOR_AT,
