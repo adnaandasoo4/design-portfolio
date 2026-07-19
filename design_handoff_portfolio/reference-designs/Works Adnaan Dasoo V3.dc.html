@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.4/dist/lenis.min.js"></script>
+  <style>
+    html { background: #111214; }
+    body { margin: 0; background: #111214; }
+    a { color: #111214; text-decoration: none; }
+    a:hover { color: #6b6b70; }
+    ::selection { background: #111214; color: #ffffff; }
+    @font-face { font-family: 'HK Grotesk Wide'; src: url('uploads/HKGroteskWide_2020D/HKGroteskWide_2020D/OTF/HKGroteskWide-SemiBold.otf') format('opentype'); font-weight: 600; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'HK Grotesk Wide'; src: url('uploads/HKGroteskWide_2020D/HKGroteskWide_2020D/OTF/HKGroteskWide-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+    @keyframes aboutMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    @media (max-width: 1024px) {
+      [data-works-grid] { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 860px) {
+      [data-ah-info] { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
+      [data-ah-info] > div:last-child { align-items: flex-start !important; text-align: left !important; }
+      [data-works-grid] { grid-template-columns: 1fr !important; }
+    }
+  @media (max-width: 700px) {
+      [data-navcenter] { display: none !important; }
+    }
+
+    /* ---- light mode: whole-canvas invert (v1 technique), media counter-inverted; soft landing ---- */
+    html { transition: filter 0.65s ease; }
+    html[data-theme="light"] { filter: invert(1); }
+    html[data-theme="light"] img, html[data-theme="light"] video, html[data-theme="light"] [style*="uploads/"] { filter: invert(1) !important; }
+    img, video { transition: filter 0.65s ease; }
+    /* ---- page transition veil ---- */
+    html::before { content: ''; position: fixed; inset: 0; z-index: 150; background: #111214; opacity: 0; pointer-events: none; transition: opacity 0.32s ease; animation: adPageIn 0.6s ease; }
+    html[data-pageleave]::before { opacity: 1; }
+    @keyframes adPageIn { from { opacity: 1; } to { opacity: 0; } }
+  </style>
+  <script>
+  (function () {
+    if (window.__adThemeWired) return; window.__adThemeWired = true;
+    var d = document.documentElement;
+    try { if (localStorage.getItem('ad-theme') === 'light') d.setAttribute('data-theme', 'light'); } catch (e) {}
+    window.addEventListener('pageshow', function () { d.removeAttribute('data-pageleave'); });
+    document.addEventListener('click', function (e) {
+      var t = e.target && e.target.closest ? e.target.closest('[data-themetoggle]') : null;
+      if (t) {
+        var next = d.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        if (next === 'light') d.setAttribute('data-theme', 'light'); else d.removeAttribute('data-theme');
+        try { localStorage.setItem('ad-theme', next); } catch (err) {}
+        return;
+      }
+      var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+      if (!a) return;
+      var href = a.getAttribute('href') || '';
+      if (a.getAttribute('target') === '_blank' || href.indexOf('.dc.html') === -1 || href.charAt(0) === '#' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.defaultPrevented) return;
+      e.preventDefault();
+      d.setAttribute('data-pageleave', '');
+      setTimeout(function () { window.location.href = href; }, 340);
+    }, true);
+  })();
+  </script>
+</helmet>
+<div data-sitewrap="" style="position: relative; background: #111214; font-family: 'Manrope', 'Helvetica Neue', sans-serif; -webkit-font-smoothing: antialiased;">
+
+  <!-- ================= V3 MINIMAL NAV (fixed, overtop the grid lines) ================= -->
+  <nav data-topnav="" style="position: fixed; top: 0; left: 0; right: 0; z-index: 120; display: flex; align-items: center; justify-content: space-between; padding: 16px 36px; pointer-events: none;">
+    <a data-navlink="" data-gridbreak="" href="Adnaan Dasoo Site V3.dc.html" style="position: relative; display: inline-block; overflow: hidden; padding: 9px 16px; cursor: pointer; text-decoration: none; pointer-events: auto;"><span data-nl-hl="" style="position: absolute; inset: 0; background: #1d1d21; transform: scaleX(0); transform-origin: left center; transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none;"></span><span style="position: relative; font: 500 18px/1.3 'Manrope', 'Helvetica Neue', sans-serif; color: #f2f1ef;">adnaan dasoo</span></a>
+    <div data-navcenter="" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: flex; gap: 0px;">
+      <a data-navlink="" data-gridbreak="" href="Adnaan Dasoo Site V3.dc.html" style="position: relative; display: inline-block; overflow: hidden; padding: 9px 16px; cursor: pointer; text-decoration: none; pointer-events: auto;"><span data-nl-hl="" style="position: absolute; inset: 0; background: #1d1d21; transform: scaleX(0); transform-origin: left center; transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none;"></span><span style="position: relative; font: 500 17px/1.3 'Manrope', 'Helvetica Neue', sans-serif; color: #f2f1ef;">home</span></a>
+      <a data-navlink="" data-gridbreak="" href="About Adnaan Dasoo V3.dc.html" style="position: relative; display: inline-block; overflow: hidden; padding: 9px 16px; cursor: pointer; text-decoration: none; pointer-events: auto;"><span data-nl-hl="" style="position: absolute; inset: 0; background: #1d1d21; transform: scaleX(0); transform-origin: left center; transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none;"></span><span style="position: relative; font: 500 17px/1.3 'Manrope', 'Helvetica Neue', sans-serif; color: #f2f1ef;">about</span></a>
+      <a data-navlink="" data-gridbreak="" href="Works Adnaan Dasoo V3.dc.html" style="position: relative; display: inline-block; overflow: hidden; padding: 9px 16px; cursor: pointer; text-decoration: none; pointer-events: auto;"><span data-nl-hl="" style="position: absolute; inset: 0; background: #1d1d21; transform: scaleX(0); transform-origin: left center; transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none;"></span><span style="position: relative; font: 500 17px/1.3 'Manrope', 'Helvetica Neue', sans-serif; color: #f2f1ef;">work</span></a>
+      <a data-navlink="" data-gridbreak="" href="mailto:adnaandasoo@gmail.com" style="position: relative; display: inline-block; overflow: hidden; padding: 9px 16px; cursor: pointer; text-decoration: none; pointer-events: auto;"><span data-nl-hl="" style="position: absolute; inset: 0; background: #1d1d21; transform: scaleX(0); transform-origin: left center; transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1); pointer-events: none;"></span><span style="position: relative; font: 500 17px/1.3 'Manrope', 'Helvetica Neue', sans-serif; color: #f2f1ef;">contact</span></a>
+    </div>
+    <div data-nav-right="" style="display: flex; align-items: center; gap: 8px; pointer-events: auto;">
+    <button data-themetoggle="" aria-label="Toggle light mode" title="Light / dark" style="flex: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; background: #f2f1ef; border: none; border-radius: 3px; cursor: pointer; pointer-events: auto; padding: 0;"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" style="display: block;"><circle cx="12" cy="12" r="8" fill="none" stroke="#111214" stroke-width="2"></circle><path d="M12 4a8 8 0 0 0 0 16Z" fill="#111214"></path></svg></button>
+    <a data-sayhi="" data-gridbreak="" href="mailto:adnaandasoo@gmail.com" style="display: flex; align-items: center; gap: 20px; height: 34px; padding: 0 5px 0 22px; background: #f2f1ef; border-radius: 3px; text-decoration: none; pointer-events: auto;">
+      <span style="position: relative; display: block; overflow: hidden; height: 20px;">
+        <span data-sh-base="" style="display: block; font: 600 15px/20px 'Manrope', 'Helvetica Neue', sans-serif; color: #111214; white-space: nowrap; transition: transform 0.55s cubic-bezier(0.19, 1, 0.22, 1);">say hi</span>
+        <span data-sh-over="" aria-hidden="true" style="position: absolute; left: 0; top: 0; display: block; font: 600 15px/20px 'Manrope', 'Helvetica Neue', sans-serif; color: #111214; white-space: nowrap; transform: translateY(105%); transition: transform 0.55s cubic-bezier(0.19, 1, 0.22, 1);">say hi</span>
+      </span>
+      <span style="position: relative; display: block; width: 26px; height: 26px; background: #111214; border-radius: 2px; overflow: hidden;">
+        <span data-sh-a1="" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transition: transform 0.55s cubic-bezier(0.19, 1, 0.22, 1);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f2f1ef" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg></span>
+        <span data-sh-a2="" aria-hidden="true" style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; transform: translate(-130%, 130%); transition: transform 0.55s cubic-bezier(0.19, 1, 0.22, 1);"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f2f1ef" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"></path><path d="M8 7h9v9"></path></svg></span>
+      </span>
+    </a>
+    </div>
+  </nav>
+
+  <!-- ================= GRID HERO (~52vh): lilac grid on black; verticals hit the top of the thin marquee ================= -->
+  <section id="works-hero" data-screen-label="Works / Top" data-grid-sec="" style="position: relative; height: 52vh; min-height: 500px; background: #111214; overflow: hidden;">
+    <canvas data-grid-canvas="" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;"></canvas>
+
+    <div data-marquee="" style="position: absolute; left: 0; right: 0; bottom: 0; height: 24px; z-index: 3; display: flex; align-items: center; overflow: hidden; pointer-events: none;">
+      <div data-marquee-track="" style="display: flex; width: max-content; animation: aboutMarquee 38s linear infinite; will-change: transform;">
+        <div data-marquee-group="" style="display: flex; align-items: center;"></div>
+        <div data-marquee-group="" style="display: flex; align-items: center;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= WORKS (white by default; dark/mono toggled by the nav) ================= -->
+  <section data-ab-narr="" data-screen-label="Works / Grid" style="position: relative; z-index: 2; background: #ffffff; color: #111214;">
+    <div style="max-width: 1560px; margin: 0 auto; padding: clamp(90px, 14vh, 180px) 36px clamp(110px, 18vh, 250px); box-sizing: border-box;">
+
+      <div style="display: flex; justify-content: space-between; align-items: baseline;">
+        <span style="font: 500 12px/1 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing: 0.24em; text-transform: uppercase; color: #7c7c82;">( selected works )</span>
+        <span style="display: inline-flex; align-items: baseline; gap: 18px;">
+          <span lang="ja" style="font: 400 12px/1 'Manrope','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; letter-spacing: 0.28em; color: #7c7c82;">&#20316;&#21697;</span>
+          <span style="font: 500 12px/1 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing: 0.14em; color: #a6a6ac;">( 06 )</span>
+        </span>
+      </div>
+      <div aria-hidden="true" style="height: 1px; background: rgba(17,18,20,0.16); margin-top: 16px;"></div>
+
+      <div data-works-grid="" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(52px, 8vh, 104px) clamp(26px, 3.2vw, 60px); padding-top: clamp(36px, 6vh, 72px);">
+
+        <div data-work-card="" data-reveal="" style="display: flex; flex-direction: column; gap: 12px; cursor: pointer;">
+          <div data-pixtrail="" style="position: relative; overflow: hidden; aspect-ratio: 4 / 3; background: #f2f1ef;">
+            <img src="uploads/ChatGPT Image Jul 14, 2026, 02_06_21 PM (2).png" alt="full time" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+            <span style="font: 600 15px/1.3 'Manrope', sans-serif; color: #111214;">full time</span>
+            <span style="font: 500 12px/1.3 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing: 0.08em; color: #7c7c82;">product &middot; 2025</span>
+          </div>
+          <span lang="ja" style="font: 400 11px/1 'Manrope','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; letter-spacing: 0.12em; color: #a0a0a5; margin-top: -4px;">&#12501;&#12523;&#12479;&#12452;&#12512;</span>
+        </div>
+
+        <div data-work-card="" data-reveal="" style="display: flex; flex-direction: column; gap: 12px; cursor: pointer;">
+          <div data-pixtrail="" style="position: relative; overflow: hidden; aspect-ratio: 4 / 3; background: #f2f1ef;">
+            <img src="uploads/ChatGPT Image Jul 14, 2026, 02_06_22 PM (6).png" alt="ronny" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+            <span style="font: 600 15px/1.3 'Manrope', sans-serif; color: #111214;">ronny</span>
+            <span style="font: 500 12px/1.3 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing: 0.08em; color: #7c7c82;">portfolio &middot; 2025</span>
+          </div>
+          <span lang="ja" style="font: 400 11px/1 'Manrope','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; letter-spacing: 0.12em; color: #a0a0a5; margin-top: -4px;">&#12525;&#12491;&#12540;</span>
+        </div>
+
+        <div data-work-card="" data-reveal="" style="display: flex; flex-direction: column; gap: 12px; cursor: pointer;">
+          <div data-pixtrail="" style="position: relative; overflow: hidden; aspect-ratio: 4 / 3; background: #f2f1ef;">
+            <img src="uploads/ChatGPT Image Jul 14, 2026, 02_06_22 PM (5).png" alt="new arrivals" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+            <span style="font: 600 15px/1.3 'Manrope', sans-serif; color: #111214;">new arrivals</span>
+            <span style="font: 500 12px/1.3 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing: 0.08em; color: #7c7c82;">concept &middot; 2024</span>
+          </div>
+          <span lang="ja" style="font: 400 11px/1 'Manrope','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; letter-spacing: 0.12em; color: #a0a0a5; margin-top: -4px;">&#12491;&#12517;&#12540;&#12450;&#12521;&#12452;&#12496;&#12523;</span>
+        </div>
+
+        <div data-work-card="" data-reveal="" style="display: flex; flex-direction: column; gap: 12px; cursor: pointer;">
+          <div data-pixtrail="" style="position: relative; overflow: hidden; aspect-ratio: 4 / 3; background: #f2f1ef;">
+            <img src="uploads/ChatGPT Image Jul 14, 2026, 02_06_21 PM (1).png" alt="salem elkhateeb" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+            <span style="font: 600 15px/1.3 'Manrope', sans-serif; color: #111214;">salem elkhateeb</span>
+            <span style="font: 500 12px/1.3 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing: 0.08em; color: #7c7c82;">portfolio &middot; 2025</span>
+          </div>
+          <span lang="ja" style="font: 400 11px/1 'Manrope','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; letter-spacing: 0.12em; color: #a0a0a5; margin-top: -4px;">&#12475;&#12452;&#12521;&#12512;&#12539;&#12456;&#12523;&#12495;&#12486;&#12451;&#12540;&#12502;</span>
+        </div>
+
+        <div data-work-card="" data-reveal="" style="display: flex; flex-direction: column; gap: 12px; cursor: pointer;">
+          <div data-pixtrail="" style="position: relative; overflow: hidden; aspect-ratio: 4 / 3; background: #f2f1ef;">
+            <img src="uploads/ChatGPT Image Jul 14, 2026, 02_06_21 PM (3).png" alt="portfolio v2" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+            <span style="font: 600 15px/1.3 'Manrope', sans-serif; color: #111214;">portfolio v2</span>
+            <span style="font: 500 12px/1.3 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing: 0.08em; color: #7c7c82;">web &middot; 2024</span>
+          </div>
+          <span lang="ja" style="font: 400 11px/1 'Manrope','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; letter-spacing: 0.12em; color: #a0a0a5; margin-top: -4px;">&#12509;&#12540;&#12488;&#12501;&#12457;&#12522;&#12458; v2</span>
+        </div>
+
+        <div data-work-card="" data-reveal="" style="display: flex; flex-direction: column; gap: 12px; cursor: pointer;">
+          <div data-pixtrail="" style="position: relative; overflow: hidden; aspect-ratio: 4 / 3; background: #f2f1ef;">
+            <img src="uploads/ChatGPT Image Jul 14, 2026, 02_06_21 PM (4).png" alt="umbc msa" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;">
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px;">
+            <span style="font: 600 15px/1.3 'Manrope', sans-serif; color: #111214;">umbc msa</span>
+            <span style="font: 500 12px/1.3 ui-monospace,'SF Mono',Menlo,monospace; letter-spacing: 0.08em; color: #7c7c82;">web &middot; 2024</span>
+          </div>
+          <span lang="ja" style="font: 400 11px/1 'Manrope','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; letter-spacing: 0.12em; color: #a0a0a5; margin-top: -4px;">&#12518;&#12540;&#12456;&#12512;&#12499;&#12540;&#12471;&#12540;&#12539;&#12456;&#12512;&#12456;&#12473;&#12456;&#12540;</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  componentDidMount() {
+    this._cleanups = [];
+    const doc = document;
+    const q = (s) => doc.querySelector(s);
+    const qa = (s) => Array.from(doc.querySelectorAll(s));
+
+    // ---------- v3 nav: highlight hover + say-hi swap ----------
+    qa('[data-navlink]').forEach((el) => {
+      const hl = el.querySelector('[data-nl-hl]');
+      if (!hl) return;
+      const enter = () => { hl.style.transformOrigin = 'left center'; hl.style.transform = 'scaleX(1)'; };
+      const leave = () => { hl.style.transformOrigin = 'right center'; hl.style.transform = 'scaleX(0)'; };
+      el.addEventListener('mouseenter', enter);
+      el.addEventListener('mouseleave', leave);
+      this._cleanups.push(() => { el.removeEventListener('mouseenter', enter); el.removeEventListener('mouseleave', leave); });
+    });
+    const sayhi = q('[data-sayhi]');
+    if (sayhi) {
+      const shBase = sayhi.querySelector('[data-sh-base]');
+      const shOver = sayhi.querySelector('[data-sh-over]');
+      const shA1 = sayhi.querySelector('[data-sh-a1]');
+      const shA2 = sayhi.querySelector('[data-sh-a2]');
+      const enter = () => { shBase.style.transform = 'translateY(-105%)'; shOver.style.transform = 'translateY(0)'; shA1.style.transform = 'translate(130%, -130%)'; shA2.style.transform = 'translate(0, 0)'; };
+      const leave = () => { shBase.style.transform = 'translateY(0)'; shOver.style.transform = 'translateY(105%)'; shA1.style.transform = 'translate(0, 0)'; shA2.style.transform = 'translate(-130%, 130%)'; };
+      sayhi.addEventListener('mouseenter', enter);
+      sayhi.addEventListener('mouseleave', leave);
+      this._cleanups.push(() => { sayhi.removeEventListener('mouseenter', enter); sayhi.removeEventListener('mouseleave', leave); });
+    }
+    const fine = window.matchMedia('(pointer: fine)').matches;
+
+    // ---------- marquee: WORKS / ワークス, en-dash separators, all off-white ----------
+    qa('[data-marquee-group]').forEach((group) => {
+      const frag = doc.createDocumentFragment();
+      const dash = () => { const d = doc.createElement('span'); d.textContent = '\u2013'; d.style.cssText = "flex: none; margin: 0 26px; font: 500 13px/1 'Manrope', sans-serif; color: rgba(236,235,232,0.82);"; return d; };
+      for (let i = 0; i < 8; i++) {
+        const en = doc.createElement('span');
+        en.textContent = 'WORKS';
+        en.style.cssText = "font: 500 13px/1 'Manrope', sans-serif; letter-spacing: 0.06em; color: rgba(236,235,232,0.82); white-space: nowrap;";
+        frag.appendChild(en); frag.appendChild(dash());
+        const jp = doc.createElement('span');
+        jp.lang = 'ja';
+        jp.textContent = '\u30ef\u30fc\u30af\u30b9';
+        jp.style.cssText = "font: 700 13px/1 'Manrope','Hiragino Kaku Gothic ProN','Yu Gothic','Noto Sans JP',sans-serif; letter-spacing: 0.08em; color: rgba(236,235,232,0.82); white-space: nowrap;";
+        frag.appendChild(jp); frag.appendChild(dash());
+      }
+      group.appendChild(frag);
+    });
+
+    // ---------- nav hovers -> lilac (links AND toggles) ----------
+    if (fine) qa('[data-ablink]').forEach((el) => {
+      if (el.hasAttribute('data-current')) return;
+      const enter = () => { el.style.color = '#c7c2ce'; };
+      const leave = () => { el.style.color = '#8a8a8e'; };
+      el.addEventListener('mouseenter', enter);
+      el.addEventListener('mouseleave', leave);
+      this._cleanups.push(() => { el.removeEventListener('mouseenter', enter); el.removeEventListener('mouseleave', leave); });
+    });
+
+    // ---------- dark / monochrome toggles applied to the works section ----------
+    this._ab = { dark: false, mono: false };
+    try { const s = JSON.parse(localStorage.getItem('site-fx') || '{}'); this._ab.dark = !!s.dark; this._ab.mono = !!s.mono; } catch (e) {}
+    const narr = q('[data-ab-narr]');
+    const applyAb = () => {
+      const f = [];
+      if (this._ab.dark) f.push('invert(1)');
+      if (this._ab.mono) f.push('grayscale(1)');
+      if (narr) { narr.style.filter = f.join(' '); narr.style.background = this._ab.dark ? '#eeedeb' : '#ffffff'; }
+      if (this._paintHead) this._paintHead();   // #eeedeb inverts to #111214 (home off-black); light stays pure white
+      qa('[data-pixtrail]').forEach(wp => { wp.style.filter = this._ab.dark ? 'invert(1)' : ''; });   // counter-invert shot wraps (img + trail canvas) so they stay true
+    };
+    qa('[data-abtoggle]').forEach((btn) => {
+      const kind = btn.getAttribute('data-abtoggle');
+      const ind = btn.querySelector('[data-ab-ind]');
+      if (ind) ind.textContent = this._ab[kind] ? 'y' : 'n';
+      const fn = () => { this._ab[kind] = !this._ab[kind]; if (ind) ind.textContent = this._ab[kind] ? 'y' : 'n'; try { localStorage.setItem('site-fx', JSON.stringify(this._ab)); } catch (e) {} applyAb(); };
+      btn.addEventListener('click', fn);
+      this._cleanups.push(() => btn.removeEventListener('click', fn));
+    });
+    applyAb();   // apply any persisted theme instantly on load...
+    requestAnimationFrame(() => requestAnimationFrame(() => {   // ...then arm the soft cross-fade for user toggles
+      if (narr) narr.style.transition = 'filter 0.55s ease';
+      qa('[data-pixtrail]').forEach(wp => { wp.style.transition = 'filter 0.55s ease'; });
+    }));
+
+    // ---------- grid hero: lilac grid morph; verticals break only where they cross nav text ----------
+    const sec = q('[data-grid-sec]');
+    const cv = q('[data-grid-canvas]');
+    const breaks = qa('[data-gridbreak]');
+    const MARQ = 24;
+    let gridUpdate = null;
+    if (sec && cv) {
+      const ctx = cv.getContext('2d');
+      const LILAC = '199,194,206';
+      const STEP = 12, AMP = 130, SX = 120, SY = 280;
+      let W = 0, H = 0, dpr = 1, lines = [];
+      const build = () => {
+        dpr = Math.min(2, window.devicePixelRatio || 1);
+        W = sec.clientWidth; H = sec.clientHeight;
+        cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+        lines = [];
+        const nCols = Math.max(6, Math.round(W / 178));
+        const gap = W / nCols;
+        for (let c = 1; c < nCols; c++) {
+          const xs = (c % 2 === 0) ? [c * gap] : [c * gap - 6, c * gap + 6];
+          xs.forEach((x) => {
+            const pts = [];
+            for (let y = 0; y <= H + STEP; y += STEP) pts.push({ y, o: 0, v: 0 });
+            lines.push({ x, pts });
+          });
+        }
+      };
+      build();
+      let mx = null, my = 0;
+      const move = (e) => { const r = cv.getBoundingClientRect(); mx = e.clientX - r.left; my = e.clientY - r.top; };
+      const out = () => { mx = null; };
+      sec.addEventListener('mousemove', move);
+      sec.addEventListener('mouseleave', out);
+      window.addEventListener('resize', build);
+      this._cleanups.push(() => { sec.removeEventListener('mousemove', move); sec.removeEventListener('mouseleave', out); window.removeEventListener('resize', build); });
+      gridUpdate = () => {
+        const cr = cv.getBoundingClientRect();
+        const rects = breaks.map((el) => { const r = el.getBoundingClientRect(); return { x0: r.left - cr.left - 9, x1: r.right - cr.left + 9, y0: r.top - cr.top - 5, y1: r.bottom - cr.top + 5 }; });
+        const gb = H - MARQ;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.clearRect(0, 0, W, H);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(' + LILAC + ',0.12)';
+        [0.62].forEach((f) => { const y = Math.round(gb * f) + 0.5; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); });
+        ctx.strokeStyle = 'rgba(' + LILAC + ',0.26)';
+        for (const ln of lines) {
+          const dir = ln.x < W / 2 ? -1 : 1;
+          const edge = Math.min(1, Math.abs(ln.x - W / 2) / (W / 2));
+          for (const p of ln.pts) {
+            let t = 0;
+            if (mx != null) {
+              const dx = ln.x - mx, dy = p.y - my;
+              const g = Math.exp(-(dx * dx) / (2 * SX * SX) - (dy * dy) / (2 * SY * SY));
+              t = dir * AMP * edge * g;
+            }
+            p.v += (t - p.o) * 0.12;
+            p.v *= 0.68;
+            p.o += p.v;
+          }
+          let started = false;
+          ctx.beginPath();
+          for (const p of ln.pts) {
+            if (p.y > gb) break;
+            const px = ln.x + p.o, py = p.y;
+            let blocked = false;
+            for (const r of rects) { if (px >= r.x0 && px <= r.x1 && py >= r.y0 && py <= r.y1) { blocked = true; break; } }
+            if (blocked) { if (started) { ctx.stroke(); ctx.beginPath(); started = false; } continue; }
+            if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+          }
+          if (started) ctx.stroke();
+        }
+      };
+    }
+
+    // ---------- sticky header: name pinned; info row folds on scroll-down, expands on scroll-up / near top ----------
+    const head = q('[data-ahead]');
+    const info = q('[data-ah-info]');
+    let infoH = 0, navExp = true, lastY = window.scrollY, lastDir = 'up', headerUpdate = null;
+    if (head && info) {
+      const setNav = (exp) => {
+        if (exp === navExp) return;
+        navExp = exp;
+        info.style.opacity = exp ? '1' : '0';
+        info.style.transform = exp ? 'translateY(0)' : 'translateY(-10px)';
+        info.style.maxHeight = exp ? infoH + 'px' : '0px';
+        info.style.paddingTop = exp ? '16px' : '0px';
+        info.style.paddingBottom = exp ? '14px' : '0px';
+        info.style.pointerEvents = exp ? 'auto' : 'none';
+      };
+      requestAnimationFrame(() => {
+        infoH = info.scrollHeight;
+        info.style.overflow = 'hidden';
+        info.style.boxSizing = 'border-box';
+        info.style.maxHeight = infoH + 'px';
+        info.style.transition = 'opacity 0.45s ease, transform 0.55s cubic-bezier(0.19,1,0.22,1), max-height 0.55s cubic-bezier(0.19,1,0.22,1), padding 0.55s cubic-bezier(0.19,1,0.22,1)';
+      });
+      let solid = false;
+      const paintHead = () => {
+        const dark = !!(this._ab && this._ab.dark);
+        if (solid) {
+          head.style.background = dark ? '#111214' : '#ffffff';
+          head.style.setProperty('--htext', dark ? '#ecebe8' : '#111214');
+          head.style.setProperty('--hrule', dark ? 'rgba(199,194,206,0.22)' : 'rgba(17,18,20,0.14)');
+        } else {
+          head.style.background = 'rgba(17,18,20,0)';
+          head.style.setProperty('--htext', '#ecebe8');
+          head.style.setProperty('--hrule', 'rgba(199,194,206,0.22)');
+        }
+      };
+      this._paintHead = paintHead;
+      headerUpdate = () => {
+        const y = window.scrollY;
+        const heroH = sec ? sec.offsetHeight : window.innerHeight * 0.52;
+        if (y < lastY - 1) lastDir = 'up'; else if (y > lastY + 1) lastDir = 'down';
+        lastY = y;
+        setNav(y < heroH * 0.5 || lastDir === 'up');
+        const wantSolid = sec ? (sec.getBoundingClientRect().bottom <= head.offsetHeight + 10) : (y > heroH);
+        if (wantSolid !== solid) { solid = wantSolid; paintHead(); }
+      };
+    }
+
+    // ---------- scroll reveals ----------
+    const reveals = qa('[data-reveal]');
+    reveals.forEach(el => { el.style.opacity = '0'; el.style.transform = 'translateY(28px)'; el.style.transition = 'opacity 0.9s ease, transform 0.9s cubic-bezier(0.19,1,0.22,1)'; });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.style.opacity = '1'; e.target.style.transform = 'translateY(0)'; io.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    reveals.forEach(el => io.observe(el));
+    this._cleanups.push(() => io.disconnect());
+
+    // ---------- signature pixel trail: v1-glitch-shaped cells of blurry-pixelated image follow the cursor ----------
+    if (fine) qa('[data-pixtrail]').forEach((wrap) => {
+      const media = wrap.querySelector('video, img');
+      if (!media) return;
+      const cv2 = doc.createElement('canvas');
+      cv2.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;image-rendering:pixelated;';
+      wrap.appendChild(cv2);
+      const ctx = cv2.getContext('2d');
+      const tiny = doc.createElement('canvas'); const tctx = tiny.getContext('2d');
+      const G = 34, PX = 22;
+      let blocks = [], raf = null, lx = -1e3, ly = -1e3;
+      const draw = () => {
+        const w = wrap.clientWidth, h = wrap.clientHeight;
+        if (!w || !h) { raf = requestAnimationFrame(draw); return; }
+        if (cv2.width !== w) { cv2.width = w; cv2.height = h; }
+        const now = performance.now();
+        blocks = blocks.filter(b => now - b.t < b.ttl);
+        ctx.clearRect(0, 0, w, h);
+        const mw = media.videoWidth || media.naturalWidth, mh = media.videoHeight || media.naturalHeight;
+        if (blocks.length && mw && mh) {
+          tiny.width = Math.max(2, Math.round(w / PX)); tiny.height = Math.max(2, Math.round(h / PX));
+          const s = Math.max(tiny.width / mw, tiny.height / mh);
+          tctx.imageSmoothingEnabled = true;
+          try { tctx.drawImage(media, (tiny.width - mw * s) / 2, (tiny.height - mh * s) / 2, mw * s, mh * s); } catch (e) {}
+          ctx.imageSmoothingEnabled = false;
+          for (const b of blocks) {
+            const age = (now - b.t) / b.ttl;
+            ctx.globalAlpha = age < 0.18 ? age / 0.18 : 1 - (age - 0.18) / 0.82;
+            ctx.drawImage(tiny, b.x / w * tiny.width, b.y / h * tiny.height, Math.max(1, b.w / w * tiny.width), Math.max(1, b.h / h * tiny.height), b.x, b.y, b.w, b.h);
+          }
+          ctx.globalAlpha = 1;
+        }
+        if (blocks.length) raf = requestAnimationFrame(draw);
+        else { raf = null; ctx.clearRect(0, 0, cv2.width, cv2.height); }
+      };
+      const move = (e) => {
+        const r = wrap.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        if (Math.hypot(x - lx, y - ly) < G * 0.55) return;
+        lx = x; ly = y;
+        for (let i = 0; i < 8; i++) {
+          blocks.push({
+            x: Math.floor((x + (Math.random() * 7 - 3.5) * G) / G) * G,
+            y: Math.floor((y + (Math.random() * 5 - 2.5) * G) / G) * G,
+            w: G * (1 + (Math.random() * 3 | 0)), h: G * (1 + (Math.random() * 2 | 0)),
+            t: performance.now(), ttl: 360 + Math.random() * 420
+          });
+        }
+        if (blocks.length > 90) blocks = blocks.slice(-90);
+        if (!raf) raf = requestAnimationFrame(draw);
+      };
+      const leave = () => { lx = -1e3; ly = -1e3; };
+      wrap.addEventListener('mousemove', move);
+      wrap.addEventListener('mouseleave', leave);
+      this._cleanups.push(() => { wrap.removeEventListener('mousemove', move); wrap.removeEventListener('mouseleave', leave); if (raf) cancelAnimationFrame(raf); });
+    });
+
+    // ---------- Lenis smooth scroll (stepped from the master loop) ----------
+    this._lenis = null;
+    const initLenis = () => {
+      if (this._lenis) return true;
+      if (!window.Lenis) return false;
+      this._lenis = new window.Lenis({ lerp: 0.09, smoothWheel: true, wheelMultiplier: 1 });
+      return true;
+    };
+    if (!initLenis()) {
+      let tries = 0;
+      const poll = setInterval(() => { if (initLenis() || ++tries > 60) clearInterval(poll); }, 120);
+      this._cleanups.push(() => clearInterval(poll));
+    }
+    this._cleanups.push(() => { if (this._lenis) { this._lenis.destroy(); this._lenis = null; } });
+
+    // ---------- master frame loop ----------
+    const onFrame = (t) => {
+      if (this._lenis) this._lenis.raf(t);
+      if (headerUpdate) headerUpdate();
+      if (gridUpdate) { const r = cv.getBoundingClientRect(); if (r.bottom > 0 && r.top < window.innerHeight) gridUpdate(); }
+      this._raf = requestAnimationFrame(onFrame);
+    };
+    this._raf = requestAnimationFrame(onFrame);
+    this._cleanups.push(() => cancelAnimationFrame(this._raf));
+  }
+  componentWillUnmount() { (this._cleanups || []).forEach(fn => { try { fn(); } catch (e) {} }); }
+}
+</script>
+</body>
+</html>
