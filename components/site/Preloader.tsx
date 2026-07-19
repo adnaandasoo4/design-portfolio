@@ -15,9 +15,9 @@ import { preloader as copy } from "@/content/copy";
  * Manrope line — "it's all (frame) about the / first touch" — with a small
  * rounded image frame INLINE in the text. Six stills HARD-CUT through the
  * frame (equal 250ms beats, the first visible from first paint, hands
- * still last); the 7th cut is the solid #1d1d21
- * panel color, which holds a double beat (500ms), then
- * clip-expands directly into the hero panel's exact rect
+ * still last); the 7th cut is the solid BLACK panel color, which holds a
+ * double beat (500ms), then clip-expands directly into the hero panel's
+ * exact rect
  * (0.65s, ease-in-out-quint, radius unwinding to the panel's square
  * corners), covering the still-visible welcome line on the way. The stage
  * background matches the site, so at finish the
@@ -266,7 +266,7 @@ export default function Preloader() {
       <div
         data-pre-panel=""
         aria-hidden="true"
-        className="absolute inset-0 bg-raise-2 opacity-0"
+        className="absolute inset-0 bg-black opacity-0"
         style={{ clipPath: "inset(50% 50% 50% 50%)" }}
       />
     </div>

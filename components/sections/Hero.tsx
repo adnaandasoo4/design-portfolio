@@ -9,10 +9,10 @@ import { hero } from "@/content/copy";
 /*
  * Hero — panel layout (user-directed redesign, 2026-07-19).
  *
- * One viewport: a raised #1d1d21 panel — square-cornered, running from
+ * One viewport: a pitch-black panel — square-cornered, running from
  * below the nav all the way to the bottom of the page — holding the intro
- * statements + autoplaying showreel, then a full-width hairline, then the
- * giant HK Grotesk Wide "ADNAAN DASOO" ON the panel, spanned across.
+ * statements + autoplaying showreel, then a short centered hairline and
+ * the giant HK Grotesk Wide "ADNAAN DASOO" ON the panel, spanned across.
  *
  * The preloader's color frame clip-expands INTO this panel's exact rect
  * ([data-hero-panel] is the measurement target), then the inner elements
@@ -78,7 +78,7 @@ export default function Hero() {
           preloader's color frame expands into exactly this rect */}
       <div
         data-hero-panel=""
-        className="relative flex min-h-0 flex-1 flex-col bg-raise-2"
+        className="relative flex min-h-0 flex-1 flex-col bg-black"
       >
         {/* Content row — scroll cue centered along the bottom */}
         <div className="relative grid min-h-0 flex-1 grid-cols-2 max-b700:grid-cols-1">
@@ -111,11 +111,11 @@ export default function Hero() {
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute top-0 left-0 h-[10%] w-[46%] -translate-x-full bg-raise-2 transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
+                  className="absolute top-0 left-0 h-[10%] w-[46%] -translate-x-full bg-black transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute right-0 bottom-0 h-[10%] w-[46%] translate-x-full bg-raise-2 transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
+                  className="absolute right-0 bottom-0 h-[10%] w-[46%] translate-x-full bg-black transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
                 />
               </div>
             </div>
@@ -124,11 +124,14 @@ export default function Hero() {
           {/* Scroll cue — one line, centered at the bottom of the panel */}
           <span
             data-hero-intro=""
-            className="absolute bottom-7 left-1/2 -translate-x-1/2 text-[15px] leading-none font-normal tracking-[0.04em] text-muted-2"
+            className="absolute bottom-7 left-1/2 -translate-x-1/2 text-[17px] leading-none font-normal tracking-[0.04em] text-muted-2"
           >
             {hero.scrollCue}
           </span>
         </div>
+
+        {/* Line break above the name — partial width, centered */}
+        <div aria-hidden="true" className="mx-auto h-px w-[38%] bg-line-09" />
 
         {/* Giant name — HK Grotesk Wide, ON the panel; every glyph its own
             span, justify-between so the word spans the panel width at any

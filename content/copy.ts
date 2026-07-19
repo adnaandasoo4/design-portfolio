@@ -22,7 +22,7 @@ export const preloader = {
 export const hero = {
   /** Left-panel intro statements (short declarative + supporting line) */
   intro: [
-    "I am a designer × engineer.",
+    "I'm Adnaan — a designer and engineer.",
     "I help brands find their visual identity — and build the digital products that carry it everywhere.",
   ],
   showreelSrc: "/assets/slider-video-02.mp4",
