@@ -12,6 +12,10 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Design handoff bundle (reference material, not project code):
+    "design_handoff_portfolio/**",
+    // Installed agent skills:
+    ".agents/**",
   ]),
 ]);
 

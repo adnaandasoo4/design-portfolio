@@ -1,26 +1,203 @@
 @import "tailwindcss";
 
+/*
+  Design tokens — HANDOFF.md §A2, expressed in the Tailwind v4 CSS-first idiom
+  (@theme replaces tailwind.config theme.extend; same semantic names).
+*/
+@theme {
+  /* ---- Color palette (semantic) ---- */
+  --color-bg: #111214; /* page background everywhere — never pure #000; also ink on light surfaces */
+  --color-raise: #15151a; /* disciplines outer card (base) */
+  --color-raise-2: #1d1d21; /* disciplines card (applied), nav-hover block */
+  --color-panel: #111214; /* disciplines inner panel (rendered value) */
+  --color-slot: #1c1c20; /* image-slot placeholder (disciplines media) */
+  --color-slot-2: #1a1a1e; /* video placeholder (footer/reel) */
+  --color-preloader: #f7f6f4; /* preloader stage background */
+  --color-preloader-slide: #26262b; /* preloader image-slide backing */
+  --color-hero-dim: #050506; /* hero dim overlay (smoke variant only) */
+  --color-ink: #ffffff; /* primary white ink */
+  --color-ink-soft: #ecebe8; /* softened white (pureWhite=false) */
+  --color-ink-1: #d5d3ce; /* work-row side labels */
+  --color-ink-2: #b8b8be; /* discipline tag text */
+  --color-muted-1: #9a9aa0; /* discipline descriptions */
+  --color-muted-2: #8a8a8e; /* eyebrows, numerals, meta, apostrophes */
+  --color-muted-3: #77777d; /* work-list header labels, footer AI icons (rest), footer JP */
+  --color-muted-ja: #3d3d42; /* Japanese labels inside white marquee */
+  --color-band-dark: #37373b; /* second divider band ("Works") */
+  --color-accent: #c7c2ce; /* lilac — copy-success, check icon, accent lines */
+  --color-surface-light: #f2f1ef; /* light-theme surface / marquee fill */
+  --color-link-light: #111214; /* link ink on light pages */
+  --color-link-light-hover: #6b6b70; /* link hover on light pages */
+
+  /* Alpha inks (white-on-dark) */
+  --color-text-50: rgba(255, 255, 255, 0.5);
+  --color-text-38: rgba(255, 255, 255, 0.38);
+  --color-text-24: rgba(255, 255, 255, 0.24); /* About-blurb unfilled word */
+
+  /* Hairlines + fills */
+  --color-line-055: rgba(255, 255, 255, 0.055); /* disciplines row rule */
+  --color-line-09: rgba(255, 255, 255, 0.09); /* work rows, footer top */
+  --color-line-13: rgba(255, 255, 255, 0.13); /* tag border */
+  --color-line-14: rgba(255, 255, 255, 0.14); /* hero rule */
+  --color-fill-035: rgba(255, 255, 255, 0.035); /* tag background */
+
+  /* ---- Typography ---- */
+  --font-manrope: var(--font-manrope-next), "Helvetica Neue", sans-serif;
+  /* HK Grotesk Wide: self-host pending license (§A10 Open Q6). Falls back to
+     Manrope until the OTFs land — only the deferred smoke masthead uses it. */
+  --font-hkgw: var(--font-hkgw-next, var(--font-manrope-next)), "Manrope",
+    sans-serif;
+  --font-ja: var(--font-manrope-next), "Hiragino Kaku Gothic ProN", "Yu Gothic",
+    "Noto Sans JP", sans-serif;
+  --font-mono-ui: ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- Radius ---- */
+  --radius-chip: 2px; /* say-hi arrow chip */
+  --radius-btn: 3px; /* nav buttons / say-hi pill */
+  --radius-tag: 6px; /* discipline tags */
+  --radius-media: 10px; /* discipline media */
+  --radius-panel: 14px; /* disciplines inner panel */
+  --radius-card: 18px; /* disciplines outer card */
+  --radius-pill: 999px; /* marquee pill images */
+
+  /* ---- Breakpoints (§A4) — use with max-* variants ---- */
+  --breakpoint-b700: 700px;
+  --breakpoint-b860: 860px;
+  --breakpoint-b1024: 1024px;
+
+  /* ---- Motion tokens (§A2) ---- */
+  --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-std: ease;
+
+  --dur-micro: 0.22s; /* word fill */
+  --dur-hover: 0.3s; /* footer color */
+  --dur-copy: 0.35s;
+  --dur-copy-2: 0.45s;
+  --dur-clip: 0.55s; /* row reveal */
+  --dur-sweep: 0.72s; /* nav */
+  --dur-track: 0.7s; /* row lift */
+  --dur-swap: 0.85s; /* say-hi */
+  --dur-intro: 0.85s; /* reveals */
+  --dur-rect: 0.9s; /* preloader */
+  --dur-theme: 0.65s; /* light toggle */
+  --dur-veil: 0.32s; /* route veil */
+  --dur-marquee: 32s; /* loop */
+}
+
+/* ---- Z-index layers (§A2) ---- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --z-livebg: 0;
+  --z-about: 1;
+  --z-flow: 2;
+  --z-hero-inner: 2;
+  --z-section: 4;
+  --z-hero: 4;
+  --z-hero-dim: 6;
+  --z-nav: 120;
+  --z-page-veil: 150;
+  --z-preloader: 200;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ---- Base ---- */
+html {
+  background: var(--color-bg);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-manrope);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #ffffff;
+  color: #111214;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Visible focus ring on all interactives (§A10) */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---- Light theme: whole-canvas invert (v1 technique, §A5 Theme Toggle);
+       media counter-inverted so it stays true ---- */
+html {
+  transition: filter var(--dur-theme) ease;
+}
+html[data-theme="light"] {
+  filter: invert(1);
+}
+html[data-theme="light"] img,
+html[data-theme="light"] video,
+html[data-theme="light"] [data-counter-invert] {
+  filter: invert(1) !important;
+}
+img,
+video {
+  transition: filter var(--dur-theme) ease;
+}
+
+/* ---- Route transition veil (§A5 / §A7 #18) ---- */
+@keyframes ad-page-in {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+[data-veil] {
+  opacity: 0;
+  transition: opacity var(--dur-veil) ease;
+  animation: ad-page-in 0.6s ease;
+}
+html[data-pageleave] [data-veil] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-veil] {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* ---- Work-row marquee loop (§A5 Marquee) — CSS keyframes, GSAP-free path ---- */
+@keyframes wlist-marq {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Reduced-motion: freeze marquee at the CSS level too (belt & braces with the
+   gsap.matchMedia branch), and guarantee the About blurb is readable even if
+   JS/fonts never arrive (§A10 — text-24 fails contrast unless filled) */
+@media (prefers-reduced-motion: reduce) {
+  [data-wrow-track] {
+    animation: none !important;
+  }
+  #about p {
+    color: var(--color-ink);
+  }
+}
+
+/* Pre-hydration guard: nav + hero intro elements start hidden for motion-ok
+   users until their GSAP intros run (autoAlpha sets inline visibility, which
+   overrides this). Prevents the paint→hide→animate flash on slow networks.
+   Reduced-motion users never match — content stays visible. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-preloaded="true"]) [data-topnav],
+  html:not([data-preloaded="true"]) [data-hero-intro] {
+    visibility: hidden;
+  }
 }
