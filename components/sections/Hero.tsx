@@ -80,7 +80,7 @@ export default function Hero() {
         data-hero-panel=""
         className="relative flex min-h-0 flex-1 flex-col bg-raise-2"
       >
-        {/* Content row — scroll cue centered along the bottom */}
+        {/* Content row */}
         <div className="relative grid min-h-0 flex-1 grid-cols-2 max-b700:grid-cols-1">
           {/* LEFT — intro statements */}
           <div className="flex flex-col p-7 max-b700:p-5">
@@ -121,17 +121,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Scroll cue — one line, centered at the bottom of the panel */}
-          <span
-            data-hero-intro=""
-            className="absolute bottom-7 left-1/2 -translate-x-1/2 text-[17px] leading-none font-normal tracking-[0.04em] text-muted-2"
-          >
-            {hero.scrollCue}
-          </span>
         </div>
-
-        {/* Line break above the name — spans the panel, stops at its edges */}
-        <div aria-hidden="true" className="h-px w-full bg-line-09" />
 
         {/* Giant name — HK Grotesk Wide, ON the panel; every glyph its own
             span, justify-between so the word spans the panel width at any
