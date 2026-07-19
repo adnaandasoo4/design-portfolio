@@ -236,16 +236,18 @@ export default function Preloader() {
         <span className="flex items-center gap-[0.4em]">
           <span>{copy.line1Before}</span>
 
-          {/* Inline slide frame — the stills cascade through here */}
+          {/* Inline slide frame — the stills cascade through here. Dark
+              backing + 1px slide overdraw (clipped by the frame's rounded
+              overflow) so no light ring shows at the antialiased edge. */}
           <span
             data-pre-frame=""
-            className="relative inline-block h-[1.35em] w-[2.05em] overflow-hidden rounded-[0.3em] bg-ink/8"
+            className="relative inline-block h-[1.35em] w-[2.05em] overflow-hidden rounded-[0.3em] bg-preloader-slide"
           >
             {SLIDES.map((src, i) => (
               <span
                 key={src}
                 data-pre-slide=""
-                className={`absolute inset-0 ${i === 0 ? "opacity-100" : "opacity-0"}`}
+                className={`absolute -inset-px ${i === 0 ? "opacity-100" : "opacity-0"}`}
                 style={{ zIndex: i + 2 }}
               >
                 {/* Plain <img> so decode() gates the cascade start */}
