@@ -72,7 +72,7 @@ export default function Hero() {
       id="hero"
       ref={sectionRef}
       aria-label="Hero"
-      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-[clamp(100px,17vh,200px)] max-b700:px-3"
+      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-[clamp(120px,20vh,230px)] max-b700:px-3"
     >
       {/* Raised panel — square corners, flush to the viewport bottom; the
           preloader's color frame expands into exactly this rect */}
@@ -82,8 +82,8 @@ export default function Hero() {
       >
         {/* Content row */}
         <div className="grid min-h-0 flex-1 grid-cols-2 max-b700:grid-cols-1">
-          {/* LEFT — intro statements + scroll cue */}
-          <div className="flex flex-col p-7 max-b700:p-5">
+          {/* LEFT — intro statements; scroll cue anchored middle-left */}
+          <div className="relative flex flex-col p-7 max-b700:p-5">
             <div
               data-hero-intro=""
               className="flex max-w-[38ch] flex-col gap-[0.8em] font-medium text-ink text-[clamp(18px,1.55vw,27px)] leading-[1.35] tracking-[-0.01em]"
@@ -93,29 +93,23 @@ export default function Hero() {
               ))}
             </div>
 
-            {/* Scroll cue — bottom-left of the panel, like the reference */}
+            {/* Scroll cue — middle of the left edge, lowercase */}
             <div
               data-hero-intro=""
-              className="mt-auto text-[12px] leading-[1.5] font-normal tracking-[0.06em] text-muted-2 uppercase"
+              className="absolute top-1/2 left-7 -translate-y-1/2 text-[13px] leading-[1.5] font-normal tracking-[0.04em] text-muted-2"
             >
               <span className="block">{hero.scrollCue}</span>
               <span className="block">{hero.scrollCueSub}</span>
             </div>
           </div>
 
-          {/* RIGHT — showreel label + reel with hover cutoff bars */}
-          <div className="relative flex flex-col border-l border-line-055 p-7 max-b700:border-t max-b700:border-l-0 max-b700:p-5">
-            <span
-              data-hero-intro=""
-              className="text-[12px] leading-none font-normal tracking-[0.06em] text-ink-2 uppercase"
-            >
-              {hero.showreelLabel}
-            </span>
-
-            <div data-hero-intro="" className="mt-6 flex justify-end pr-2">
-              {/* group: on hover, panel-colored bars slide in over the
-                  top-left and bottom-right edges (stepped cutoff view) */}
-              <div className="group relative aspect-[16/10] w-[min(32vw,560px)] overflow-hidden max-b700:w-full">
+          {/* RIGHT — reel (centered) with hover cutoff bars; label anchored
+              middle-right */}
+          <div className="relative flex flex-col justify-center border-l border-line-055 p-7 max-b700:border-t max-b700:border-l-0 max-b700:p-5">
+            <div data-hero-intro="" className="flex justify-center">
+              {/* group: on hover, panel-colored bars slide in from the LEFT
+                  (top edge) and RIGHT (bottom edge) — stepped cutoff view */}
+              <div className="group relative aspect-[16/10] w-[min(38vw,660px)] overflow-hidden rounded-(--radius-media) max-b700:w-full">
                 <video
                   ref={reelRef}
                   src={hero.showreelSrc}
@@ -127,14 +121,22 @@ export default function Hero() {
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute top-0 left-0 h-[10%] w-[46%] -translate-y-full bg-raise-2 transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-y-0 motion-reduce:transition-none"
+                  className="absolute top-0 left-0 h-[10%] w-[46%] -translate-x-full bg-raise-2 transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute right-0 bottom-0 h-[10%] w-[46%] translate-y-full bg-raise-2 transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-y-0 motion-reduce:transition-none"
+                  className="absolute right-0 bottom-0 h-[10%] w-[46%] translate-x-full bg-raise-2 transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
                 />
               </div>
             </div>
+
+            {/* Showreel label — middle of the right edge, lowercase */}
+            <span
+              data-hero-intro=""
+              className="absolute top-1/2 right-7 -translate-y-1/2 text-[13px] leading-none font-normal tracking-[0.04em] text-ink-2"
+            >
+              {hero.showreelLabel}
+            </span>
           </div>
         </div>
 
@@ -147,7 +149,7 @@ export default function Hero() {
         <h1
           aria-label="Adnaan Dasoo"
           data-hero-intro=""
-          className="flex items-end justify-between px-4 pt-1 font-hkgw font-semibold whitespace-nowrap text-ink uppercase select-none text-[clamp(34px,8.6vw,185px)] leading-[0.94]"
+          className="flex items-end justify-between px-4 pt-1 font-hkgw font-semibold whitespace-nowrap text-ink uppercase select-none text-[clamp(38px,9.8vw,210px)] leading-[0.94]"
         >
           {hero.giantName.split("").map((ch, i) => (
             <span key={`${ch}-${i}`} aria-hidden="true">

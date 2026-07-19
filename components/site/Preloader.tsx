@@ -14,7 +14,8 @@ import { preloader as copy } from "@/content/copy";
  * Off-black #111214 stage (identical to the site surface); a centered white
  * Manrope line — "it's all (frame) about the / first touch" — with a small
  * rounded image frame INLINE in the text. Six stills HARD-CUT through the
- * frame (one every 200ms from 380ms); the 7th cut is the solid #1d1d21
+ * frame (equal 250ms beats, the first visible from first paint, hands
+ * still last); the 7th cut is the solid #1d1d21
  * panel color, on which beat the welcome line clears out. 300ms later that
  * color frame clip-expands directly into the hero panel's exact rect
  * (0.9s, ease-in-out-quint, radius unwinding to the panel's square
@@ -31,14 +32,16 @@ import { preloader as copy } from "@/content/copy";
  * full page load.
  */
 
-/** Slide stills — 6 photos; the 7th "slide" is the solid panel color. */
-const SLIDES = [1, 2, 3, 4, 5, 6].map((n) => `/assets/preload-${n}.jpg`);
+/** Slide stills — 6 photos, hands-touching still last; the 7th "slide" is
+ *  the solid panel color. The FIRST still renders visible from first paint
+ *  (no blank frame). */
+const SLIDES = [1, 2, 3, 4, 6, 5].map((n) => `/assets/preload-${n}.jpg`);
 
 /* ---- Choreography timing (s) ---- */
-const CASCADE_START = 0.38; // first cut at 380ms
-const CASCADE_STEP = 0.2; // HARD CUT to the next still every 200ms
+/** Every still gets an EQUAL beat — hard cut every 250ms, first from t=0 */
+const CASCADE_STEP = 0.25;
 /** The solid color frame (7th cut) — the welcome line hides on this beat */
-const COLOR_AT = CASCADE_START + SLIDES.length * CASCADE_STEP;
+const COLOR_AT = SLIDES.length * CASCADE_STEP;
 /** Expansion starts 300ms after the color frame lands */
 const EXPAND_AT = COLOR_AT + 0.3;
 /** Welcome line fades as the color frame takes over */
@@ -120,9 +123,11 @@ export default function Preloader() {
       const proxy = root.querySelector<HTMLElement>("[data-pre-panel]");
 
       const tl = gsap.timeline({ paused: true });
-      // Cascade: HARD CUTS — each still snaps in over the previous one
+      // Cascade: HARD CUTS — the first still is already visible (markup);
+      // each following still snaps in on an equal beat
       slides.forEach((slide, i) => {
-        tl.set(slide, { opacity: 1 }, CASCADE_START + i * CASCADE_STEP);
+        if (i === 0) return;
+        tl.set(slide, { opacity: 1 }, i * CASCADE_STEP);
       });
 
       // 7th cut: the solid panel-color frame snaps in (via the proxy layer,
@@ -239,7 +244,7 @@ export default function Preloader() {
               <span
                 key={src}
                 data-pre-slide=""
-                className="absolute inset-0 opacity-0"
+                className={`absolute inset-0 ${i === 0 ? "opacity-100" : "opacity-0"}`}
                 style={{ zIndex: i + 2 }}
               >
                 {/* Plain <img> so decode() gates the cascade start */}
