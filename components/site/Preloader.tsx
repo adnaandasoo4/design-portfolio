@@ -5,40 +5,37 @@ import { usePathname } from "next/navigation";
 import { gsap, useGSAP } from "@/lib/gsap/register";
 import { EASE, DUR } from "@/lib/gsap/motion";
 import { markPreloaderDone } from "@/lib/preloader";
-import { hero } from "@/content/copy";
+import { preloader as copy } from "@/content/copy";
 
 /*
- * Preloader (§A5 / §A6 #0 / §A7 row #1).
+ * Preloader — minimal welcome (user-directed redesign, 2026-07-19; replaces
+ * the §A6 #0 name-handoff variant).
  *
- * Full-screen #f7f6f4 stage; a centered 300×384 window (clip-path inset on a
- * viewport-sized frame — compositor-friendly, §A10; the reference animated
- * width/height). Seven image slides plus a final dark (#111214) slide cascade
- * in (opacity, staggered 380 + i·120 ms), then the clip window expands to the
- * full viewport (rect .90 / ease-in-out-quint). A mix-blend-mode:difference
- * "adnaan / dasoo" rides the cascade and lands exactly on the minimal hero
- * name. Scroll is locked and the page behind is inert for the duration;
- * markPreloaderDone() fires the nav + intro reveals at finish.
+ * White stage; a centered Manrope line — "it's all (frame) about the /
+ * first touch" — with a small rounded image frame INLINE in the text. Seven
+ * stills cascade through the frame (opacity, staggered 380 + i·120 ms), then
+ * a #111214 layer clip-expands FROM the frame's rect to the full viewport
+ * (rect .90 / ease-in-out-quint), swallowing the text and handing off to the
+ * dark site surface. Scroll is locked and the page behind is inert for the
+ * duration; markPreloaderDone() fires the nav + intro reveals at finish.
  *
  * Rendered from app/layout.tsx (OUTSIDE the ScrollSmoother transform context
  * — position:fixed breaks inside #smooth-content). Plays only when the
  * session's FIRST route is "/", and only once per full page load.
  */
 
-/** Placeholder slide assets — note there is intentionally NO preload-6 (§A8). */
-const SLIDES = [1, 2, 3, 4, 5, 7, 8].map((n) => `/assets/preload-${n}.png`);
+/** Slide stills, shown in order through the inline frame. */
+const SLIDES = [1, 2, 3, 4, 5, 6, 7].map((n) => `/assets/preload-${n}.jpg`);
 
-/* ---- Frame geometry (px) ---- */
-const FRAME_W = 300;
-const FRAME_H = 384;
-
-/* ---- Choreography timing (s) — §A6 #0(c) ---- */
+/* ---- Choreography timing (s) ---- */
 const CASCADE_START = 0.38; // first slide at 380ms
 const CASCADE_STEP = 0.12; // + i·120ms
 const SLIDE_FADE = 0.5; // per-slide opacity fade
-const SLIDE_COUNT = SLIDES.length + 1; // 7 images + 1 dark slide = 8
-/** Expansion starts at 380 + 8·120 + 300 ms = 1.64s */
-const EXPAND_AT = CASCADE_START + SLIDE_COUNT * CASCADE_STEP + 0.3;
-/** Finish fires +900ms after expansion starts (= expansion end) */
+/** Dark layer snaps over the frame right after the last slide lands */
+const DARK_AT = CASCADE_START + SLIDES.length * CASCADE_STEP;
+/** …then expands to the full viewport 300ms later */
+const EXPAND_AT = DARK_AT + 0.3;
+/** Finish fires as the expansion completes */
 const FINISH_AT = EXPAND_AT + DUR.rect;
 const FADE_OUT = 0.55;
 /** Hard fallback if image decode() stalls or 404s (ms) */
@@ -113,10 +110,11 @@ export default function Preloader() {
 
       /* ---- Full-motion timeline ---- */
       const slides = gsap.utils.toArray<HTMLElement>("[data-pre-slide]", root);
-      const frame = root.querySelector<HTMLElement>("[data-pre-rect]");
+      const frame = root.querySelector<HTMLElement>("[data-pre-frame]");
+      const expand = root.querySelector<HTMLElement>("[data-pre-expand]");
 
       const tl = gsap.timeline({ paused: true });
-      // Cascade: opacity 0→1 at 380 + i·120 ms (i = 0..7, dark slide included)
+      // Cascade: slides fade through the inline frame at 380 + i·120 ms
       slides.forEach((slide, i) => {
         tl.to(
           slide,
@@ -124,22 +122,37 @@ export default function Preloader() {
           CASCADE_START + i * CASCADE_STEP,
         );
       });
-      // Clip window expands to the full viewport (rect .90 / ease-in-out-quint)
-      if (frame) {
-        const ix = Math.max(0, (window.innerWidth - FRAME_W) / 2);
-        const iy = Math.max(0, (window.innerHeight - FRAME_H) / 2);
-        tl.fromTo(
-          frame,
-          { clipPath: `inset(${iy}px ${ix}px)` },
+      // Dark layer snaps over the frame (reads as the final slide), then
+      // clip-expands to the full viewport. The rect is measured at runtime
+      // so the clip always matches the inline frame's actual position.
+      if (frame && expand) {
+        tl.call(
+          () => {
+            const r = frame.getBoundingClientRect();
+            const radius = getComputedStyle(frame).borderRadius || "0px";
+            gsap.set(expand, {
+              opacity: 1,
+              clipPath: `inset(${r.top}px ${window.innerWidth - r.right}px ${
+                window.innerHeight - r.bottom
+              }px ${r.left}px round ${radius})`,
+            });
+          },
+          [],
+          DARK_AT,
+        );
+        tl.to(
+          expand,
           {
-            clipPath: "inset(0px 0px)",
+            clipPath: "inset(0px 0px 0px 0px round 0px)",
             duration: DUR.rect,
             ease: EASE.inOutQuint,
+            immediateRender: false,
           },
           EXPAND_AT,
         );
       }
       // FINISH: reveal nav + intros, unlock scroll, fade the stage out
+      // (dark-over-dark against the site surface — seamless)
       tl.set(root, { pointerEvents: "none" }, FINISH_AT);
       tl.call(
         () => {
@@ -181,63 +194,55 @@ export default function Preloader() {
     <div
       ref={rootRef}
       data-preloader=""
-      className="fixed inset-0 z-(--z-preloader) bg-preloader"
+      className="fixed inset-0 z-(--z-preloader) flex items-center justify-center bg-preloader"
     >
-      {/* Viewport-sized frame clipped to a centered 300×384 window; the clip
-          expands to inset(0). The initial inline clip covers the pre-JS
-          paint; GSAP re-sets it in px before tweening. */}
+      {/* Welcome line — Manrope, lowercase, ink-on-white, frame inline */}
       <div
-        data-pre-rect=""
         aria-hidden="true"
-        className="absolute inset-0 overflow-hidden"
-        style={{
-          clipPath: `inset(calc(50% - ${FRAME_H / 2}px) calc(50% - ${FRAME_W / 2}px))`,
-        }}
+        className="flex flex-col items-center gap-[0.15em] text-center font-medium text-bg text-[clamp(24px,2.6vw,40px)] leading-[1.3] tracking-[-0.01em]"
       >
-        {/* Image slides, stacked z 2..8 */}
-        {SLIDES.map((src, i) => (
-          <div
-            key={src}
-            data-pre-slide=""
-            className="absolute inset-0 bg-preloader-slide opacity-0"
-            style={{ zIndex: i + 2 }}
+        <span className="flex items-center gap-[0.4em]">
+          <span>{copy.line1Before}</span>
+
+          {/* Inline slide frame — the stills cascade through here */}
+          <span
+            data-pre-frame=""
+            className="relative inline-block h-[1.18em] w-[1.72em] overflow-hidden rounded-[0.3em] bg-bg/8"
           >
-            {/* Placeholder stills — plain <img> so decode() gates the start */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={src}
-              alt=""
-              loading="eager"
-              decoding="async"
-              draggable={false}
-              className="absolute inset-0 h-full w-full object-cover object-center"
-            />
-          </div>
-        ))}
-
-        {/* Final dark slide — hands the stage to the #111214 site surface */}
-        <div
-          data-pre-slide=""
-          className="absolute inset-0 bg-bg opacity-0"
-          style={{ zIndex: 9 }}
-        />
-
-        {/* Difference-blend name — viewport-centered, so it sits exactly on
-            the minimal hero name (Manrope 400 clamp(32px,2.7vw,58px)/1.12,
-            LS −0.01em, 2nd line indented 1.15em) throughout */}
-        <div
-          data-pre-name=""
-          className="absolute inset-0 z-10 flex items-center justify-center"
-        >
-          <div className="flex flex-col mix-blend-difference font-normal text-ink text-[clamp(32px,2.7vw,58px)] leading-[1.12] tracking-[-0.01em]">
-            {hero.nameLines.map((line, i) => (
-              <span key={line} className={i === 1 ? "ml-[1.15em]" : undefined}>
-                {line}
+            {SLIDES.map((src, i) => (
+              <span
+                key={src}
+                data-pre-slide=""
+                className="absolute inset-0 opacity-0"
+                style={{ zIndex: i + 2 }}
+              >
+                {/* Plain <img> so decode() gates the cascade start */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={src}
+                  alt=""
+                  loading="eager"
+                  decoding="async"
+                  draggable={false}
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                />
               </span>
             ))}
-          </div>
-        </div>
+          </span>
+
+          <span>{copy.line1After}</span>
+        </span>
+        <span>{copy.line2}</span>
       </div>
+
+      {/* Expansion layer — starts fully clipped, snaps to the frame's rect
+          as the "final slide", then grows to the whole viewport */}
+      <div
+        data-pre-expand=""
+        aria-hidden="true"
+        className="absolute inset-0 bg-bg opacity-0"
+        style={{ clipPath: "inset(50% 50% 50% 50%)" }}
+      />
     </div>
   );
 }

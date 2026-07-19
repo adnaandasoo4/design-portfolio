@@ -12,7 +12,7 @@
   --color-panel: #111214; /* disciplines inner panel (rendered value) */
   --color-slot: #1c1c20; /* image-slot placeholder (disciplines media) */
   --color-slot-2: #1a1a1e; /* video placeholder (footer/reel) */
-  --color-preloader: #f7f6f4; /* preloader stage background */
+  --color-preloader: #ffffff; /* preloader stage background (white — user-directed redesign) */
   --color-preloader-slide: #26262b; /* preloader image-slide backing */
   --color-hero-dim: #050506; /* hero dim overlay (smoke variant only) */
   --color-ink: #ffffff; /* primary white ink */
@@ -104,6 +104,17 @@
 /* ---- Base ---- */
 html {
   background: var(--color-bg);
+}
+
+/* TEMPORARY (user request): hide the scrollbar entirely — the preloader
+   locks scroll (no bar) and the site restores it, which shifted the layout
+   by the scrollbar width on reveal. Revisit with a styled/overlay scrollbar
+   later. */
+html {
+  scrollbar-width: none; /* Firefox */
+}
+::-webkit-scrollbar {
+  display: none; /* Chrome / Safari / Edge */
 }
 
 body {

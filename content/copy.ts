@@ -4,6 +4,17 @@
 
 export const EMAIL = "adnaandasoo@gmail.com";
 
+/*
+ * Preloader welcome line — reads "it's all (image) about the / first touch"
+ * with the slide frame inline in the first row. Swap the strings to change
+ * the phrase; the frame always sits between line1Before and line1After.
+ */
+export const preloader = {
+  line1Before: "it's all",
+  line1After: "about the",
+  line2: "first touch",
+};
+
 export const hero = {
   nameLines: ["adnaan", "dasoo"],
   metaLatin: "designer  ×  engineer",
