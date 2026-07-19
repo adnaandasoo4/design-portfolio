@@ -78,7 +78,7 @@ export default function Hero() {
           preloader's color frame expands into exactly this rect */}
       <div
         data-hero-panel=""
-        className="relative flex min-h-0 flex-1 flex-col bg-black"
+        className="relative flex min-h-0 flex-1 flex-col bg-panel"
       >
         {/* Content row — scroll cue centered along the bottom */}
         <div className="relative grid min-h-0 flex-1 grid-cols-2 max-b700:grid-cols-1">
@@ -111,11 +111,11 @@ export default function Hero() {
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute top-0 left-0 h-[10%] w-[46%] -translate-x-full bg-black transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
+                  className="absolute top-0 left-0 h-[10%] w-[46%] -translate-x-full bg-panel transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
                 />
                 <span
                   aria-hidden="true"
-                  className="absolute right-0 bottom-0 h-[10%] w-[46%] translate-x-full bg-black transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
+                  className="absolute right-0 bottom-0 h-[10%] w-[46%] translate-x-full bg-panel transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
                 />
               </div>
             </div>

@@ -262,11 +262,13 @@ export default function Preloader() {
 
       {/* Color-frame → panel proxy — snaps in clipped to the inline frame's
           rect (the "7th slide"), expands to the hero panel's rect, then
-          fades over the identical real panel beneath */}
+          fades over the identical real panel beneath. z-20 keeps it ABOVE
+          the frame's z-indexed slides (z 2..9) so the color cut actually
+          covers the last still. */}
       <div
         data-pre-panel=""
         aria-hidden="true"
-        className="absolute inset-0 bg-black opacity-0"
+        className="absolute inset-0 z-20 bg-panel opacity-0"
         style={{ clipPath: "inset(50% 50% 50% 50%)" }}
       />
     </div>
