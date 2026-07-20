@@ -28,8 +28,8 @@ import { preloader as copy } from "@/content/copy";
  * fallback). Scroll locked + page inert for the duration; released on
  * finish, on reduced-motion skip, and on unmount — never left locked.
  *
- * Rendered from app/layout.tsx (OUTSIDE the ScrollSmoother transform
- * context). Plays only when the session's FIRST route is "/", once per
+ * Rendered from app/layout.tsx (OUTSIDE the smooth-scroll wrapper).
+ * Plays only when the session's FIRST route is "/", once per
  * full page load.
  */
 

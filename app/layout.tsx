@@ -1,8 +1,8 @@
 /*
  * Root layout — site metadata/JSON-LD, Manrope, the pre-paint theme-init
  * script (§A5 Theme toggle), and the fixed chrome (RouteVeil, Preloader, Nav)
- * mounted OUTSIDE <SmoothScroll> (§A2 z-layers; position:fixed breaks inside
- * the transformed #smooth-content).
+ * mounted OUTSIDE <SmoothScroll> (§A2 z-layers; the preloader inerts the
+ * #smooth-wrapper during its lock window).
  */
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";

@@ -1,32 +1,61 @@
 "use client";
 
 /*
- * Footer (§A5 / §A6 #7) — top hairline, BiLabel + est. row, 2-col grid
- * (socials + ask-AI · reel video + JP paragraph), bottom row with the
- * oversized copy-email interactive and back-to-top.
+ * Footer — 100svh redesign (user-directed, 2026-07-19; reference = MONOLOG
+ * footer screenshots — the supplied images are the source of truth).
  *
- * Motion: §A7 #16 (copy-confirm: check pops on ease-back, revert 1700ms)
- * and #17 (hovers: color .30 ease-std, lift .45 ease-out-expo).
- * Reduced motion: color hovers kept, transforms dropped; the copy-confirm
- * feedback is KEPT (essential), reduced to instant opacity swaps.
+ * Top block: "(navigation)" big-link list (left) + details / socials /
+ * ask-AI columns (right); meta row (live Baltimore clock · back-to-top ·
+ * copyright) spans toward the right, pinned above the band.
+ * Bottom block: WebGL gradient band (FooterGradient) with brand + tagline.
+ *
+ * Big-link hover: light-gray flood (--color-ink-1) + black text snap ON
+ * instantly, fade OFF at --dur-copy-2; label + arrow glide right subtly on
+ * --dur-track ease-out-quart. NOTE: Tailwind v4 translate-* utilities set
+ * the CSS `translate` property — transitions must list `translate`, not
+ * `transform`, or the shift jumps. The email link reuses the same recipe.
+ *
+ * The fixed top nav hides while the footer is in view (ScrollTrigger at
+ * "top 50%") and returns on scroll-back — the footer carries navigation.
  */
 
-import { useEffect, useRef, useState } from "react";
-import { gsap, useGSAP } from "@/lib/gsap/register";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap/register";
 import { DUR, EASE, MQ } from "@/lib/gsap/motion";
-import { scrollToTop } from "@/lib/gsap/SmoothScroll";
-import BiLabel from "@/components/site/BiLabel";
+import { scrollToSection, scrollToTop } from "@/lib/gsap/SmoothScroll";
+import { navigateWithVeil } from "@/components/site/RouteVeil";
+import FooterGradient from "@/components/site/FooterGradient";
 import { footer, askAiPrompt, EMAIL } from "@/content/copy";
 
-/** Copy-confirm revert delay (§A5 Copy-email) */
+/** How long the SR "email copied" confirmation stays up (§A5 Copy-email) */
 const COPY_REVERT_MS = 1700;
 
-/** Footer eyebrow — Manrope 400 12px/1, ls 0.18em, #8a8a8e (§A3) */
+/** Column eyebrow — lowercase Manrope, shared by all four headers */
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[12px]/[1] font-normal tracking-[0.18em] text-muted-2">
-      {children}
-    </p>
+    <p className="text-[14px]/[1] tracking-[0.04em] text-muted-2">{children}</p>
+  );
+}
+
+/** Enter/return arrow before the email — straight corner per the reference */
+function EnterArrow() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M5 4v9h12" />
+      <path d="m13 9 4 4-4 4" />
+    </svg>
   );
 }
 
@@ -37,8 +66,8 @@ function AskAiIcon({ label }: { label: string }) {
       // 12-line radial burst
       return (
         <svg
-          width="24"
-          height="24"
+          width="22"
+          height="22"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -62,8 +91,8 @@ function AskAiIcon({ label }: { label: string }) {
     case "chatgpt":
       return (
         <svg
-          width="24"
-          height="24"
+          width="22"
+          height="22"
           viewBox="0 0 24 24"
           fill="currentColor"
           aria-hidden="true"
@@ -74,8 +103,8 @@ function AskAiIcon({ label }: { label: string }) {
     case "gemini":
       return (
         <svg
-          width="24"
-          height="24"
+          width="22"
+          height="22"
           viewBox="0 0 24 24"
           fill="currentColor"
           aria-hidden="true"
@@ -86,8 +115,8 @@ function AskAiIcon({ label }: { label: string }) {
     case "grok":
       return (
         <svg
-          width="24"
-          height="24"
+          width="22"
+          height="22"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -105,106 +134,227 @@ function AskAiIcon({ label }: { label: string }) {
   }
 }
 
+/** Live clock — reference "Hanoi City 11:24:20 PM / Monday, Jul 19, 2026 (GMT +07)" */
+function LocalClock() {
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    const tick = () => setNow(new Date());
+    tick();
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  // Server render + first client paint: reserve the two lines, no mismatch.
+  if (now === null) return <div aria-hidden="true" className="min-h-[2.9em]" />;
+
+  const zone = { timeZone: footer.clockZone };
+  const time = new Intl.DateTimeFormat("en-US", {
+    ...zone,
+    hour: "numeric",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  }).format(now);
+  const date = new Intl.DateTimeFormat("en-US", {
+    ...zone,
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(now);
+  const offset =
+    new Intl.DateTimeFormat("en-US", { ...zone, timeZoneName: "shortOffset" })
+      .formatToParts(now)
+      .find((p) => p.type === "timeZoneName")?.value ?? "";
+
+  return (
+    <div className="text-ink">
+      <p>
+        {footer.clockCity} {time}
+      </p>
+      <p>
+        {date} ({offset})
+      </p>
+    </div>
+  );
+}
+
+/* -------- Big-link hover recipe --------
+ * Flood (light gray, --color-ink-1) + label color snap ON instantly (hover
+ * duration 0) and fade OFF at --dur-copy-2; label + arrow glide right
+ * subtly on --dur-track ease-out-quart (transitioning `translate`). */
+const FLOOD =
+  "pointer-events-none absolute -inset-x-2 inset-y-0 bg-ink-1 opacity-0 " +
+  "transition-opacity duration-(--dur-copy-2) ease-(--ease-std) " +
+  "group-hover:opacity-100 group-hover:duration-0 " +
+  "group-focus-visible:opacity-100 group-focus-visible:duration-0";
+
+const LABEL =
+  "relative text-[clamp(34px,3vw,60px)]/[1.15] font-medium " +
+  "tracking-[-0.01em] text-ink " +
+  "[transition:color_var(--dur-copy-2)_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
+  "group-hover:[transition:color_0s_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
+  "group-hover:text-bg group-focus-visible:text-bg " +
+  "motion-safe:group-hover:translate-x-2 motion-safe:group-focus-visible:translate-x-2";
+
+const ARROW =
+  "relative size-[0.8em] text-bg opacity-0 " +
+  "[transition:opacity_var(--dur-copy-2)_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
+  "motion-safe:-translate-x-3 " +
+  "motion-safe:group-hover:translate-x-0 motion-safe:group-focus-visible:translate-x-0 " +
+  "group-hover:opacity-100 group-focus-visible:opacity-100";
+
+const BIG_LINK =
+  "group relative flex items-center justify-between gap-6 py-2.5 pr-4 " +
+  "text-[clamp(34px,3vw,60px)]/[1.15]";
+
+function BigLinkInner({ label }: { label: string }) {
+  return (
+    <>
+      <span aria-hidden="true" className={FLOOD} />
+      <span className={LABEL}>{label}</span>
+      <svg
+        className={ARROW}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M4 12h16" />
+        <path d="m13 5 7 7-7 7" />
+      </svg>
+    </>
+  );
+}
+
+/* Email link — same hover recipe at detail scale, no copy-confirm
+ * choreography (user-removed); SR announcement retained. The underline is a
+ * border-bottom (currentColor) so it spans the enter arrow too. */
+const EMAIL_FLOOD =
+  "pointer-events-none absolute -left-2.5 -right-5 -inset-y-2 bg-ink-1 opacity-0 " +
+  "transition-opacity duration-(--dur-copy-2) ease-(--ease-std) " +
+  "group-hover:opacity-100 group-hover:duration-0 " +
+  "group-focus-visible:opacity-100 group-focus-visible:duration-0";
+
+const EMAIL_LABEL =
+  "relative inline-flex items-center border-b border-current text-ink " +
+  "[transition:color_var(--dur-copy-2)_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
+  "group-hover:[transition:color_0s_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
+  "group-hover:text-bg group-focus-visible:text-bg " +
+  "motion-safe:group-hover:translate-x-2 motion-safe:group-focus-visible:translate-x-2";
+
+/* Social links — same hover recipe at list scale */
+const SOCIAL_FLOOD =
+  "pointer-events-none absolute -left-1.5 -right-4 -inset-y-0.5 bg-ink-1 opacity-0 " +
+  "transition-opacity duration-(--dur-copy-2) ease-(--ease-std) " +
+  "group-hover:opacity-100 group-hover:duration-0 " +
+  "group-focus-visible:opacity-100 group-focus-visible:duration-0";
+
+const SOCIAL_LABEL =
+  "relative inline-block text-ink " +
+  "[transition:color_var(--dur-copy-2)_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
+  "group-hover:[transition:color_0s_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
+  "group-hover:text-bg group-focus-visible:text-bg " +
+  "motion-safe:group-hover:translate-x-2 motion-safe:group-focus-visible:translate-x-2";
+
 export default function Footer() {
   const rootRef = useRef<HTMLElement>(null);
-  const copyIconRef = useRef<SVGSVGElement>(null);
-  const checkIconRef = useRef<SVGSVGElement>(null);
-  const emailTextRef = useRef<HTMLSpanElement>(null);
-  const reelRef = useRef<HTMLVideoElement>(null);
-  const revertTimer = useRef<number | null>(null);
+  const copyTimer = useRef<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
-  const { contextSafe } = useGSAP({ scope: rootRef });
-
-  // Clear any pending revert timer on unmount.
+  // Clear any pending SR-revert timer on unmount.
   useEffect(() => {
     return () => {
-      if (revertTimer.current !== null) window.clearTimeout(revertTimer.current);
+      if (copyTimer.current !== null) window.clearTimeout(copyTimer.current);
     };
   }, []);
 
-  // Reel autoplay (§A10): only when a src exists AND the visitor has not
-  // opted into reduced motion — reduced users keep the poster still.
-  useEffect(() => {
-    if (footer.reelSrc === null) return;
-    if (window.matchMedia(MQ.reduced).matches) return;
-    reelRef.current?.play().catch(() => {
-      /* autoplay blocked — poster remains, which is fine */
-    });
-  }, []);
-
-  /*
-   * Copy-email confirm (§A7 #16). The ref-reading callbacks are created
-   * INSIDE the click handler (not during render) and wrapped in contextSafe
-   * so their tweens stay scoped to this component's gsap context.
-   */
-  const onCopyClick = () => {
-    /** Revert check → copy after the confirm window. */
-    const revertConfirm = contextSafe(() => {
-      const copyIcon = copyIconRef.current;
-      const checkIcon = checkIconRef.current;
-      if (!copyIcon || !checkIcon) return;
-      revertTimer.current = null;
-      setCopied(false);
-      if (window.matchMedia(MQ.reduced).matches) {
-        gsap.set(checkIcon, { opacity: 0, scale: 0.6 });
-        gsap.set(copyIcon, { opacity: 1, scale: 1 });
-        return;
-      }
-      gsap.to(checkIcon, {
-        opacity: 0,
-        scale: 0.6,
-        duration: DUR.copy,
-        ease: EASE.outExpo,
-      });
-      gsap.to(copyIcon, {
-        opacity: 1,
-        scale: 1,
-        duration: DUR.copy,
-        ease: EASE.outExpo,
-      });
-    });
-
-    /** Confirm choreography — only runs after a successful clipboard write. */
-    const playConfirm = contextSafe(() => {
-      const copyIcon = copyIconRef.current;
-      const checkIcon = checkIconRef.current;
-      const text = emailTextRef.current;
-      if (!copyIcon || !checkIcon || !text) return;
-      if (revertTimer.current !== null)
-        window.clearTimeout(revertTimer.current);
-      gsap.killTweensOf([copyIcon, checkIcon, text]);
-      setCopied(true);
-
-      if (window.matchMedia(MQ.reduced).matches) {
-        // Essential feedback KEPT (§A7 #17) — instant opacity swap, no transforms.
-        gsap.set(copyIcon, { opacity: 0 });
-        gsap.set(checkIcon, { opacity: 1, scale: 1 });
-      } else {
-        gsap.to(copyIcon, {
-          opacity: 0,
-          scale: 0.6,
-          duration: DUR.copy,
-          ease: EASE.outExpo,
+  /* Footer carries navigation while in view: hide the fixed top nav when the
+   * footer reaches mid-viewport, bring it back on scroll-up. */
+  useGSAP(
+    () => {
+      const root = rootRef.current;
+      const topnav = document.querySelector<HTMLElement>("[data-topnav]");
+      if (!root || !topnav) return;
+      const mm = gsap.matchMedia();
+      mm.add(MQ.motionOk, () => {
+        const st = ScrollTrigger.create({
+          trigger: root,
+          start: "top 50%",
+          onEnter: () =>
+            gsap.to(topnav, {
+              yPercent: -100,
+              autoAlpha: 0,
+              duration: DUR.copy2,
+              ease: EASE.outExpo,
+              overwrite: "auto",
+            }),
+          onLeaveBack: () =>
+            gsap.to(topnav, {
+              yPercent: 0,
+              autoAlpha: 1,
+              duration: DUR.copy2,
+              ease: EASE.outExpo,
+              overwrite: "auto",
+            }),
         });
-        // Check pops in on ease-back (.6 → 1)
-        gsap.fromTo(
-          checkIcon,
-          { opacity: 0, scale: 0.6 },
-          { opacity: 1, scale: 1, duration: DUR.copy2, ease: EASE.back },
-        );
-        // Text nudge scale .98 → 1 (≈180ms)
-        gsap.fromTo(
-          text,
-          { scale: 0.98 },
-          { scale: 1, duration: 0.18, ease: EASE.std },
-        );
-      }
-      revertTimer.current = window.setTimeout(revertConfirm, COPY_REVERT_MS);
-    });
+        return () => {
+          st.kill();
+          gsap.set(topnav, { yPercent: 0, autoAlpha: 1 });
+        };
+      });
+      mm.add(MQ.reduced, () => {
+        const st = ScrollTrigger.create({
+          trigger: root,
+          start: "top 50%",
+          onEnter: () => gsap.set(topnav, { autoAlpha: 0 }),
+          onLeaveBack: () => gsap.set(topnav, { autoAlpha: 1 }),
+        });
+        return () => {
+          st.kill();
+          gsap.set(topnav, { autoAlpha: 1 });
+        };
+      });
+      return () => mm.revert();
+    },
+    { scope: rootRef },
+  );
 
-    // Only confirm on success; on failure do nothing visible.
-    navigator.clipboard.writeText(EMAIL).then(playConfirm, () => {});
+  /** Scroll links. #hero routes home first when off "/"; #footer (contact)
+   *  scrolls in place — every page ends in the footer. */
+  const goScroll = (target: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (target === "#hero" && pathname !== "/")
+      navigateWithVeil((href) => router.push(href), "/");
+    else scrollToSection(target);
+  };
+
+  /** About / Work: intercept the real <a> and route through the page veil. */
+  const goRoute = (target: string) => (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (pathname === target) return;
+    navigateWithVeil((href) => router.push(href), target);
+  };
+
+  /** Copy email — no choreography (user-removed); SR confirmation kept. */
+  const onCopyClick = () => {
+    navigator.clipboard.writeText(EMAIL).then(
+      () => {
+        setCopied(true);
+        if (copyTimer.current !== null) window.clearTimeout(copyTimer.current);
+        copyTimer.current = window.setTimeout(
+          () => setCopied(false),
+          COPY_REVERT_MS,
+        );
+      },
+      () => {},
+    );
   };
 
   return (
@@ -212,165 +362,163 @@ export default function Footer() {
       id="footer"
       aria-label="Footer"
       ref={rootRef}
-      className="relative z-(--z-section) flex min-h-[44vh] flex-col bg-bg px-9 pt-0 pb-[clamp(40px,5vh,64px)]"
+      className="relative z-(--z-section) bg-bg"
     >
-      {/* Top hairline */}
-      <div aria-hidden="true" className="h-px bg-line-09" />
-
-      {/* Labels row */}
-      <div className="flex items-start justify-between pt-6.5 pb-[clamp(40px,7vh,80px)]">
-        <BiLabel latin={footer.metaLatin} ja={footer.metaJa} />
-        <p className="text-right text-[16px]/[1.4] font-normal text-text-50">
-          {footer.est}
-        </p>
-      </div>
-
-      {/* Main grid: socials + ask-AI · reel video */}
-      <div
-        data-foot-grid
-        className="grid grid-cols-[1.25fr_1fr] gap-12 max-b700:grid-cols-1 max-b700:gap-11"
-      >
-        {/* LEFT — socials + ask-AI */}
-        <div className="flex flex-col items-start">
-          <Eyebrow>{footer.socialsEyebrow}</Eyebrow>
-          <ul className="mt-4.5 flex flex-col items-start gap-3.5">
-            {footer.socials.map((s) => (
-              <li key={s.label}>
-                <a
-                  href={s.href}
-                  className="text-[19px]/[1] font-normal tracking-[0.02em] text-muted-2 transition-colors duration-(--dur-hover) ease-(--ease-std) hover:text-ink focus-visible:text-ink"
-                >
-                  {s.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-
-          <div className="mt-11">
-            <Eyebrow>{footer.askAiEyebrow}</Eyebrow>
+      {/* ---- Top block: navigation + columns — full viewport ---- */}
+      <div className="flex min-h-svh flex-col bg-bg px-9 pt-14 pb-6">
+        <div className="grid grid-cols-[1fr_0.85fr] gap-x-[8vw] max-b860:grid-cols-1 max-b860:gap-y-14">
+          {/* LEFT — "(navigation)" + big links */}
+          <div>
+            <Eyebrow>{footer.navEyebrow}</Eyebrow>
+            <nav aria-label="Footer">
+              <ul className="mt-8">
+                {footer.links.map((link) => (
+                  <li key={link.label} className="border-b border-line-09">
+                    {link.type === "scroll" ? (
+                      <Link
+                        href={`/${link.target}`}
+                        onClick={goScroll(link.target)}
+                        className={BIG_LINK}
+                      >
+                        <BigLinkInner label={link.label} />
+                      </Link>
+                    ) : (
+                      <Link
+                        href={link.target}
+                        onClick={goRoute(link.target)}
+                        className={BIG_LINK}
+                      >
+                        <BigLinkInner label={link.label} />
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
-          <ul className="mt-4.5 flex items-center gap-5.5">
-            {footer.askAi.map((ai) => (
-              <li key={ai.label}>
-                <a
-                  href={ai.base + encodeURIComponent(askAiPrompt)}
-                  target="_blank"
-                  rel="noopener"
-                  aria-label={ai.aria}
-                  className="block text-muted-3 [transition:color_var(--dur-hover)_var(--ease-std),transform_var(--dur-copy-2)_var(--ease-out-expo)] hover:text-ink focus-visible:text-ink motion-safe:hover:-translate-y-0.5 motion-safe:focus-visible:-translate-y-0.5"
-                >
-                  <AskAiIcon label={ai.label} />
-                </a>
-              </li>
-            ))}
-          </ul>
+
+          {/* RIGHT — details / socials / ask-AI columns */}
+          <div className="grid grid-cols-[1.3fr_1fr_1fr] content-start gap-x-10 gap-y-10 max-b700:grid-cols-1">
+            {/* (details) */}
+            <div>
+              <Eyebrow>{footer.detailsEyebrow}</Eyebrow>
+              <button
+                type="button"
+                data-foot-copy
+                onClick={onCopyClick}
+                className="group relative mt-7 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[18px]/[1.4]"
+              >
+                <span aria-hidden="true" className={EMAIL_FLOOD} />
+                {/* SR users need to know activation copies (not mails) — §A10 */}
+                <span className="sr-only">copy email address: </span>
+                <span className={EMAIL_LABEL}>
+                  <EnterArrow />
+                  {EMAIL}
+                </span>
+              </button>
+              {/* Screen-reader confirmation (§A10) */}
+              <span aria-live="polite" className="sr-only">
+                {copied ? "email copied" : ""}
+              </span>
+              <p className="mt-6 text-[16px]/[1.55] whitespace-pre-line text-muted-1">
+                {footer.basedIn}
+              </p>
+            </div>
+
+            {/* (socials) */}
+            <div>
+              <Eyebrow>{footer.socialsEyebrow}</Eyebrow>
+              <ul className="mt-7 flex flex-col items-start gap-1">
+                {footer.socials.map((s) => (
+                  <li key={s.label}>
+                    <a
+                      href={s.href}
+                      className="group relative inline-block text-[19px]/[1.2] text-ink"
+                    >
+                      <span aria-hidden="true" className={SOCIAL_FLOOD} />
+                      <span className={SOCIAL_LABEL}>{s.label}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* (ask ai about me) */}
+            <div>
+              <Eyebrow>{footer.askAiEyebrow}</Eyebrow>
+              <ul className="mt-7 flex flex-wrap items-center gap-4">
+                {footer.askAi.map((ai) => (
+                  <li key={ai.label}>
+                    <a
+                      href={ai.base + encodeURIComponent(askAiPrompt)}
+                      target="_blank"
+                      rel="noopener"
+                      aria-label={ai.aria}
+                      className="block text-muted-3 transition-colors duration-(--dur-hover) ease-(--ease-std) hover:text-ink focus-visible:text-ink"
+                    >
+                      <AskAiIcon label={ai.label} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
 
-        {/* RIGHT — reel video + JP paragraph */}
-        <div
-          data-foot-video
-          className="flex w-[min(26vw,380px)] flex-col gap-5 max-b700:w-full"
-        >
-          {/* Autoplaying reel src arrives with the real assets (§A8) —
-              poster-only until `footer.reelSrc` is supplied. No autoPlay
-              attribute: playback starts from the ref effect below, which is
-              gated on prefers-reduced-motion (§A10 — reduced users keep the
-              poster still). */}
-          <video
-            ref={reelRef}
-            className="aspect-[16/10] w-full bg-slot-2 object-cover"
-            poster={footer.reelPoster}
-            muted
-            loop
-            playsInline
-            preload="metadata"
+        {/* ---- Meta row: clock · back-to-top · bilingual sign-off, full span ---- */}
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-6 gap-y-6 pt-16 text-[19px]/[1.5]">
+          <LocalClock />
+          <button
+            type="button"
+            data-back-top
+            onClick={() => scrollToTop()}
+            className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[19px]/[1.5] text-ink transition-transform duration-(--dur-copy-2) ease-(--ease-out-expo) motion-safe:hover:-translate-y-0.5 motion-safe:focus-visible:-translate-y-0.5"
           >
-            {footer.reelSrc !== null ? (
-              <source src={footer.reelSrc} type="video/mp4" />
-            ) : null}
-          </video>
-          <p
-            lang="ja"
-            className="font-ja text-[13px]/[2] font-normal tracking-[0.14em] text-muted-3"
-          >
-            {footer.jaParagraph}
-          </p>
-        </div>
-      </div>
-
-      {/* Bottom row — copy-email + back-to-top */}
-      <div className="mt-auto flex flex-wrap items-end justify-between gap-10 pt-11">
-        <button
-          type="button"
-          data-foot-copy
-          onClick={onCopyClick}
-          className="group inline-flex cursor-pointer items-center gap-[0.3em] border-0 bg-transparent p-0 text-[clamp(28px,3.3vw,58px)]/[1.1] font-medium tracking-[-0.02em] text-ink transition-colors duration-(--dur-hover) ease-(--ease-std) hover:text-accent focus-visible:text-accent"
-        >
-          {/* SR users need to know activation copies (not mails) — §A10 */}
-          <span className="sr-only">copy email address: </span>
-          <span ref={emailTextRef} className="inline-block">
-            {EMAIL}
-          </span>
-          {/* Icon slot: slides in on hover/focus (§A7 #17); copy ↔ check (§A7 #16) */}
-          <span
-            aria-hidden="true"
-            className="relative inline-block size-[0.52em] translate-x-2.5 opacity-0 transition-[opacity,transform] duration-(--dur-copy) ease-(--ease-out-expo) group-hover:translate-x-0 group-hover:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:opacity-100 motion-reduce:translate-x-0"
-          >
+            {footer.backToTop}
             <svg
-              ref={copyIconRef}
-              className="absolute inset-0 h-full w-full"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth={2}
+              strokeWidth={2.2}
               strokeLinecap="round"
               strokeLinejoin="round"
+              aria-hidden="true"
             >
-              <rect x="9" y="9" width="11" height="11" rx="2" />
-              <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+              <path d="M12 19V5" />
+              <path d="m5 12 7-7 7 7" />
             </svg>
-            <svg
-              ref={checkIconRef}
-              className="absolute inset-0 h-full w-full"
-              style={{ opacity: 0, transform: "scale(0.6)" }}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="#c7c2ce"
-              strokeWidth={2.4}
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          </button>
+          {/* Bilingual sign-off — latin line white + meta-row size (user);
+              JP sub-line keeps the dimmer recurring treatment */}
+          <div className="flex flex-col gap-1">
+            <p className="text-[19px]/[1.4] whitespace-nowrap text-ink">
+              {footer.metaLatin}
+            </p>
+            <p
+              lang="ja"
+              className="font-ja text-[14px]/[1.4] tracking-[0.14em] whitespace-nowrap text-text-38"
             >
-              <path d="M4.5 12.5 10 18 19.5 6.5" />
-            </svg>
-          </span>
-        </button>
-        {/* Screen-reader confirmation (§A10) */}
-        <span aria-live="polite" className="sr-only">
-          {copied ? "email copied" : ""}
-        </span>
+              {footer.metaJa}
+            </p>
+          </div>
+        </div>
+      </div>
 
-        <button
-          type="button"
-          data-back-top
-          onClick={() => scrollToTop()}
-          className="inline-flex cursor-pointer items-center gap-2.5 whitespace-nowrap border-0 bg-transparent p-0 text-[17px]/[1] font-normal tracking-[0.02em] text-ink transition-transform duration-(--dur-copy-2) ease-(--ease-out-expo) motion-safe:hover:-translate-y-1 motion-safe:focus-visible:-translate-y-1"
-        >
-          {footer.backToTop}
-          <svg
-            width="15"
-            height="15"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2.2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 19V5" />
-            <path d="m5 12 7-7 7 7" />
-          </svg>
-        </button>
+      {/* ---- Bottom block: WebGL gradient band, curtain-revealed ----
+           The in-flow slot reserves the height; the band itself is FIXED to
+           the viewport bottom and clip-path'd to the slot, so scrolling the
+           last stretch expands the visible strip up from the bottom edge —
+           the band stays stationary while the page lifts off it.
+           (clip-path clips fixed descendants without moving them.) */}
+      <div
+        data-band-clip=""
+        className="relative h-[32svh] min-h-60 [clip-path:inset(0)]"
+      >
+        <div className="fixed inset-x-0 bottom-0 h-[32svh] min-h-60">
+          <FooterGradient />
+        </div>
       </div>
     </footer>
   );

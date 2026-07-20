@@ -3,16 +3,16 @@ import About from "@/components/sections/About";
 import Divider from "@/components/sections/Divider";
 import WorkList from "@/components/sections/WorkList";
 import Disciplines from "@/components/sections/Disciplines";
-import Statement from "@/components/sections/Statement";
+import ContactVisual from "@/components/sections/ContactVisual";
 import Footer from "@/components/site/Footer";
 
 /*
  * Home — §A6 order: Preloader → (Nav in layout) → Hero → About → Divider →
- * Work List → Disciplines → Statement → Footer. One continuous #111214
+ * Work List → Disciplines → Contact visual → Footer. One continuous #111214
  * surface; sections carry their own z-index (§A2).
  *
  * Footer sits OUTSIDE <main> so it maps to the contentinfo landmark (§A10);
- * both stay inside the ScrollSmoother content so they scroll together.
+ * both stay inside the smooth-scroll content so they scroll together.
  */
 export default function Home() {
   return (
@@ -27,7 +27,7 @@ export default function Home() {
           <Divider />
           <WorkList />
           <Disciplines />
-          <Statement />
+          <ContactVisual />
         </div>
       </main>
       <div className="relative z-(--z-flow) overflow-x-clip">

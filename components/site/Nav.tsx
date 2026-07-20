@@ -4,8 +4,8 @@
  * Fixed top nav (§A5 [data-topnav]).
  * - fixed full-width, padding 16px 36px, mix-blend-mode: difference, z-nav 120
  * - container is pointer-events-none; interactive children re-enable
- * - brand + "home" scroll to #hero on "/" (ScrollSmoother) or route home
- * - about/work route through the page veil; contact is mailto
+ * - brand + "home" scroll to #hero on "/" (Lenis) or route home
+ * - about/work route through the page veil; contact scrolls to #footer
  * - link sweep (§A7 #4): #1d1d21 block enters from the LEFT on hover/focus
  *   and retracts to the RIGHT on leave — .72s / ease-out-expo, pure CSS
  * - intro (§A7 #2): slides down from the top after the preloader
@@ -53,12 +53,15 @@ export default function Nav() {
   const pathname = usePathname();
   const router = useRouter();
 
-  /** Brand + "home": scroll to #hero on the home page, route home elsewhere. */
-  const goHome = (e: MouseEvent<HTMLAnchorElement>) => {
+  /** Scroll links. #hero routes home first when off "/"; #footer (contact)
+   *  scrolls in place — every page ends in the footer. */
+  const goScroll = (target: string) => (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    if (pathname === "/") scrollToSection("#hero");
-    else navigateWithVeil((href) => router.push(href), "/");
+    if (target === "#hero" && pathname !== "/")
+      navigateWithVeil((href) => router.push(href), "/");
+    else scrollToSection(target);
   };
+  const goHome = goScroll("#hero");
 
   /** about / work: intercept the real <a> and route through the page veil. */
   const goRoute =
@@ -124,20 +127,7 @@ export default function Nav() {
                 data-navlink=""
                 data-scrollto={link.target}
                 href={`/${link.target}`}
-                onClick={goHome}
-                className={LINK}
-              >
-                <SweepLabel label={link.label} />
-              </Link>
-            );
-          }
-          if (link.type === "route") {
-            return (
-              <Link
-                key={link.label}
-                data-navlink=""
-                href={link.target}
-                onClick={goRoute(link.target)}
+                onClick={goScroll(link.target)}
                 className={LINK}
               >
                 <SweepLabel label={link.label} />
@@ -145,14 +135,15 @@ export default function Nav() {
             );
           }
           return (
-            <a
+            <Link
               key={link.label}
               data-navlink=""
               href={link.target}
+              onClick={goRoute(link.target)}
               className={LINK}
             >
               <SweepLabel label={link.label} />
-            </a>
+            </Link>
           );
         })}
       </div>

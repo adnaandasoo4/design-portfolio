@@ -50,43 +50,60 @@ export const workList = {
   ctaHref: "/works",
 };
 
-export const statement = {
-  word: "CONTACT",
-  topCrop: "13.5vw",
-  bottomCrop: "8.5vw",
-  barRows: [
-    ["EACH", "PROJECT", "STARTS", "WITH", "A", "CONVERSATION."],
-    ["DESIGN", "AND", "ENGINEERING,", "HELD", "TO", "THE", "SAME", "STANDARD."],
-  ],
+/*
+ * Contact visual (user-directed, 2026-07-19) — replaces the big CONTACT
+ * statement: full-viewport monochrome desk photo with a stark white line.
+ */
+export const contactVisual = {
+  eyebrow: "( contact )",
+  heading: "LET'S TALK",
+  /** Supporting line — carried over from the retired Statement section */
+  sub: "Each project starts with a conversation.",
+  imageSrc: "/assets/contact-desk.png",
 };
 
 /** Prefilled bio prompt for the footer ask-AI links (verbatim). */
 export const askAiPrompt =
   "Who is Adnaan Dasoo? Tell me about this Baltimore-based designer and engineer — his visual identity work, digital brand projects, and how he blends design with front-end engineering.";
 
+/*
+ * Footer — 100svh redesign (user-directed, 2026-07-19; reference = MONOLOG
+ * footer screenshots). Top: "Navigation" big-link list + details/socials/
+ * ask-AI columns + meta row (clock · back-to-top/booking · copyright).
+ * Bottom: WebGL gradient band with brand + tagline overlay.
+ */
 export const footer = {
-  metaLatin: "designer  ×  engineer",
-  metaJa: "デザイナー × エンジニア",
-  est: "est. 2026 · baltimore, md",
-  socialsEyebrow: "(my socials)",
+  navEyebrow: "( navigation )",
+  /** Big footer nav links (reference-cased) */
+  links: [
+    { label: "Home", type: "scroll", target: "#hero" },
+    { label: "About", type: "route", target: "/about" },
+    { label: "Work", type: "route", target: "/works" },
+    { label: "Contact", type: "scroll", target: "#footer" },
+  ] as const,
+  detailsEyebrow: "( my details )",
+  basedIn: "Based in Baltimore, MD.\nWorking worldwide.",
+  socialsEyebrow: "( my socials )",
   socials: [
     // TODO: real URLs (Open Q5) — placeholder "#" in the reference
-    { label: "github", href: "#" },
-    { label: "linkedin", href: "#" },
-    { label: "instagram", href: "#" },
+    { label: "Github", href: "#" },
+    { label: "Linkedin", href: "#" },
+    { label: "Instagram", href: "#" },
   ],
-  askAiEyebrow: "(ask ai about me)",
+  askAiEyebrow: "( ask ai about me )",
   askAi: [
     { label: "claude", base: "https://claude.ai/new?q=", aria: "ask claude about adnaan" },
     { label: "chatgpt", base: "https://chatgpt.com/?q=", aria: "ask chatgpt about adnaan" },
     { label: "gemini", base: "https://www.google.com/search?udm=50&q=", aria: "ask gemini about adnaan" },
     { label: "grok", base: "https://grok.com/?q=", aria: "ask grok about adnaan" },
   ],
-  jaParagraph:
-    "デザインとエンジニアリングを、同じ基準で。最初のアイデアから完成まで、一緒に作りましょう。",
-  backToTop: "back to top",
-  reelPoster: "/assets/reel-poster.png",
-  reelSrc: "/assets/brand-reel.mp4" as string | null,
+  /** Live clock — city label + IANA zone it ticks in */
+  clockCity: "Baltimore",
+  clockZone: "America/New_York",
+  backToTop: "Back to top",
+  /** Meta-row bilingual sign-off (restored from the pre-redesign footer) */
+  metaLatin: "designer × engineer",
+  metaJa: "デザイナー × エンジニア",
 };
 
 export const nav = {
@@ -95,7 +112,7 @@ export const nav = {
     { label: "home", type: "scroll", target: "#hero" },
     { label: "about", type: "route", target: "/about" },
     { label: "work", type: "route", target: "/works" },
-    { label: "contact", type: "mailto", target: `mailto:${EMAIL}` },
+    { label: "contact", type: "scroll", target: "#footer" },
   ] as const,
   sayHi: "say hi",
 };
