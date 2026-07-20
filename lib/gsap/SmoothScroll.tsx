@@ -1,18 +1,24 @@
 "use client";
 
 /*
- * Global ScrollSmoother provider (§A7).
- * - smooth ≈1.2 (maps the reference's Lenis lerp .045 feel)
- * - effects on (data-speed/data-lag hooks)
- * - smoothTouch 0 + native scroll ≤700px via matchMedia gate
- * - reduced-motion: no smoother at all (native scroll)
+ * Global Lenis smooth-scroll provider (§A7).
+ * - reference values from the handoff: lerp .045, wheelMultiplier .9,
+ *   touchMultiplier 1.4, smoothWheel true
+ * - desktop only: native scroll ≤700px via matchMedia gate
+ * - reduced-motion: no Lenis at all (native scroll)
+ * - driven by the GSAP ticker; ScrollTrigger.update on every scroll
  *
- * Fixed chrome (nav, preloader, veil) must live OUTSIDE this wrapper —
- * position:fixed breaks inside the transformed smooth-content element.
+ * Lenis scrolls the document natively (no transformed wrapper), but the
+ * #smooth-wrapper/#smooth-content ids stay — the preloader inerts the
+ * wrapper during its lock window.
  */
 import { useRef } from "react";
-import { gsap, useGSAP, ScrollSmoother } from "@/lib/gsap/register";
+import Lenis from "lenis";
+import "lenis/dist/lenis.css";
+import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap/register";
 import { MQ } from "@/lib/gsap/motion";
+
+let lenis: Lenis | null = null;
 
 export default function SmoothScroll({
   children,
@@ -25,15 +31,21 @@ export default function SmoothScroll({
     const mm = gsap.matchMedia();
     // Full experience only: desktop width AND no reduced-motion opt-in.
     mm.add(`${MQ.desktop} and ${MQ.motionOk}`, () => {
-      const smoother = ScrollSmoother.create({
-        wrapper: "#smooth-wrapper",
-        content: "#smooth-content",
-        smooth: 1.2,
-        effects: true,
-        smoothTouch: 0,
-        normalizeScroll: true,
+      lenis = new Lenis({
+        lerp: 0.045,
+        wheelMultiplier: 0.9,
+        touchMultiplier: 1.4,
+        smoothWheel: true,
       });
-      return () => smoother.kill();
+      lenis.on("scroll", ScrollTrigger.update);
+      const raf = (time: number) => lenis?.raf(time * 1000);
+      gsap.ticker.add(raf);
+      gsap.ticker.lagSmoothing(0);
+      return () => {
+        gsap.ticker.remove(raf);
+        lenis?.destroy();
+        lenis = null;
+      };
     });
     return () => mm.revert();
   });
@@ -45,18 +57,16 @@ export default function SmoothScroll({
   );
 }
 
-/** Route [data-scrollto] clicks through the smoother when present (§A5). */
+/** Route [data-scrollto] clicks through Lenis when present (§A5). */
 export function scrollToSection(target: string) {
-  const smoother = ScrollSmoother.get();
-  const el = document.querySelector(target);
+  const el = document.querySelector<HTMLElement>(target);
   if (!el) return;
-  if (smoother) smoother.scrollTo(el, true);
+  if (lenis) lenis.scrollTo(el);
   else el.scrollIntoView({ behavior: "smooth" });
 }
 
-/** Back-to-top (§A5) — works on every page, smoother-aware. */
+/** Back-to-top (§A5) — works on every page, Lenis-aware. */
 export function scrollToTop() {
-  const smoother = ScrollSmoother.get();
-  if (smoother) smoother.scrollTo(0, true);
+  if (lenis) lenis.scrollTo(0);
   else window.scrollTo({ top: 0, behavior: "smooth" });
 }
