@@ -90,7 +90,7 @@ export default function WorkList() {
       className="relative z-(--z-section) bg-bg pt-[clamp(56px,8vh,110px)] pb-[clamp(56px,8vh,100px)]"
     >
       {/* Header row — Industry / Timeline */}
-      <div className="flex items-baseline justify-between px-9 pb-4">
+      <div className="flex items-baseline justify-between px-9 pb-4 max-b700:px-5.5">
         <span className="font-normal text-[13px] leading-none tracking-[0.04em] text-muted-3">
           {workList.headerLeft}
         </span>

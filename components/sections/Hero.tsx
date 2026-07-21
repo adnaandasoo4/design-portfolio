@@ -1,39 +1,34 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap/register";
 import { DUR, EASE, MQ } from "@/lib/gsap/motion";
 import { onPreloaderDone } from "@/lib/preloader";
 import { hero } from "@/content/copy";
+import FooterGradient from "@/components/site/FooterGradient";
 
 /*
- * Hero — panel layout (user-directed redesign, 2026-07-19).
+ * Hero — full-bleed gradient layout (user-directed, 2026-07-20; pared down
+ * from the pill experiment).
  *
- * One viewport: a pitch-black panel — square-cornered, running from
- * below the nav all the way to the bottom of the page — holding the intro
- * statements + autoplaying showreel, then a short centered hairline and
- * the giant HK Grotesk Wide "ADNAAN DASOO" ON the panel, spanned across.
+ * The footer's WebGL gradient spans the ENTIRE section as a dimmed
+ * background layer (wrapper opacity ~40% so it reads as atmosphere, not
+ * artwork; FooterGradient self-gates its rAF loop via IntersectionObserver
+ * on the canvas — no [data-band-clip] ancestor here). Above it: only the
+ * small "let's collaborate" CTA top-right (the fixed nav hides its own CTA
+ * at the top of the page — see Nav.tsx), and the reduced-scale name at the
+ * BOTTOM of the section — the two WORDS spread edge-to-edge, letters at
+ * natural tracking.
  *
- * The preloader's color frame clip-expands INTO this panel's exact rect
- * ([data-hero-panel] is the measurement target), then the inner elements
- * ([data-hero-intro]) rise in on markPreloaderDone. Reduced motion: all
- * content visible statically; the reel holds its first frame.
- *
- * Showreel hover: two panel-colored bars slide in over the video's top-left
- * and bottom-right edges, recreating the reference's stepped cutoff view.
+ * Reveal: the preloader expands its off-black layer to the full viewport,
+ * then markPreloaderDone fires and the [data-hero-intro] blocks rise in
+ * (y 32→0, autoAlpha, .85 out-quart, .06 stagger). The gradient layer is
+ * NOT an intro block — it simply sits there as the stage fades, reading as
+ * the page background. Reduced motion: markup renders visible statically.
  */
+
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const reelRef = useRef<HTMLVideoElement>(null);
-
-  // Autoplay the reel muted-on-loop only for motion-ok visitors; reduced
-  // motion keeps the first frame as a still (§A10).
-  useEffect(() => {
-    if (window.matchMedia(MQ.reduced).matches) return;
-    reelRef.current?.play().catch(() => {
-      /* autoplay blocked — first frame remains */
-    });
-  }, []);
 
   useGSAP(
     () => {
@@ -45,17 +40,17 @@ export default function Hero() {
 
       const mm = gsap.matchMedia();
 
-      // Default motion branch: elements rise in over the panel once the
-      // preloader's color frame has expanded into it (§ preloader handoff).
+      // §A7 #3 intro reveals: from-bottom +32px → 0, `.85 ease-out-quart`,
+      // stagger `.06` — fired when the preloader's expand completes.
       mm.add(MQ.motionOk, () => {
-        gsap.set(introEls, { y: 24, autoAlpha: 0 });
+        gsap.set(introEls, { y: 32, autoAlpha: 0 });
         const offPreloader = onPreloaderDone(() => {
           gsap.to(introEls, {
             y: 0,
             autoAlpha: 1,
             duration: DUR.intro,
             ease: EASE.outQuart,
-            stagger: 0.08,
+            stagger: 0.06,
           });
         });
         return () => offPreloader();
@@ -72,75 +67,35 @@ export default function Hero() {
       id="hero"
       ref={sectionRef}
       aria-label="Hero"
-      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-[clamp(130px,22vh,255px)] max-b700:px-3"
+      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-4 pb-5 max-b700:h-svh max-b700:px-3"
     >
-      {/* Raised panel — square corners, flush to the viewport bottom; the
-          preloader's color frame expands into exactly this rect */}
-      <div
-        data-hero-panel=""
-        className="relative flex min-h-0 flex-1 flex-col bg-raise-2"
-      >
-        {/* Content row */}
-        <div className="relative grid min-h-0 flex-1 grid-cols-2 max-b700:grid-cols-1">
-          {/* LEFT — intro statements */}
-          <div className="flex flex-col p-7 max-b700:p-5">
-            <div
-              data-hero-intro=""
-              className="flex max-w-[38ch] flex-col gap-[0.8em] font-medium text-ink text-[clamp(21px,1.9vw,34px)] leading-[1.3] tracking-[-0.012em]"
-            >
-              {hero.intro.map((line) => (
-                <p key={line}>{line}</p>
-              ))}
-            </div>
-          </div>
-
-          {/* RIGHT — reel top-right with hover cutoff bars */}
-          <div className="flex flex-col p-7 max-b700:p-5">
-            <div data-hero-intro="" className="flex justify-end">
-              {/* group: on hover, panel-colored bars slide in from the LEFT
-                  (top edge) and RIGHT (bottom edge) — stepped cutoff view */}
-              <div className="group relative aspect-[16/10] w-[min(38vw,660px)] overflow-hidden rounded-(--radius-media) max-b700:w-full">
-                <video
-                  ref={reelRef}
-                  src={hero.showreelSrc}
-                  muted
-                  loop
-                  playsInline
-                  preload="auto"
-                  className="absolute inset-0 h-full w-full bg-slot-2 object-cover"
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute top-0 left-0 h-[10%] w-[46%] -translate-x-full bg-raise-2 transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute right-0 bottom-0 h-[10%] w-[46%] translate-x-full bg-raise-2 transition-transform duration-[0.45s] ease-(--ease-out-quart) group-hover:translate-x-0 motion-reduce:transition-none"
-                />
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Giant name — HK Grotesk Wide, ON the panel; every glyph its own
-            span, justify-between so the word spans the panel width at any
-            viewport. Size is computed from the face's measured advance
-            width ("ADNAAN DASOO" ≈ 9.1em in HKGW SemiBold, ÷9.25 for a 2%
-            hinting margin), so the glyphs themselves fill the width and the
-            justify slack stays sub-letter-spacing. */}
-        <h1
-          aria-label="Adnaan Dasoo"
-          data-hero-intro=""
-          className="flex items-end justify-between px-2 pt-1 font-hkgw font-semibold whitespace-nowrap text-ink uppercase select-none text-[clamp(38px,calc((100vw-88px)/9.25),260px)] leading-[0.94]"
-        >
-          {hero.giantName.split("").map((ch, i) => (
-            <span key={`${ch}-${i}`} aria-hidden="true">
-              {ch === " " ? " " : ch}
-            </span>
-          ))}
-        </h1>
+      {/* FULL-BLEED GRADIENT — dimmed ambient background across the whole
+          section: half-speed flow, hold-to-distort active, but no cursor
+          pill and no pointer cursor */}
+      <div aria-hidden="true" className="absolute inset-0 opacity-40">
+        <FooterGradient speed={0.5} pill={false} />
       </div>
+      {/* CENTER STATEMENT — dead-center over the gradient */}
+      <div
+        data-hero-intro=""
+        className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center font-medium text-ink text-[clamp(15px,1.25vw,20px)]/[1.45] tracking-[-0.008em] max-b700:px-6"
+      >
+        {hero.statement.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </div>
+
+      {/* NAME — bottom of the section; the two WORDS spread edge-to-edge,
+          letters at natural tracking */}
+      <h1
+        aria-label="Adnaan Dasoo"
+        data-hero-intro=""
+        className="relative mt-auto flex items-end justify-between px-2 font-hkgw font-semibold whitespace-nowrap text-ink uppercase select-none text-[clamp(38px,calc((100vw-88px)/13.5),170px)] leading-[0.94] max-b700:text-[clamp(24px,calc((100vw-40px)/9.6),38px)]"
+      >
+        {hero.giantName.split(" ").map((word) => (
+          <span key={word}>{word}</span>
+        ))}
+      </h1>
     </section>
   );
 }

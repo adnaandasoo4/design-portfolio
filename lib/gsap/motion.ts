@@ -31,7 +31,6 @@ export const DUR = {
   swap: 0.85, // say-hi
   intro: 0.85, // reveals
   rect: 0.9, // preloader
-  theme: 0.65, // light toggle
   veil: 0.32, // route veil
   veilIn: 0.6, // route veil entrance fade
   marquee: 32, // loop

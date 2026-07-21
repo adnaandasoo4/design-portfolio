@@ -54,42 +54,122 @@ export default function Disciplines() {
             );
           });
 
-        // §A7 SplitText notes — intro line by lines + eyebrow, revealed once
-        // on enter. Split only after fonts are ready to avoid re-split reflow.
+        // §A7 SplitText notes — every text block reveals as MASKED LINES on
+        // scroll (user round 2026-07-21), images clip-reveal alongside.
+        // Split only after fonts are ready to avoid re-split reflow.
         const introEl = sectionRef.current?.querySelector<HTMLElement>(
           "[data-xp-intro-line]",
         );
         const eyebrowEl =
           sectionRef.current?.querySelector<HTMLElement>("[data-xp-eyebrow]");
-        let split: SplitText | null = null;
+        const splits: SplitText[] = [];
         let cancelled = false;
 
-        if (introEl && eyebrowEl) {
-          document.fonts.ready.then(() => {
-            if (cancelled) return;
-            // ctx.add scopes the late-created tween to this matchMedia branch.
-            ctx.add(() => {
-              split = SplitText.create(introEl, { type: "lines" });
+        document.fonts.ready.then(() => {
+          if (cancelled) return;
+          // ctx.add scopes the late-created tweens to this matchMedia branch.
+          ctx.add(() => {
+            // Intro: eyebrow + headline lines
+            if (introEl && eyebrowEl) {
+              const split = SplitText.create(introEl, {
+                type: "lines",
+                mask: "lines",
+              });
+              splits.push(split);
               gsap.from([eyebrowEl, ...split.lines], {
-                y: 32,
-                opacity: 0,
+                yPercent: 110,
                 duration: DUR.intro,
                 ease: EASE.outQuart,
-                stagger: 0.05,
+                stagger: 0.06,
                 scrollTrigger: {
                   trigger: introEl,
                   start: "top 85%",
                   once: true,
                 },
               });
-            });
+            }
+
+            // Rows: name + description as masked line rises; numeral, JP
+            // label and tag pills stagger up; media clip-reveals downward
+            // (inset keeps the corner radius via `round`).
+            gsap.utils
+              .toArray<HTMLElement>("[data-xp-row]", sectionRef.current)
+              .forEach((row) => {
+                const name = row.querySelector<HTMLElement>("h3");
+                const desc = row.querySelector<HTMLElement>("[data-xp-desc]");
+                const ja = row.querySelector<HTMLElement>("[lang='ja']");
+                const numeral =
+                  row.querySelector<HTMLElement>("[data-xp-numeral]");
+                const tags = gsap.utils.toArray<HTMLElement>("li", row);
+                const media = row.querySelector<HTMLElement>("[data-xp-media]");
+                if (!name || !desc) return;
+
+                const nameSplit = SplitText.create(name, {
+                  type: "lines",
+                  mask: "lines",
+                });
+                const descSplit = SplitText.create(desc, {
+                  type: "lines",
+                  mask: "lines",
+                });
+                splits.push(nameSplit, descSplit);
+
+                const tl = gsap.timeline({
+                  scrollTrigger: { trigger: row, start: "top 78%", once: true },
+                });
+                tl.from(
+                  [...nameSplit.lines, ...descSplit.lines],
+                  {
+                    yPercent: 110,
+                    duration: DUR.intro,
+                    ease: EASE.outQuart,
+                    stagger: 0.07,
+                  },
+                  0,
+                );
+                if (numeral || ja)
+                  tl.from(
+                    [numeral, ja].filter(Boolean),
+                    {
+                      y: 24,
+                      autoAlpha: 0,
+                      duration: DUR.copy2,
+                      ease: EASE.outQuart,
+                      stagger: 0.06,
+                    },
+                    0.05,
+                  );
+                if (tags.length)
+                  tl.from(
+                    tags,
+                    {
+                      y: 18,
+                      autoAlpha: 0,
+                      duration: DUR.copy2,
+                      ease: EASE.outQuart,
+                      stagger: 0.04,
+                    },
+                    0.15,
+                  );
+                if (media)
+                  tl.from(
+                    media,
+                    {
+                      clipPath: "inset(0% 0% 100% 0% round 10px)",
+                      duration: DUR.intro,
+                      ease: EASE.outQuart,
+                      clearProps: "clipPath",
+                    },
+                    0.1,
+                  );
+              });
           });
-        }
+        });
 
         return () => {
           cancelled = true;
-          split?.revert();
-          split = null;
+          splits.forEach((s) => s.revert());
+          splits.length = 0;
         };
       });
     },
@@ -103,14 +183,20 @@ export default function Disciplines() {
       aria-label="Disciplines"
       className="relative z-(--z-section) bg-bg px-4 pt-17.5 pb-32.5 max-b700:px-3 max-b700:pt-10 max-b700:pb-17.5"
     >
-      {/* Outer card — #1d1d21 (bg-raise-2, applied value; NOT the #15151a base) */}
-      <div data-xp-card className="rounded-card bg-raise-2">
+      {/* Outer card — #1d1d21 (bg-raise-2, applied value; NOT the #15151a base).
+          pb-3 (not mb-3 on the panel): a bottom margin on the last child
+          collapses through the card's bottom edge (no padding/border/BFC
+          here, unlike the reference card's overflow:hidden), which deleted
+          the 12px lip and let the panel sit flush with the card's bottom. */}
+      <div data-xp-card className="rounded-card bg-raise-2 pb-3">
         {/* Intro grid: empty numeral gutter · eyebrow + intro line */}
         <div
           data-xp-intro
           className="grid grid-cols-[clamp(120px,15vw,300px)_1fr] gap-10 px-12 pt-24 pb-27 max-b700:grid-cols-1 max-b700:gap-5 max-b700:px-5.5 max-b700:pt-12 max-b700:pb-10"
         >
-          <div aria-hidden="true" />
+          {/* Empty numeral gutter — hidden when the grid stacks so its row
+              gap doesn't offset the eyebrow (AboutBio idiom) */}
+          <div aria-hidden="true" className="max-b700:hidden" />
           <div>
             <p
               data-xp-eyebrow
@@ -120,7 +206,7 @@ export default function Disciplines() {
             </p>
             <h2
               data-xp-intro-line
-              className="mt-4.5 max-w-310 text-[min(50px,3.25vw)] leading-[1.26] font-medium tracking-[-0.015em] text-pretty text-ink"
+              className="mt-4.5 max-w-310 text-[min(50px,3.25vw)] leading-[1.26] font-medium tracking-[-0.015em] text-pretty text-ink max-b700:text-[22px]"
             >
               {disciplinesIntro}
             </h2>
@@ -128,7 +214,10 @@ export default function Disciplines() {
         </div>
 
         {/* Inner panel — #111214, 3 rows */}
-        <div data-xp-panel className="mx-3 mb-3 rounded-panel bg-panel">
+        <div
+          data-xp-panel
+          className="mx-3 rounded-panel bg-panel pb-9 max-b700:pb-5"
+        >
           {disciplines.map((d) => (
             <div
               key={d.numeral}
@@ -143,7 +232,10 @@ export default function Disciplines() {
               )}
 
               {/* 1 — numeral */}
-              <div className="pt-3 text-[18px] leading-none font-normal text-muted-2">
+              <div
+                data-xp-numeral
+                className="pt-3 text-[18px] leading-none font-normal text-muted-2"
+              >
                 {d.numeral}
               </div>
 
@@ -154,7 +246,7 @@ export default function Disciplines() {
                 </h3>
                 <span
                   lang="ja"
-                  className="-mt-1.5 block font-ja text-[15px] leading-none font-normal tracking-[0.12em] text-muted-2"
+                  className="mt-2.5 block font-ja text-[15px] leading-none font-normal tracking-[0.12em] text-muted-2"
                 >
                   {d.jaName}
                 </span>
@@ -162,7 +254,10 @@ export default function Disciplines() {
 
               {/* 3 — description + tag pills */}
               <div>
-                <p className="max-w-[34ch] text-[18px] leading-[1.7] font-normal text-muted-1">
+                <p
+                  data-xp-desc
+                  className="text-[18px] leading-[1.7] font-normal text-muted-1"
+                >
                   {d.description}
                 </p>
                 <ul className="mt-5.5 flex flex-wrap gap-2">

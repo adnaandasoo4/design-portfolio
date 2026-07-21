@@ -37,7 +37,7 @@ export default function AboutClosing() {
         >
           <a
             href={`mailto:${EMAIL}`}
-            className="font-medium text-[clamp(28px,3.3vw,58px)] leading-[1.1] tracking-[-0.02em] text-ink transition-colors duration-(--dur-hover) ease-(--ease-std) hover:text-accent focus-visible:text-accent"
+            className="font-medium text-[clamp(28px,3.3vw,58px)] leading-[1.1] tracking-[-0.02em] text-ink transition-colors duration-(--dur-hover) ease-(--ease-std) hover:text-accent focus-visible:text-accent max-b700:text-[clamp(21px,6.6vw,28px)]"
           >
             {EMAIL}
           </a>

@@ -1,6 +1,6 @@
 /*
  * Work-list index content (§A6 #4). Copy is verbatim from the reference
- * design. Pill images are labeled placeholders until real art lands (§A8).
+ * design. Pill images are real photos in /public/assets (§A8).
  */
 export type Project = {
   /** Row display name (centered, oversized) */
@@ -26,7 +26,7 @@ export const projects: Project[] = [
     jaName: "ロニー",
     industry: "Brand",
     year: "24",
-    image: "/assets/pill-ronny.png",
+    image: "/assets/pill-ronny-2.png",
     href: "/works",
   },
   {
@@ -35,7 +35,7 @@ export const projects: Project[] = [
     jaName: "セイラム・エルカティーブ",
     industry: "Portfolio",
     year: "26",
-    image: "/assets/pill-elkhateeb.png",
+    image: "/assets/pill-elkhateeb-2.png",
     href: "/works",
   },
   {
@@ -44,7 +44,7 @@ export const projects: Project[] = [
     jaName: "ナイキ・クローン",
     industry: "Concept",
     year: "25",
-    image: "/assets/pill-nike-clone.png",
+    image: "/assets/pill-nike-clone-2.png",
     href: "/works",
   },
   {
@@ -53,7 +53,7 @@ export const projects: Project[] = [
     jaName: "ソファイブ・トラッカー",
     industry: "Product",
     year: "26",
-    image: "/assets/pill-sofive.png",
+    image: "/assets/pill-sofive-2.png",
     href: "/works",
   },
 ];

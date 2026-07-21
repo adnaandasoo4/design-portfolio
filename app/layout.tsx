@@ -1,8 +1,8 @@
 /*
- * Root layout — site metadata/JSON-LD, Manrope, the pre-paint theme-init
- * script (§A5 Theme toggle), and the fixed chrome (RouteVeil, Preloader, Nav)
- * mounted OUTSIDE <SmoothScroll> (§A2 z-layers; the preloader inerts the
- * #smooth-wrapper during its lock window).
+ * Root layout — site metadata/JSON-LD, Manrope, and the fixed chrome
+ * (RouteVeil, Preloader, Nav) mounted OUTSIDE <SmoothScroll> (§A2 z-layers;
+ * the preloader inerts the #smooth-wrapper during its lock window).
+ * The site is permanently dark — no theme toggle, no light mode.
  */
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
@@ -42,25 +42,25 @@ const SITE_URL = "https://adnaandasoo.com"; // TODO: confirm final domain
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "adnaan dasoo — designer × engineer",
-    template: "%s — adnaan dasoo",
+    default: "Adnaan Dasoo",
+    template: "%s — Adnaan Dasoo",
   },
   description:
     "Portfolio of Adnaan Dasoo, a Baltimore-based designer and engineer. Visual identities, digital design, and production-grade builds — design and engineering held to the same standard.",
   alternates: { canonical: "/" },
   openGraph: {
-    title: "adnaan dasoo — designer × engineer",
+    title: "Adnaan Dasoo — designer × engineer",
     description:
       "Visual identities, digital design, and production-grade builds — design and engineering held to the same standard.",
     url: SITE_URL,
-    siteName: "adnaan dasoo",
+    siteName: "Adnaan Dasoo",
     images: [{ url: "/assets/og.png", width: 1200, height: 630 }],
     locale: "en_US",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "adnaan dasoo — designer × engineer",
+    title: "Adnaan Dasoo — designer × engineer",
     images: ["/assets/og.png"],
   },
   icons: { icon: "/favicon.ico" },
@@ -98,12 +98,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Theme init before paint — avoids FOUC (§A5 Theme toggle) */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.getItem('ad-theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}`,
-          }}
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}

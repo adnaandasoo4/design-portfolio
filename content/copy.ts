@@ -4,34 +4,23 @@
 
 export const EMAIL = "adnaandasoo@gmail.com";
 
-/*
- * Preloader welcome line — reads "it's all (image) about the / first touch"
- * with the slide frame inline in the first row. Swap the strings to change
- * the phrase; the frame always sits between line1Before and line1After.
- */
-export const preloader = {
-  line1Before: "it's all",
-  line1After: "about the",
-  line2: "first touch",
-};
+/* Preloader is purely visual (stills + off-black expand) — no copy. */
 
 /*
- * Hero — panel layout (user-directed redesign, 2026-07-19): raised panel
- * with intro text + showreel, giant name spanned across the bottom.
+ * Hero — full-bleed dimmed gradient + collaborate CTA + bottom name
+ * (user-directed, 2026-07-20).
  */
 export const hero = {
-  /** Left-panel intro statements (short declarative + supporting line) */
-  intro: [
-    "I'm Adnaan — a designer and engineer.",
-    "I help brands find their visual identity — and build the digital products that carry it everywhere.",
+  /** Centered statement — one array item per display line */
+  statement: [
+    "Visual identity and production-grade websites",
+    "for brands that sweat every detail.",
   ],
-  showreelSrc: "/assets/slider-video-02.mp4",
-  /** Giant bottom name — spanned edge-to-edge like the reference */
+  /** Bottom name — the two words spread edge-to-edge */
   giantName: "ADNAAN DASOO",
-  scrollCue: "scroll down",
 };
 
-/** About blurb — preserve verbatim (§A6 #2); split by words for the fill. */
+/** About blurb — preserve verbatim (§A6 #2); rendered static at full ink. */
 export const aboutBlurb =
   "The goal has always been to close the gap between design and engineering. I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.";
 
@@ -51,15 +40,16 @@ export const workList = {
 };
 
 /*
- * Contact visual (user-directed, 2026-07-19) — replaces the big CONTACT
- * statement: full-viewport monochrome desk photo with a stark white line.
+ * Contact visual (user-directed, 2026-07-19; copy revised 2026-07-20) —
+ * full-viewport monochrome desk photo with a stacked white statement and
+ * a large say-hi CTA. One array item per display line; no arrow glyphs in
+ * the headline. No eyebrow — the "( contact )" label was removed 2026-07-20.
  */
 export const contactVisual = {
-  eyebrow: "( contact )",
-  heading: "LET'S TALK",
-  /** Supporting line — carried over from the retired Statement section */
-  sub: "Each project starts with a conversation.",
-  imageSrc: "/assets/contact-desk.png",
+  lines: ["helping brands", "establish their", "visual presence."],
+  /** Large CTA pill below the statement — scrolls to #footer */
+  cta: "let's collaborate",
+  imageSrc: "/assets/contact-desk-3.png",
 };
 
 /** Prefilled bio prompt for the footer ask-AI links (verbatim). */
@@ -79,6 +69,7 @@ export const footer = {
     { label: "Home", type: "scroll", target: "#hero" },
     { label: "About", type: "route", target: "/about" },
     { label: "Work", type: "route", target: "/works" },
+    { label: "Disciplines", type: "scroll", target: "#disciplines" },
     { label: "Contact", type: "scroll", target: "#footer" },
   ] as const,
   detailsEyebrow: "( my details )",
@@ -92,11 +83,13 @@ export const footer = {
   ],
   askAiEyebrow: "( ask ai about me )",
   askAi: [
+    { label: "openai", base: "https://chatgpt.com/?q=", aria: "ask chatgpt about adnaan" },
     { label: "claude", base: "https://claude.ai/new?q=", aria: "ask claude about adnaan" },
-    { label: "chatgpt", base: "https://chatgpt.com/?q=", aria: "ask chatgpt about adnaan" },
     { label: "gemini", base: "https://www.google.com/search?udm=50&q=", aria: "ask gemini about adnaan" },
     { label: "grok", base: "https://grok.com/?q=", aria: "ask grok about adnaan" },
   ],
+  /** Cursor pill shown while hovering the gradient band */
+  holdLabel: "hold",
   /** Live clock — city label + IANA zone it ticks in */
   clockCity: "Baltimore",
   clockZone: "America/New_York",
@@ -107,12 +100,10 @@ export const footer = {
 };
 
 export const nav = {
-  brand: "adnaan dasoo",
   links: [
     { label: "home", type: "scroll", target: "#hero" },
     { label: "about", type: "route", target: "/about" },
     { label: "work", type: "route", target: "/works" },
     { label: "contact", type: "scroll", target: "#footer" },
   ] as const,
-  sayHi: "say hi",
 };

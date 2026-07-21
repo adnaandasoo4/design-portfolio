@@ -20,8 +20,8 @@ export const disciplinesIntro =
 export const disciplines: Discipline[] = [
   {
     numeral: "01",
-    name: "brand strategy",
-    jaName: "ブランド戦略",
+    name: "Visual Identity",
+    jaName: "ビジュアルアイデンティティ",
     description:
       "Positioning, voice, and visual identity — finding what makes a brand worth noticing and building the system that carries it everywhere.",
     tags: [
@@ -32,13 +32,13 @@ export const disciplines: Discipline[] = [
       "naming",
       "brand systems",
     ],
-    image: "/assets/disc-brand-strategy.png",
+    image: "/assets/disc-brand-strategy-2.png",
     line: false,
   },
   {
     numeral: "02",
-    name: "digital design",
-    jaName: "デジタルデザイン",
+    name: "Digital Brand",
+    jaName: "デジタルブランド",
     description:
       "Interfaces, motion, and art direction — screens that feel considered in every state, from the first paint to the edge case.",
     tags: [
@@ -49,17 +49,17 @@ export const disciplines: Discipline[] = [
       "typography",
       "interaction",
     ],
-    image: "/assets/disc-digital-design.png",
+    image: "/assets/disc-digital-design-2.png",
     line: true,
   },
   {
     numeral: "03",
-    name: "development",
+    name: "Development",
     jaName: "開発",
     description:
       "Production-grade builds in React and TypeScript — fast, accessible front-ends where the craft survives contact with real users.",
     tags: ["react", "next.js", "typescript", "gsap", "supabase", "ci / cd"],
-    image: "/assets/disc-development.png",
+    image: "/assets/disc-development-3.png",
     line: true,
   },
 ];

@@ -5,51 +5,59 @@ import { usePathname } from "next/navigation";
 import { gsap, useGSAP } from "@/lib/gsap/register";
 import { EASE } from "@/lib/gsap/motion";
 import { markPreloaderDone } from "@/lib/preloader";
-import { preloader as copy } from "@/content/copy";
 
 /*
- * Preloader — dark welcome + pill-to-panel handoff (user-directed redesign,
- * 2026-07-19).
+ * Preloader — original handoff wire-up (§A5 [data-preloader], §A6 #0,
+ * §A7 #1), restored 2026-07-20 over the short-lived welcome-line redesign.
  *
- * Off-black #111214 stage (identical to the site surface); a centered white
- * Manrope line — "it's all (frame) about the / first touch" — with a small
- * rounded image frame INLINE in the text. Six stills HARD-CUT through the
- * frame (equal 250ms beats, the first visible from first paint, hands
- * still last); the 7th cut is the solid BLACK panel color, which holds a
- * double beat (500ms), then clip-expands directly into the hero panel's
- * exact rect
- * (0.65s, ease-in-out-quint, radius unwinding to the panel's square
- * corners), covering the still-visible welcome line on the way. The stage
- * background matches the site, so at finish the
- * overlay swaps to transparent and the proxy fades over the identical real
- * panel — an invisible handoff — while the hero's elements rise in on top.
+ * Light #f7f6f4 stage; centered 300×384 frame. Seven stills HARD-CUT over
+ * one another (opacity snaps — the reference's slide divs have no opacity
+ * transition) at 380 + i·120ms; the 8th cut is a solid SITE-OFF-BLACK
+ * (#111214, --color-bg) slide. At 380 + 8·120 + 300ms = 1640ms the rect
+ * expands (`rect .90 / ease-in-out-quint`) to the FULL VIEWPORT — the
+ * off-black becomes the site background itself (user direction 2026-07-20;
+ * no name overlay, no panel-rect target). The expanding layer is a flat
+ * color, so the clip-path port honors the transform/opacity/clip-path rule.
+ *
+ * At expand-complete (+900ms): scroll unlocks, markPreloaderDone fires the
+ * reveals — nav, hero PANEL fade-in, hero intro elements — and the stage
+ * fades out .55s (display:none at +600ms, per the reference).
  *
  * Gating: cascade starts only after all stills decode() (hard 1200ms
  * fallback). Scroll locked + page inert for the duration; released on
  * finish, on reduced-motion skip, and on unmount — never left locked.
+ * Reduced motion: skip cascade/expand, unlock immediately (§A10).
  *
  * Rendered from app/layout.tsx (OUTSIDE the smooth-scroll wrapper).
- * Plays only when the session's FIRST route is "/", once per
- * full page load.
+ * Plays only when the session's FIRST route is "/", once per full page
+ * load.
  */
 
-/** Slide stills — 6 photos, hands-touching still last; the 7th "slide" is
- *  the solid panel color. The FIRST still renders visible from first paint
- *  (no blank frame). */
-const SLIDES = [1, 2, 3, 4, 6, 5].map((n) => `/assets/preload-${n}.jpg`);
+/** Image slides — preload-1…6 (preload-7, the 911 GT3 still, was cut by
+ *  user direction 2026-07-21). The final slide is the solid off-black. */
+const SLIDES = [1, 2, 3, 4, 5, 6].map((n) => `/assets/preload-${n}.jpg`);
 
-/* ---- Choreography timing (s) ---- */
-/** Equal hard-cut beats, first still from t=0 */
-const CASCADE_STEP = 0.25;
-/** The solid color frame (7th cut) lands after the six equal-beat stills… */
-const COLOR_AT = SLIDES.length * CASCADE_STEP;
-/** …and HOLDS for 2× a beat before expanding */
-const EXPAND_AT = COLOR_AT + CASCADE_STEP * 2;
-/** Fast expansion — it swallows the (still-visible) welcome line */
-const EXPAND_DUR = 0.65;
-/** Finish fires as the expansion completes */
-const FINISH_AT = EXPAND_AT + EXPAND_DUR;
+/* ---- Choreography timing (s) — reference v1 port, verbatim ---- */
+/** First hard cut lands at 380ms… */
+const CASCADE_BASE = 0.38;
+/** …then one cut every 150ms — each still holds the frame for exactly one
+ *  step before the next covers it (120ms read rushed, 180ms dragged;
+ *  150ms is the user-tuned middle) */
+const CASCADE_STEP = 0.15;
+/** 8 slides total: 7 stills + the solid color slide */
+const SLIDE_COUNT = SLIDES.length + 1;
+/** Expand at 380 + 8·120 + 300 = 1640ms */
+const EXPAND_AT = CASCADE_BASE + SLIDE_COUNT * CASCADE_STEP + 0.3;
+/** The off-black grows from the frame to the viewport edges over 1.15s —
+ *  longer than the reference's .90s so the sweep reads smooth, not snappy */
+const EXPAND_DUR = 1.15;
+/** Finish (unlock + reveals + fade) only after the expansion has fully
+ *  landed (+0.1s breath) so the reach-the-edges moment is never cut short
+ *  by the stage fade */
+const FINISH_AT = EXPAND_AT + EXPAND_DUR + 0.1;
 const FADE_OUT = 0.55;
+/** display:none 600ms after the fade starts (reference setTimeout) */
+const HIDE_AT = FINISH_AT + 0.6;
 /** Hard fallback if image decode() stalls or 404s (ms) */
 const DECODE_FALLBACK_MS = 1200;
 
@@ -99,6 +107,7 @@ export default function Preloader() {
       window.addEventListener("keydown", preventKeys);
       html.style.overflow = "hidden";
       wrapper?.setAttribute("inert", "");
+      window.scrollTo(0, 0);
       const unlock = () => {
         if (!locked) return;
         locked = false;
@@ -123,57 +132,42 @@ export default function Preloader() {
       const proxy = root.querySelector<HTMLElement>("[data-pre-panel]");
 
       const tl = gsap.timeline({ paused: true });
-      // Cascade: HARD CUTS — the first still is already visible (markup);
-      // each following still snaps in on an equal beat
+
+      // Cascade: HARD CUTS — each slide (7 stills + the solid color layer)
+      // snaps to opacity 1 at 380 + i·120ms, stacking over the previous.
       slides.forEach((slide, i) => {
-        if (i === 0) return;
-        tl.set(slide, { opacity: 1 }, i * CASCADE_STEP);
+        tl.set(slide, { opacity: 1 }, CASCADE_BASE + i * CASCADE_STEP);
       });
 
-      // 7th cut: the solid panel-color frame snaps in (via the proxy layer,
-      // clipped to the frame's exact rounded rect). The welcome line stays
-      // put — the fast expansion simply covers it.
+      // Expand: the full-viewport proxy (same flat off-black as the 8th
+      // slide beneath it — the swap is invisible) clip-expands from the
+      // frame's rect to the whole viewport, i.e. INTO the site background.
+      // The inset is written MANUALLY from a tweened progress value —
+      // GSAP's clip-path string interpolation proved unreliable here (the
+      // rect snapped off-position before expanding); driving px insets per
+      // tick guarantees the growth starts exactly at the frame and reaches
+      // every edge together. Frame rect is read at call time so a resize
+      // during the cascade can't go stale.
       if (frame && proxy) {
         tl.call(
           () => {
             const f = frame.getBoundingClientRect();
-            const radius = getComputedStyle(frame).borderRadius || "0px";
             const vw = window.innerWidth;
             const vh = window.innerHeight;
-            // 1px overdraw: getBoundingClientRect is fractional, and a
-            // clip landing between device pixels leaves a hairline of the
-            // still visible around the color frame. Expanding the clip a
-            // touch past the frame (and hiding the frame's contents) makes
-            // the color fill clean to the edge.
-            const PAD = 1;
-            gsap.set(proxy, {
-              opacity: 1,
-              clipPath: `inset(${f.top - PAD}px ${vw - f.right - PAD}px ${vh - f.bottom - PAD}px ${f.left - PAD}px round ${radius})`,
-            });
-            gsap.set(frame, { autoAlpha: 0 });
-          },
-          [],
-          COLOR_AT,
-        );
-      }
-
-      // Expansion: the color frame grows directly into the hero panel's
-      // exact rect (square corners — radius unwinds to 0 mid-flight),
-      // swallowing the welcome line on the way.
-      if (frame && proxy) {
-        tl.call(
-          () => {
-            const panel = document.querySelector("[data-hero-panel]");
-            const p = panel?.getBoundingClientRect();
-            const vw = window.innerWidth;
-            const vh = window.innerHeight;
-            gsap.to(proxy, {
-              // Fallback: expand to the full viewport if the panel is absent
-              clipPath: p
-                ? `inset(${p.top}px ${vw - p.right}px ${vh - p.bottom}px ${p.left}px round 0px)`
-                : "inset(0px 0px 0px 0px round 0px)",
+            const setClip = (p: number) => {
+              const k = 1 - p;
+              proxy.style.clipPath =
+                `inset(${f.top * k}px ${(vw - f.right) * k}px ` +
+                `${(vh - f.bottom) * k}px ${f.left * k}px)`;
+            };
+            setClip(0);
+            gsap.set(proxy, { opacity: 1 });
+            const state = { p: 0 };
+            gsap.to(state, {
+              p: 1,
               duration: EXPAND_DUR,
               ease: EASE.inOutQuint,
+              onUpdate: () => setClip(state.p),
             });
           },
           [],
@@ -181,8 +175,8 @@ export default function Preloader() {
         );
       }
 
-      // FINISH: stage bg → transparent (identical surfaces, invisible swap),
-      // nav + hero elements fire, proxy fades over the real panel.
+      // FINISH (expand complete): unlock scroll, fire nav + hero intro
+      // reveals, fade the stage out over the revealed site.
       tl.set(root, { pointerEvents: "none" }, FINISH_AT);
       tl.call(
         () => {
@@ -192,13 +186,12 @@ export default function Preloader() {
         [],
         FINISH_AT,
       );
-      tl.set(root, { backgroundColor: "transparent" }, FINISH_AT);
       tl.to(
         root,
         { autoAlpha: 0, duration: FADE_OUT, ease: EASE.std },
         FINISH_AT,
       );
-      tl.call(() => setDone(true), [], FINISH_AT + FADE_OUT);
+      tl.call(() => setDone(true), [], HIDE_AT);
 
       /* ---- Start after image decode(), hard 1200ms fallback (404-proof) ---- */
       let started = false;
@@ -225,59 +218,52 @@ export default function Preloader() {
     <div
       ref={rootRef}
       data-preloader=""
-      className="fixed inset-0 z-(--z-preloader) flex items-center justify-center bg-preloader"
+      className="fixed inset-0 z-(--z-preloader) flex items-center justify-center overflow-hidden bg-preloader"
     >
-      {/* Welcome line — Manrope, white on the dark stage, frame inline */}
+      {/* Centered 300×384 frame — the stills hard-cut through here.
+          Slightly smaller on phones (same 25:32 ratio); the expand reads
+          the frame rect at call time, so the math follows automatically. */}
       <div
-        data-pre-line=""
-        aria-hidden="true"
-        className="flex flex-col items-center gap-[0.15em] text-center font-medium text-ink text-[clamp(28px,3.3vw,52px)] leading-[1.3] tracking-[-0.01em]"
+        data-pre-frame=""
+        className="relative h-[384px] w-[300px] overflow-hidden max-b700:h-[307px] max-b700:w-[240px]"
       >
-        <span className="flex items-center gap-[0.4em]">
-          <span>{copy.line1Before}</span>
-
-          {/* Inline slide frame — the stills cascade through here. Dark
-              backing + 1px slide overdraw (clipped by the frame's rounded
-              overflow) so no light ring shows at the antialiased edge. */}
-          <span
-            data-pre-frame=""
-            className="relative inline-block h-[1.35em] w-[2.05em] overflow-hidden rounded-[0.3em] bg-preloader-slide"
+        {SLIDES.map((src, i) => (
+          <div
+            key={src}
+            data-pre-slide=""
+            className="absolute inset-0 bg-preloader-slide opacity-0"
+            style={{ zIndex: i + 2 }}
           >
-            {SLIDES.map((src, i) => (
-              <span
-                key={src}
-                data-pre-slide=""
-                className={`absolute -inset-px ${i === 0 ? "opacity-100" : "opacity-0"}`}
-                style={{ zIndex: i + 2 }}
-              >
-                {/* Plain <img> so decode() gates the cascade start */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={src}
-                  alt=""
-                  loading="eager"
-                  decoding="async"
-                  draggable={false}
-                  className="absolute inset-0 h-full w-full object-cover object-center"
-                />
-              </span>
-            ))}
-          </span>
+            {/* Plain <img> so decode() gates the cascade start */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={src}
+              alt=""
+              loading="eager"
+              decoding="async"
+              draggable={false}
+              className="absolute inset-0 h-full w-full object-cover object-center"
+            />
+          </div>
+        ))}
 
-          <span>{copy.line1After}</span>
-        </span>
-        <span>{copy.line2}</span>
+        {/* 8th slide — solid site off-black; the expand proxy takes over
+            from this exact flat color, so the handoff is invisible */}
+        <div
+          data-pre-slide=""
+          aria-hidden="true"
+          className="absolute inset-0 bg-bg opacity-0"
+          style={{ zIndex: SLIDES.length + 2 }}
+        />
       </div>
 
-      {/* Color-frame → panel proxy — snaps in clipped to the inline frame's
-          rect (the "7th slide"), expands to the hero panel's rect, then
-          fades over the identical real panel beneath. z-20 keeps it ABOVE
-          the frame's z-indexed slides (z 2..9) so the color cut actually
-          covers the last still. */}
+      {/* Expand proxy — snaps in clipped to the frame's rect, clip-expands
+          to the full viewport (the site background), then fades with the
+          stage while the page elements animate in beneath */}
       <div
         data-pre-panel=""
         aria-hidden="true"
-        className="absolute inset-0 z-20 bg-raise-2 opacity-0"
+        className="absolute inset-0 z-20 bg-bg opacity-0"
         style={{ clipPath: "inset(50% 50% 50% 50%)" }}
       />
     </div>
