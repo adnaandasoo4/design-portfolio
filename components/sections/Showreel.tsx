@@ -27,9 +27,11 @@
  * angle for free, with no velocity sampling and no timers to keep in sync.
  *
  * INTRO. The card does not reveal itself — Hero conducts the whole opening
- * as one timeline, and reaches in for [data-reel-clip] and
- * [data-reel-caption]. Split that across two components and the reel and
- * the type it sits above drift apart the first time either duration moves.
+ * as one timeline, and reaches in for [data-reel-clip], [data-reel-media]
+ * and [data-reel-caption]. Split that across two components and the reel
+ * and the type it sits above drift apart the first time either duration
+ * moves. The video is scaled during the opening; the pointer sweep below
+ * only ever touches the figure, so the two never share a property.
  *
  * Only `transform` is touched by the sweep (§A7), from a single gsap.ticker
  * callback rather than a tween per event. Coarse pointers and reduced-motion
@@ -139,6 +141,7 @@ export default function Showreel() {
           className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px]"
         >
           <video
+            data-reel-media=""
             className="size-full object-cover"
             ref={video}
             src={hero.reel.src}

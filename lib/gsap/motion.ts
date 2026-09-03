@@ -30,6 +30,11 @@ export const DUR = {
   track: 0.7, // row lift
   swap: 0.85, // say-hi
   intro: 0.85, // reveals
+  /* Hero opening. Longer than `intro` on purpose: this is the one moment
+     the site gets to arrive, and at .85 with a power3 ease the wipe and the
+     lines were over before they read as deliberate. GSAP-side only — no CSS
+     mirrors it, nothing in a stylesheet runs this long. */
+  open: 1.15,
   rect: 0.9, // preloader
   veil: 0.32, // route veil
   veilIn: 0.6, // route veil entrance fade

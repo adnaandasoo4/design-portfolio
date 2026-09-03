@@ -43,24 +43,34 @@
  * clamp's 34px floor is wider than a phone can hold at this face's set
  * width, and the authored line breaks would start wrapping a second time.
  *
- * INTRO (rebuilt 2026-09-03). Every block used to rise 32px and fade in
- * together — the same gesture applied four times, which is a transition
- * rather than an opening. It is now ONE timeline of line reveals, conducted
- * from here so the reel and the type beneath it cannot drift:
+ * INTRO (rebuilt 2026-09-03, twice). ONE gesture, in ONE direction, on ONE
+ * ease. Three moves, overlapping so heavily they read as a single event:
  *
- *   1. the reel opens from a centre line — clip-path inset(50%) → inset(0),
- *      the same wipe the work-list marquee uses, so the site opens in a
- *      shape it already speaks;
- *   2. its caption rises out from under the card's bottom edge;
- *   3. the eyebrow, headline and paragraph split into LINES, each in its own
- *      clipping box, and rise through it in DOM order — which is also
- *      top-to-bottom on screen, so the page assembles downward.
+ *   1. the reel is WIPED open from its bottom edge upward, while the video
+ *      inside it starts oversized and settles to true size as the wipe
+ *      lands. The counter-motion is the whole trick — without it a clip
+ *      reveal is a rectangle appearing, and with it the reel reads as a
+ *      plate sliding into place behind a window;
+ *   2. the caption rises out from under the card's bottom edge;
+ *   3. eyebrow, headline and paragraph split into LINES, each masked, and
+ *      rise through it — DOM order, which is also top-to-bottom on screen.
+ *
+ * The first attempt opened the reel from its CENTRE line and ran everything
+ * on power3 at .85s. Both were wrong. A centre-out clip on 16:9 video reads
+ * as the picture being un-squashed vertically, and it pulled against text
+ * that was rising — two directions, so neither registered. Everything moves
+ * one way now, on expo.out over DUR.open, which is long enough for the
+ * settle to be seen rather than merely completed.
  *
  * Nothing fades. A mask reveal and a fade are different claims about where
- * the content came from, and mixing them reads as neither. autoAlpha is set
- * on the text only to hold it unsplit-and-unstyled off the screen until
- * both gates below have opened; it is restored in the same frame the lines
- * start moving, never animated.
+ * the content came from. autoAlpha is set on the text only to hold it
+ * unsplit and off-screen until both gates below have opened; it is restored
+ * in the same frame the lines start moving, never animated.
+ *
+ * Masks come from SplitText's own `mask: "lines"` rather than a linesClass
+ * of overflow-hidden. GSAP sizes those wrappers itself, which is the safer
+ * of the two at the headline's 0.88 leading — a hand-rolled box is exactly
+ * the line height, with nothing spare for a cap or an accent.
  *
  * TWO GATES, and the timeline needs both: markPreloaderDone (the off-black
  * has finished expanding) and document.fonts.ready (§A7 — split against the
@@ -79,14 +89,24 @@ import { onPreloaderDone } from "@/lib/preloader";
 import { hero } from "@/content/copy";
 import Showreel from "@/components/sections/Showreel";
 
-/** The reel's closed and open states. Percentages on every side in both,
- *  so the browser can interpolate between them. */
-const REEL_SHUT = "inset(50% 0% 50% 0%)";
+/** The reel's closed and open clips. `inset(100% 0 0 0)` collapses the box
+ *  onto its BOTTOM edge, so opening to inset(0) grows it upward — the same
+ *  direction every line beneath it travels. Percentages on all four sides in
+ *  both states, so the browser can interpolate between them. */
+const REEL_SHUT = "inset(100% 0% 0% 0%)";
 const REEL_OPEN = "inset(0% 0% 0% 0%)";
-/** The caption and the type start a beat inside the reel's own opening, so
- *  the hero reads as one gesture rather than a queue. */
-const CAPTION_AT = 0.34;
-const LINES_AT = 0.46;
+/** How much larger than its frame the video starts. Enough to be felt as it
+ *  settles, not so much that the crop visibly changes. */
+const REEL_OVERSCAN = 1.22;
+/** The settle outlasts the wipe, so the reel is still arriving after its
+ *  edge has stopped — the part that reads as weight. */
+const SETTLE_STRETCH = 1.3;
+
+/* Timeline positions, in seconds. Every move starts before the one above it
+   has finished; played end to end this is a queue, not an opening. */
+const CAPTION_AT = 0.32;
+const LINES_AT = 0.42;
+const LINE_STAGGER = 0.075;
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -100,6 +120,7 @@ export default function Hero() {
 
       mm.add(MQ.motionOk, () => {
         const reel = section.querySelector<HTMLElement>("[data-reel-clip]");
+        const media = section.querySelector<HTMLElement>("[data-reel-media]");
         const caption =
           section.querySelector<HTMLElement>("[data-reel-caption]");
         const textEls = gsap.utils.toArray<HTMLElement>(
@@ -111,7 +132,8 @@ export default function Hero() {
         // autoAlpha rather than a mask because its masks do not exist yet —
         // SplitText makes them, and only once the font has landed.
         if (reel) gsap.set(reel, { clipPath: REEL_SHUT });
-        if (caption) gsap.set(caption, { yPercent: 108 });
+        if (media) gsap.set(media, { scale: REEL_OVERSCAN });
+        if (caption) gsap.set(caption, { yPercent: 100 });
         gsap.set(textEls, { autoAlpha: 0 });
 
         let split: SplitText | null = null;
@@ -123,22 +145,22 @@ export default function Hero() {
         const start = () => {
           if (cancelled || tl || !fontsReady || !preloaderDone) return;
 
-          // linesClass gives every line its own clipping box, so the rise
-          // reads as type emerging from an edge rather than sliding.
-          split = new SplitText(textEls, {
-            type: "lines",
-            linesClass: "overflow-hidden",
-          });
+          // `mask: "lines"` wraps every line in a clipping box GSAP sizes
+          // itself; see the note above on why that beats a hand-rolled
+          // overflow-hidden at this leading.
+          split = new SplitText(textEls, { type: "lines", mask: "lines" });
           // Safe now: each line sits below its own mask, so revealing the
           // element reveals nothing yet.
           gsap.set(textEls, { autoAlpha: 1 });
 
           tl = gsap.timeline({
-            defaults: { duration: DUR.intro, ease: EASE.outQuart },
+            defaults: { duration: DUR.open, ease: EASE.outExpo },
           });
           if (reel) tl.to(reel, { clipPath: REEL_OPEN }, 0);
+          if (media)
+            tl.to(media, { scale: 1, duration: DUR.open * SETTLE_STRETCH }, 0);
           if (caption) tl.to(caption, { yPercent: 0 }, CAPTION_AT);
-          tl.from(split.lines, { yPercent: 108, stagger: 0.06 }, LINES_AT);
+          tl.from(split.lines, { yPercent: 100, stagger: LINE_STAGGER }, LINES_AT);
         };
 
         document.fonts.ready.then(() => {
@@ -160,6 +182,7 @@ export default function Hero() {
           split?.revert();
           gsap.set(textEls, { clearProps: "visibility,opacity" });
           if (reel) gsap.set(reel, { clearProps: "clipPath" });
+          if (media) gsap.set(media, { clearProps: "transform" });
           if (caption) gsap.set(caption, { clearProps: "transform" });
         };
       });
