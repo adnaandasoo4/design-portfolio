@@ -139,9 +139,12 @@ export default function Showreel() {
         </div>
 
         {/* Caption — hugs the card's own left and right edges */}
+        {/* Label carries the ink; the action sits back in the same grey as
+            the hero's eyebrow and paragraph, so the secondary tier is
+            consistent across the whole section. */}
         <figcaption className="mt-[clamp(12px,1.4vw,20px)] flex items-center justify-between gap-6 font-mono-ui text-meta leading-none text-ink">
           <span>{hero.reel.label}</span>
-          <span>{hero.reel.note}</span>
+          <span className="text-muted-2">{hero.reel.note}</span>
         </figcaption>
       </figure>
     </div>
