@@ -58,21 +58,35 @@ export const hero = {
  * different things under one name in one folder is an import waiting to go
  * to the wrong file.
  *
- * The mission blurb, split at its own sentence break so
- * the thesis can take masthead treatment and the argument can sit in the
- * secondary tier. NOT a rewrite: `statement` and `body` are the handoff
- * text verbatim, and `aboutBlurb` below reassembles them so the §A6 string
- * still exists in one piece and cannot drift from its halves.
+ * `statement` is the §A6 blurb's opening sentence, kept verbatim, and takes
+ * the section's h2. The paragraphs beneath it are new (user, 2026-09-03) —
+ * a personal piece rather than a service description, built on the parallel
+ * the user gave: in football everything runs through the first touch, and
+ * the same is true of a page. The rail's label comes from that idea too.
  */
 export const aboutSection = {
-  eyebrow: "( about )",
+  eyebrow: "( first touch )",
+  note: "Baltimore, MD\nStill taking touches.",
+  /* PLACEHOLDER (2026-09-03): /assets/about-portrait.png is a 16KB stand-in
+     graphic reading "Adnaan Dasoo — portrait", not a photograph. The mirror
+     shot the user wanted is not in the project. Drop the real file at this
+     path and nothing else has to change. */
+  portrait: "/assets/about-portrait.png",
+  portraitAlt: "Adnaan Dasoo",
   statement:
     "The goal has always been to close the gap between design and engineering.",
-  body: "I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.",
+  paragraphs: [
+    "I have always been pulled toward how things look. Not decoration — proportion, weight, the reason one version of a thing feels settled and the next one doesn't. Long before I had a word for it, I was moving things a few pixels at a time until they sat right.",
+    "Football taught me the rest of it. Everything in that game runs through the first touch. Not the finish, not the pass after it — the touch. Take it cleanly and the next moment opens up in front of you. Take it badly and you spend the rest of the play recovering from yourself. You cannot fake it and you cannot rush it; you earn it by taking it ten thousand times, alone, against a wall.",
+    "Design is the same discipline in different clothes. The first touch is the first second on the page — the moment someone decides, before they have read a word, whether you are serious. It has to be clean. So I iterate, and iterate, and iterate again. Not because I am unsure, but because the version that lands is almost never the first one, and the distance between close and clean is the entire job.",
+  ],
 };
 
-/** About blurb — preserve verbatim (§A6 #2). */
-export const aboutBlurb = `${aboutSection.statement} ${aboutSection.body}`;
+/** §A6 #2 blurb — retained verbatim as the handoff record. The section now
+ *  runs the longer personal piece above; only its first sentence is
+ *  rendered, as aboutSection.statement. */
+export const aboutBlurb =
+  "The goal has always been to close the gap between design and engineering. I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.";
 
 export const divider = {
   /** [text, color, speed, preOffset marginLeft] */

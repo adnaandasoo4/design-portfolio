@@ -26,11 +26,15 @@ export default function Spread({
   tight = false,
   id,
   ariaLabel,
+  railExtra,
 }: {
   /** Mono label at the top of the rail, e.g. "( branding )" */
   eyebrow: string;
   /** Optional line(s) under the rail's hairline; \n breaks are honoured */
   note?: string;
+  /** Optional block at the FOOT of the rail — an image, a stat, a link.
+   *  Sits inside the rail's reveal, so it rises with the label above it. */
+  railExtra?: ReactNode;
   children: ReactNode;
   className?: string;
   /** Half the vertical padding — for sections that follow a full-bleed band */
@@ -59,6 +63,7 @@ export default function Spread({
           <p>{eyebrow}</p>
           <span aria-hidden="true" className="block h-px w-full bg-line-09" />
           {note ? <p className="whitespace-pre-line">{note}</p> : null}
+          {railExtra}
         </div>
 
         <div>{children}</div>

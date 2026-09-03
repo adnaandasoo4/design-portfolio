@@ -7,16 +7,20 @@
  * the page no longer uses, setting the thesis and the argument supporting
  * it as one undifferentiated block.
  *
- * Now the rail carries the label and the location, and the right column
- * carries the thesis as the section's <h2> — which it never had — followed
- * by the argument in the same mono/grey/--text-meta tier the hero's eyebrow,
- * paragraph and reel caption all share.
+ * The rail carries the label, a short note and the portrait; the right
+ * column carries the thesis as the section's <h2> — which it never had —
+ * followed by a personal piece in the same mono/grey/--text-meta tier the
+ * hero's eyebrow, paragraph and reel caption all share.
+ *
+ * That tier was chosen for two-line captions, so across three paragraphs it
+ * gets a looser line-height and a measure capped in `ch`: mono at a
+ * comfortable reading width, not a caption stretched to fill a column.
  *
  * The layout itself lives in components/site/Spread, shared with the
  * Branding page, so the two cannot drift apart.
  *
- * Copy is NOT rewritten: statement and body are the §A6 blurb split at its
- * own sentence break, and aboutBlurb is derived by reassembling them.
+ * The statement is the §A6 blurb's opening sentence, verbatim; the
+ * paragraphs under it are new (user, 2026-09-03).
  *
  * Weight is the hierarchy against the hero: the h1 there is font-bold, this
  * is font-semibold — which is also the heaviest REAL cut of HK Grotesk Wide
@@ -31,8 +35,9 @@
 import { useRef } from "react";
 import { gsap, useGSAP, SplitText } from "@/lib/gsap/register";
 import { DUR, EASE, MQ } from "@/lib/gsap/motion";
+import Image from "next/image";
 import Spread from "@/components/site/Spread";
-import { aboutSection, footer } from "@/content/copy";
+import { aboutSection } from "@/content/copy";
 
 /** Where the section has to reach before the reveal fires */
 const REVEAL_START = "top 75%";
@@ -105,8 +110,19 @@ export default function About() {
         id="about"
         ariaLabel="About"
         eyebrow={aboutSection.eyebrow}
-        note={footer.basedIn}
+        note={aboutSection.note}
         className="z-(--z-about)"
+        railExtra={
+          <div className="relative mt-3 aspect-4/5 w-full overflow-hidden rounded-media bg-slot">
+            <Image
+              src={aboutSection.portrait}
+              alt={aboutSection.portraitAlt}
+              fill
+              sizes="(max-width: 860px) 100vw, 26vw"
+              className="object-cover"
+            />
+          </div>
+        }
       >
         <h2
           data-about-statement=""
@@ -114,12 +130,13 @@ export default function About() {
         >
           {aboutSection.statement}
         </h2>
-        <p
-          data-reveal=""
-          className="mt-[clamp(28px,4vh,56px)] max-w-[52ch] font-mono-ui text-meta/[1.7] text-muted-2"
-        >
-          {aboutSection.body}
-        </p>
+        <div className="mt-[clamp(28px,4vh,56px)] flex max-w-[62ch] flex-col gap-[1.4em] font-mono-ui text-meta/[1.85] text-muted-2">
+          {aboutSection.paragraphs.map((paragraph) => (
+            <p key={paragraph.slice(0, 24)} data-reveal="">
+              {paragraph}
+            </p>
+          ))}
+        </div>
       </Spread>
     </div>
   );
