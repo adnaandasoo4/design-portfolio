@@ -10,7 +10,9 @@
  *   1. the reel, centred in whatever height is left between the fixed nav
  *      and the statement block — which lands it slightly ABOVE the vertical
  *      centre of the viewport, as in the reference;
- *   2. a mono eyebrow;
+ *   2. a mono eyebrow, sentence case (user, 2026-09-02) — its tracking
+ *      came in from 0.1em with the capitals, which needed the air that
+ *      lowercase does not;
  *   3. the masthead headline (the page's single <h1>, §A10) with the
  *      paragraph BOTTOM-aligned to its last line — `items-end` is doing
  *      that, not a hand-tuned offset, so it holds at every width.
@@ -105,7 +107,7 @@ export default function Hero() {
       <div className="shrink-0">
         <p
           data-hero-intro=""
-          className="font-mono-ui text-meta/[1.6] tracking-[0.1em] text-muted-2 uppercase"
+          className="font-mono-ui text-meta/[1.6] tracking-[0.02em] text-muted-2"
         >
           {hero.eyebrow.map((line) => (
             <span key={line} className="block">

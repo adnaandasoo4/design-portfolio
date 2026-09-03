@@ -24,7 +24,7 @@ export const EMAIL = "adnaandasoo@gmail.com";
  */
 export const hero = {
   /** Mono eyebrow — one array item per display line */
-  eyebrow: ["FOR B2B TECH TEAMS THAT HAVE", "OUTGROWN THEIR WEBSITE"],
+  eyebrow: ["For B2B tech teams that have", "outgrown their website"],
   /** Masthead headline — one array item per display line */
   headline: ["BRANDING & WEBSITES", "THAT MOVE B2B TECH", "TEAMS FORWARD"],
   /** Right-hand paragraph, bottom-aligned to the headline */
@@ -44,12 +44,11 @@ export const hero = {
     src: "/assets/brand-reel.mp4",
     /** Accessible name for the video */
     alt: "Branding showreel",
-    /** Caption under the card — label left, description right. Replaces the
-     *  reference's "Projects Showreel" / "Watch" pair (user, 2026-09-02);
-     *  set in the mono face at --text-meta so it reads as one tier with the
-     *  hero's eyebrow and paragraph. */
-    label: "( showreel )",
-    note: "Branding, identity & digital",
+    /** Caption under the card — label left, action right. Set in the mono
+     *  face at --text-meta so it reads as one tier with the hero's eyebrow
+     *  and paragraph. The parentheses match the footer's eyebrows. */
+    label: "( projects showreel )",
+    note: "watch",
   },
 };
 
