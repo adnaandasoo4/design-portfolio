@@ -8,6 +8,13 @@
  * rather than three near-misses. That is the hero's own size token, a step
  * above the site-wide --text-meta.
  *
+ * MOBILE (user, 2026-09-03). The card goes edge to edge and loses both its
+ * corner radius and its caption. w-screen is wider than the hero's padded
+ * content box, and the track centres it, so it overhangs the 16px gutter
+ * evenly on both sides and lands flush to the viewport edges; <main>'s
+ * overflow-x-clip is what keeps that from becoming a scrollbar. The sweep
+ * below is fine-pointer only, so nothing here fights it.
+ *
  * TRAVEL. The card sweeps the full width of the hero's content box —
  * margin to margin, never past the page gutters. The amplitude is measured,
  * not guessed: half the slack left over once the card's own width is taken
@@ -138,7 +145,7 @@ export default function Showreel() {
             element. See components/sections/Hero. */}
         <div
           data-reel-clip=""
-          className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px]"
+          className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px] max-b700:w-screen max-b700:rounded-none"
         >
           <video
             data-reel-media=""
@@ -163,7 +170,7 @@ export default function Showreel() {
             other line in the hero. SplitText cannot do this one — it would
             wrap the flex children in line divs and take the
             justify-between apart. */}
-        <figcaption className="mt-[clamp(12px,1.4vw,20px)] overflow-hidden">
+        <figcaption className="mt-[clamp(12px,1.4vw,20px)] overflow-hidden max-b700:hidden">
           <span
             data-reel-caption=""
             className="flex items-center justify-between gap-6 font-manrope text-meta-lg leading-none text-ink"

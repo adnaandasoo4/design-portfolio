@@ -42,6 +42,11 @@
  * Below 700px the headline drops off the clamp onto a pure vw size — the
  * clamp's 34px floor is wider than a phone can hold at this face's set
  * width, and the authored line breaks would start wrapping a second time.
+ * That vw figure went 6.2 → 9.4 and the secondary tier 15 → 17px (user,
+ * 2026-09-03): the clamps are authored for a desktop measure, and at the
+ * floor of every one of them the phone hero was the quietest screen on the
+ * site rather than its loudest. The line-height on the secondary tier eases
+ * to 1.5 with the size, as it does everywhere else here.
  *
  * INTRO (rebuilt 2026-09-03, twice). ONE gesture, in ONE direction, on ONE
  * ease. Three moves, overlapping so heavily they read as a single event:
@@ -211,7 +216,7 @@ export default function Hero() {
       <div className="shrink-0">
         <p
           data-hero-line=""
-          className="font-manrope text-meta-lg/[1.6] tracking-[0.02em] text-muted-2"
+          className="font-manrope text-meta-lg/[1.6] tracking-[0.02em] text-muted-2 max-b700:text-[17px]/[1.5]"
         >
           {hero.eyebrow.map((line) => (
             <span key={line} className="block">
@@ -223,7 +228,7 @@ export default function Hero() {
         <div className="mt-[clamp(16px,2.4vh,30px)] flex items-end justify-between gap-[clamp(24px,5vw,90px)] max-b860:flex-col max-b860:items-start max-b860:gap-7">
           <h1
             data-hero-line=""
-            className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-bold tracking-[-0.02em] text-ink uppercase max-b700:text-[6.2vw]"
+            className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-bold tracking-[-0.02em] text-ink uppercase max-b700:text-[9.4vw]"
           >
             {hero.headline.map((line) => (
               <span key={line} className="block">
@@ -234,7 +239,7 @@ export default function Hero() {
 
           <p
             data-hero-line=""
-            className="w-[clamp(250px,26vw,360px)] shrink-0 pb-[0.4em] font-manrope text-meta-lg/[1.6] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
+            className="w-[clamp(250px,26vw,360px)] shrink-0 pb-[0.4em] font-manrope text-meta-lg/[1.6] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0 max-b700:text-[17px]/[1.5]"
           >
             {hero.paragraph}
           </p>

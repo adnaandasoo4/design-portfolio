@@ -260,7 +260,11 @@ export default function Disciplines() {
                 >
                   {d.description}
                 </p>
-                <ul className="mt-5.5 flex flex-wrap gap-2">
+                {/* Dropped below 700px (user, 2026-09-03): six pills wrap
+                    to three or four rows at that width, which turns a
+                    footnote to the description into the tallest thing in
+                    the row. */}
+                <ul className="mt-5.5 flex flex-wrap gap-2 max-b700:hidden">
                   {d.tags.map((tag) => (
                     <li
                       key={tag}

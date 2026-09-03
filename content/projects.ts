@@ -19,7 +19,9 @@ export type Project = {
   href: string;
 };
 
-export const projects: Project[] = [
+/* Authored order is irrelevant — `projects` below is sorted, so a new row
+   can be appended here and lands in the right place on its own. */
+const ROWS: Project[] = [
   {
     name: "Ronny",
     marqueeName: "Ronny",
@@ -57,3 +59,15 @@ export const projects: Project[] = [
     href: "/works",
   },
 ];
+
+/**
+ * Newest first (user, 2026-09-03). Sorted rather than hand-ordered: the row
+ * order IS the year order, and a list that only happens to be sorted stops
+ * being sorted the first time someone appends to it.
+ *
+ * Array#sort is stable per spec, so rows sharing a year keep the order they
+ * were authored in above — the only part still decided by hand.
+ */
+export const projects: Project[] = [...ROWS].sort(
+  (a, b) => Number(b.year) - Number(a.year),
+);

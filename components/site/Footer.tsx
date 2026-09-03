@@ -12,6 +12,7 @@
  * so five rows + meta always clear 70svh at desktop heights ~700–1100px
  * (row padding is py-1.5 — the fifth row ate the py-2 slack at ~700px).
  * Bottom block: WebGL gradient band (FooterGradient) with brand + tagline.
+ * The band is dropped below 700px (user, 2026-09-03).
  *
  * Big-link hover: light-gray flood (--color-ink-1) + black text snap ON
  * instantly, fade OFF at --dur-copy-2; label + arrow glide right subtly on
@@ -673,9 +674,14 @@ export default function Footer() {
            last stretch expands the visible strip up from the bottom edge —
            the band stays stationary while the page lifts off it.
            (clip-path clips fixed descendants without moving them.) */}
+      {/* Gone entirely below 700px (user, 2026-09-03) — `hidden` takes the
+          30svh slot out of the flow with it, so the footer simply ends at
+          its content on a phone. FooterGradient still mounts, but its rAF
+          loop is gated on an IntersectionObserver and a display:none host
+          never intersects, so nothing runs. */}
       <div
         data-band-clip=""
-        className="relative h-[30svh] min-h-48 [clip-path:inset(0)]"
+        className="relative h-[30svh] min-h-48 [clip-path:inset(0)] max-b700:hidden"
       >
         <div className="fixed inset-x-0 bottom-0 h-[30svh] min-h-48">
           <FooterGradient />

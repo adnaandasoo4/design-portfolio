@@ -74,7 +74,7 @@ export default function WorksIndex() {
               <span className="relative block aspect-[16/10] overflow-hidden rounded-media bg-slot">
                 <Image
                   src={card.image}
-                  alt={`${card.title} — ${card.meta} project preview`}
+                  alt={`${card.title} — ${card.kind} ${card.year} project preview`}
                   fill
                   sizes="(max-width: 860px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   loading={i < 3 ? "eager" : "lazy"}
@@ -100,7 +100,9 @@ export default function WorksIndex() {
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   {" · "}
-                  {card.meta}
+                  {card.kind}
+                  {" · "}
+                  {card.year}
                 </span>
               </span>
             </a>
