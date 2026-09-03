@@ -7,7 +7,7 @@
  * and stays the only one.
  */
 import Image from "next/image";
-import Spread from "@/components/branding/Spread";
+import Spread from "@/components/site/Spread";
 import { branding } from "@/content/branding";
 
 export default function BrandingGallery() {

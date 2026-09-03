@@ -10,7 +10,7 @@
  * 860px where the grid becomes a single column and there is nothing left
  * to divide.
  */
-import Spread from "@/components/branding/Spread";
+import Spread from "@/components/site/Spread";
 import { branding } from "@/content/branding";
 
 export default function BrandingServices() {

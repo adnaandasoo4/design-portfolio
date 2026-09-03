@@ -8,7 +8,7 @@
  * only Regular and SemiBold cuts. Deliberate, per the user; a real Bold OTF
  * would upgrade every masthead at once with no code change.
  */
-import Spread from "@/components/branding/Spread";
+import Spread from "@/components/site/Spread";
 import { branding } from "@/content/branding";
 
 export default function BrandingMasthead() {

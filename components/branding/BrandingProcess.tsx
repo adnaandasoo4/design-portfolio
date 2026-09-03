@@ -7,7 +7,7 @@
  * a rule immediately under the section's own rail hairline and read as a
  * doubled line rather than a list.
  */
-import Spread from "@/components/branding/Spread";
+import Spread from "@/components/site/Spread";
 import { branding } from "@/content/branding";
 
 export default function BrandingProcess() {

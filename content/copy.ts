@@ -53,13 +53,18 @@ export const hero = {
 };
 
 /*
- * About (§A6 #2) — the mission blurb, split at its own sentence break so
+ * About section, home page (§A6 #2). Named aboutSection, not `about`:
+ * content/about.ts already exports an `about` for the /about PAGE, and two
+ * different things under one name in one folder is an import waiting to go
+ * to the wrong file.
+ *
+ * The mission blurb, split at its own sentence break so
  * the thesis can take masthead treatment and the argument can sit in the
  * secondary tier. NOT a rewrite: `statement` and `body` are the handoff
  * text verbatim, and `aboutBlurb` below reassembles them so the §A6 string
  * still exists in one piece and cannot drift from its halves.
  */
-export const about = {
+export const aboutSection = {
   eyebrow: "( about )",
   statement:
     "The goal has always been to close the gap between design and engineering.",
@@ -67,7 +72,7 @@ export const about = {
 };
 
 /** About blurb — preserve verbatim (§A6 #2). */
-export const aboutBlurb = `${about.statement} ${about.body}`;
+export const aboutBlurb = `${aboutSection.statement} ${aboutSection.body}`;
 
 export const divider = {
   /** [text, color, speed, preOffset marginLeft] */
