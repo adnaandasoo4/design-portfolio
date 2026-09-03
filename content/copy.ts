@@ -1,6 +1,7 @@
 /*
  * Site-level copy (§A6) — all strings verbatim from the reference design.
  */
+import { about } from "@/content/about";
 
 export const EMAIL = "adnaandasoo@gmail.com";
 
@@ -59,17 +60,26 @@ export const hero = {
  * different things under one name in one folder is an import waiting to go
  * to the wrong file.
  *
- * No eyebrow and no note: the section index and the location line were both
- * removed (user, 2026-09-03), leaving the illustration alone in the left
- * column.
+ * CUT BACK to a teaser (user, 2026-09-03). It ran three long paragraphs —
+ * the whole personal piece — on a page whose job is to move you along. Two
+ * of the three now live only on /about, and the section is the statement,
+ * one paragraph, and a link. The paragraph is not duplicated here: it is
+ * `about.homeTeaser`, imported, so the two pages cannot drift.
+ *
+ * The rail index is back (user, 2026-09-03) after being removed earlier the
+ * same day, reading "Myself" above the illustration. It returns because the
+ * section now has somewhere to send you: an unlabelled image beside a
+ * paragraph and a link reads as a loose fragment, and a word above it makes
+ * it a section again. Still no location line.
  *
  * `statement` is the §A6 blurb's opening sentence, kept verbatim, and takes
- * the section's h2. The paragraphs beneath it are new (user, 2026-09-03) —
- * a personal piece rather than a service description, built on the parallel
- * the user gave: in football everything runs through the first touch, and
- * the same is true of a page.
+ * the section's h2.
  */
 export const aboutSection = {
+  /** Rail index, above the illustration. Unbracketed, unlike the Branding
+   *  page's "( branding )" — the user gave the word, and it labels a person
+   *  rather than a section of work. */
+  eyebrow: "Myself",
   /** Left column of the section. The file is 736x1308 (9:16); it is
    *  displayed at 4:5 and top-anchored, so the crop comes off the BOTTOM —
    *  the desk, window and moon survive, the bed and floor do not. */
@@ -78,16 +88,17 @@ export const aboutSection = {
     "Illustration of a figure working at a desk late at night, lit by a monitor and a full moon through the window.",
   statement:
     "The goal has always been to close the gap between design and engineering.",
-  paragraphs: [
-    "I have always been pulled toward how things look. Not decoration — proportion, weight, the reason one version of a thing feels settled and the next one doesn't. Long before I had a word for it, I was moving things a few pixels at a time until they sat right.",
-    "Football taught me the rest of it. Everything in that game runs through the first touch. Not the finish, not the pass after it — the touch. Take it cleanly and the next moment opens up in front of you. Take it badly and you spend the rest of the play recovering from yourself. You cannot fake it and you cannot rush it; you earn it by taking it ten thousand times, alone, against a wall.",
-    "Design is the same discipline in different clothes. The first touch is the first second on the page — the moment someone decides, before they have read a word, whether you are serious. It has to be clean. So I iterate, and iterate, and iterate again. Not because I am unsure, but because the version that lands is almost never the first one, and the distance between close and clean is the entire job.",
-  ],
+  /** The one paragraph the section keeps — the same string /about renders
+   *  second in its narrative, never a copy of it. */
+  teaser: about.homeTeaser,
+  /** Sends you to the rest of the piece. */
+  readMoreText: "Read more",
+  readMoreHref: "/about",
 };
 
-/** §A6 #2 blurb — retained verbatim as the handoff record. The section now
- *  runs the longer personal piece above; only its first sentence is
- *  rendered, as aboutSection.statement. */
+/** §A6 #2 blurb — retained verbatim as the handoff record. Only its first
+ *  sentence is rendered, as aboutSection.statement; the personal piece that
+ *  replaced the rest of it lives in content/about.ts. */
 export const aboutBlurb =
   "The goal has always been to close the gap between design and engineering. I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.";
 

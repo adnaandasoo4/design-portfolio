@@ -185,10 +185,19 @@ html[data-theme="light"] {
   --font-ja: var(--font-manrope-next), "Hiragino Kaku Gothic ProN", "Yu Gothic",
     "Noto Sans JP", sans-serif;
 
-  /* One shared size for the hero's secondary text. The eyebrow, the
-     right-hand paragraph and the showreel caption must read as a single
-     tier (user, 2026-09-02) — keeping it a token means they cannot drift
-     apart the next time one of them is touched. */
+  /* TWO meta sizes, because the hero's tier outgrew the site's.
+
+     --text-hero-meta is the hero's secondary text: the eyebrow, the
+     right-hand paragraph and the showreel caption. Those three must read as
+     a single tier (user, 2026-09-02) and are now a step LARGER than the
+     rest of the site (user, 2026-09-03) — the hero is the one screen with
+     room for it, and at 13px the block was reading as fine print under a
+     masthead rather than as its subtitle.
+
+     --text-meta stays the site-wide small tier: rails, captions, labels and
+     body blocks on About, Branding and Works. Keeping them separate is what
+     lets the hero grow without dragging nineteen other elements with it. */
+  --text-hero-meta: clamp(15px, 1.2vw, 18px);
   --text-meta: clamp(13px, 1vw, 15px);
 
   /* ---- Radius ---- */
