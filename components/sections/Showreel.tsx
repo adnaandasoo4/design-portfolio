@@ -2,9 +2,10 @@
 
 /*
  * Showreel (user-directed, 2026-09-02) — the card the home page opens on,
- * playing the branding reel and nothing else: no frame, no fill behind it,
- * and no captions. It grew to take back the space the captions held, so the
- * block it occupies is unchanged even though the card is larger.
+ * playing the branding reel: no frame and no fill behind it, with a caption
+ * beneath. The caption is set in the mono face at --text-meta, the same
+ * size and family as the hero's eyebrow and paragraph, so the three read as
+ * one tier rather than three near-misses.
  *
  * TRAVEL. The card sweeps the full width of the hero's content box —
  * margin to margin, never past the page gutters. The amplitude is measured,
@@ -121,9 +122,9 @@ export default function Showreel() {
     /* Full-width track: this element IS the hero's content box, so its
        width is what the amplitude above is measured against. */
     <div ref={scope} className="flex w-full justify-center">
-      {/* The card banks as one piece */}
+      {/* The card and its caption bank as one piece */}
       <figure ref={frame} className="m-0 will-change-transform">
-        <div className="aspect-16/9 w-[clamp(280px,30vw,540px)] overflow-hidden rounded-[3px]">
+        <div className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px]">
           <video
             className="size-full object-cover"
             ref={video}
@@ -136,6 +137,12 @@ export default function Showreel() {
             preload="auto"
           />
         </div>
+
+        {/* Caption — hugs the card's own left and right edges */}
+        <figcaption className="mt-[clamp(12px,1.4vw,20px)] flex items-center justify-between gap-6 font-mono-ui text-meta leading-none text-ink">
+          <span>{hero.reel.label}</span>
+          <span>{hero.reel.note}</span>
+        </figcaption>
       </figure>
     </div>
   );

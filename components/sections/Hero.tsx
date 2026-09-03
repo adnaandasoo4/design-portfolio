@@ -16,9 +16,11 @@
  *      that, not a hand-tuned offset, so it holds at every width.
  *
  * Eyebrow and paragraph are the page's secondary tier: both grey
- * (--color-muted-2) against the white headline, and both on the shared
- * --text-meta size the showreel caption also uses, so the three cannot
- * drift apart.
+ * (--color-muted-2) against the white headline, both in the mono face, and
+ * both on the shared --text-meta size the showreel caption also uses — one
+ * tier in size AND family, so the three cannot drift apart. The paragraph's
+ * column widened a step with the switch, since mono sets roughly a fifth
+ * wider per character than Manrope at the same size.
  *
  * The masthead is font-bold (700), which the browser SYNTHESISES — only
  * Regular (400) and SemiBold (600) cuts of HK Grotesk Wide are in
@@ -126,7 +128,7 @@ export default function Hero() {
 
           <p
             data-hero-intro=""
-            className="w-[clamp(240px,25vw,340px)] shrink-0 pb-[0.4em] text-meta/[1.5] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
+            className="w-[clamp(250px,26vw,360px)] shrink-0 pb-[0.4em] font-mono-ui text-meta/[1.6] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
           >
             {hero.paragraph}
           </p>

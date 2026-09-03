@@ -42,9 +42,14 @@ export const hero = {
    *  loading state instead. */
   reel: {
     src: "/assets/brand-reel.mp4",
-    /** Accessible name for the video. The "Projects Showreel" / "Watch"
-     *  captions were removed 2026-09-02 — the card carries itself. */
+    /** Accessible name for the video */
     alt: "Branding showreel",
+    /** Caption under the card — label left, description right. Replaces the
+     *  reference's "Projects Showreel" / "Watch" pair (user, 2026-09-02);
+     *  set in the mono face at --text-meta so it reads as one tier with the
+     *  hero's eyebrow and paragraph. */
+    label: "( showreel )",
+    note: "Branding, identity & digital",
   },
 };
 

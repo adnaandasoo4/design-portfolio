@@ -330,8 +330,16 @@ export default function FooterGradient({
   return (
     <>
       {/* Canvas host — the canvas itself is created fresh per mount (see
-          effect) so a lost WebGL context can never be inherited */}
-      <div ref={hostRef} aria-hidden="true" className="absolute inset-0" />
+          effect) so a lost WebGL context can never be inherited.
+          cursor-pointer is the band's only affordance now that the follower
+          is gone (user, 2026-09-02): the arrow changing is what says the
+          surface does something. `cursor` inherits, so the canvas appended
+          in here picks it up without being styled directly. */}
+      <div
+        ref={hostRef}
+        aria-hidden="true"
+        className="absolute inset-0 cursor-pointer"
+      />
     </>
   );
 }
