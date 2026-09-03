@@ -597,15 +597,17 @@ export default function Footer() {
 
             {/* Closing CTA — the foot of this column. Large, because at the
                 bottom of an otherwise empty stretch it has to carry the
-                corner rather than just sit in it. mailto, not the copy
-                action the address above uses: a different verb, not a
-                second button for the same one. */}
+                corner rather than just sit in it; the clamp went up a step
+                when the copy shortened to two words, so the block it fills
+                stayed about the same. mailto, not the copy action the
+                address above uses: a different verb, not a second button
+                for the same one. */}
             <div className="mt-auto pt-16 max-b860:mt-0 max-b860:pt-12">
               <a
                 data-collab=""
                 href={`mailto:${EMAIL}`}
                 aria-label={footer.collaborate}
-                className="group inline-flex flex-col items-start gap-3 text-[clamp(26px,3.6vw,58px)] font-semibold tracking-[-0.02em] text-ink max-b700:gap-2 max-b700:text-[30px]"
+                className="group inline-flex flex-col items-start gap-3 text-[clamp(28px,4.2vw,68px)] font-semibold tracking-[-0.02em] text-ink max-b700:gap-2 max-b700:text-[32px]"
               >
                 <SwapText text={footer.collaborate} />
                 {/* The rule that leaves right and returns from the left —

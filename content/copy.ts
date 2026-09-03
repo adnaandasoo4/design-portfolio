@@ -75,10 +75,10 @@ export const workList = {
  */
 export const contactVisual = {
   lines: ["helping brands", "establish their", "visual presence."],
-  /** Large CTA pill below the statement — scrolls to #footer. Same words as
-   *  the footer's closing CTA (user, 2026-09-02); no arrow in the label
-   *  here, since the button already carries its own arrow chip. */
-  cta: "Let's Grab a Coffee",
+  /** Large CTA pill below the statement — scrolls to #footer. Deliberately
+   *  the same words as the footer's closing CTA (user, 2026-09-02); no
+   *  arrow in the label here, since the button carries its own arrow chip. */
+  cta: "Let's Talk",
   imageSrc: "/assets/contact-desk-3.png",
 };
 
@@ -103,7 +103,7 @@ export const footer = {
    *  mail draft — a different action from the copy-to-clipboard address in
    *  ( my details ), not a second button for the same one. The arrow is
    *  drawn, not typed: it rides the same per-letter swap as the words. */
-  collaborate: "Let's Grab a Coffee",
+  collaborate: "Let's Talk",
   socialsEyebrow: "( my socials )",
   socials: [
     // TODO: real URLs (Open Q5) — placeholder "#" in the reference
