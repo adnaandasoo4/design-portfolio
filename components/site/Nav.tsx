@@ -342,7 +342,7 @@ export default function Nav() {
                         >
                           <RowInner label={link.label} index={i} />
                         </Link>
-                      ) : link.type === "scroll" ? (
+                      ) : (
                         <Link
                           data-navlink=""
                           data-scrollto={link.target}
@@ -352,17 +352,6 @@ export default function Nav() {
                         >
                           <RowInner label={link.label} index={i} />
                         </Link>
-                      ) : (
-                        /* "pending": the row exists and hovers, but has nowhere to
-                     go yet — announced as disabled rather than faked. */
-                        <a
-                          href={link.target}
-                          aria-disabled="true"
-                          onClick={(e) => e.preventDefault()}
-                          className={`${ROW_LINK} cursor-default`}
-                        >
-                          <RowInner label={link.label} index={i} />
-                        </a>
                       )}
                     </li>
                   ))}

@@ -1,7 +1,7 @@
 "use client";
 
 /*
- * RevealGroup — shared About-page scroll-reveal wrapper. Any descendant marked
+ * RevealGroup — shared scroll-reveal wrapper (About page, Branding page). Any descendant marked
  * [data-reveal] rises in once on enter (§A7 #9 vocabulary: y 28→0, opacity,
  * .6s ease-out-quart, stagger .06, once). Motion lives ONLY in the matchMedia
  * default branch — the static markup is already the reduced-motion fallback,

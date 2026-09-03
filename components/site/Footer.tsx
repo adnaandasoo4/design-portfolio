@@ -501,7 +501,7 @@ export default function Footer() {
                       >
                         <BigLinkInner label={link.label} />
                       </Link>
-                    ) : link.type === "route" ? (
+                    ) : (
                       <Link
                         href={link.target}
                         onClick={goRoute(link.target)}
@@ -509,18 +509,6 @@ export default function Footer() {
                       >
                         <BigLinkInner label={link.label} />
                       </Link>
-                    ) : (
-                      /* "pending" (Branding) — the row exists and hovers,
-                         but has nowhere to go yet; announced as disabled
-                         rather than faked, exactly as in the top menu. */
-                      <a
-                        href={link.target}
-                        aria-disabled="true"
-                        onClick={(e) => e.preventDefault()}
-                        className={`${BIG_LINK} cursor-default`}
-                      >
-                        <BigLinkInner label={link.label} />
-                      </a>
                     )}
                   </li>
                 ))}

@@ -6,7 +6,7 @@
  * once-on-enter rise via RevealGroup.
  */
 
-import RevealGroup from "@/components/about/RevealGroup";
+import RevealGroup from "@/components/site/RevealGroup";
 import { about } from "@/content/about";
 
 export default function AboutMeta() {

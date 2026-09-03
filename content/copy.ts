@@ -141,13 +141,12 @@ export const nav = {
   /** Full wordmark, left side. The nav renders it uppercase. */
   wordmark: "Adnaan Dasoo",
   menuLabel: "Menu",
-  /** Menu panel links. "Branding" has no destination yet (Open Q, 2026-09-02)
-   *  — type "pending" renders the row and its hover, with no navigation. */
+  /** Menu panel links, shared with the footer. */
   links: [
     { label: "Home", type: "scroll", target: "#hero" },
     { label: "About", type: "route", target: "/about" },
     { label: "Work", type: "route", target: "/works" },
-    { label: "Branding", type: "pending", target: "#" },
+    { label: "Branding", type: "route", target: "/branding" },
     { label: "Disciplines", type: "scroll", target: "#disciplines" },
     { label: "Contact", type: "scroll", target: "#footer" },
   ] as const,

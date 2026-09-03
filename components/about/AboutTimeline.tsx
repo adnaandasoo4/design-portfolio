@@ -10,7 +10,7 @@
  * real experience data is supplied.
  */
 
-import RevealGroup from "@/components/about/RevealGroup";
+import RevealGroup from "@/components/site/RevealGroup";
 import { about } from "@/content/about";
 
 export default function AboutTimeline() {

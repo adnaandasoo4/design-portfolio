@@ -6,7 +6,7 @@
  * home work-list CTA idiom. Standard once-on-enter rise via RevealGroup.
  */
 
-import RevealGroup from "@/components/about/RevealGroup";
+import RevealGroup from "@/components/site/RevealGroup";
 import ArrowLink from "@/components/site/ArrowLink";
 import { about } from "@/content/about";
 import { EMAIL, workList } from "@/content/copy";
