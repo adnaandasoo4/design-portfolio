@@ -117,11 +117,13 @@ export default function About() {
           /* The file is 9:16 and ran the height of the whole section at that
              ratio. Shown at 4:5 and anchored to the top, so object-cover
              takes the crop off the BOTTOM — desk, window and moon stay, bed
-             and floor go. The gradient mask then softens the cut into the
-             page instead of ending on a hard horizon, and because a mask
-             applies to the element's own background too, the bg-slot
-             loading backdrop fades with it rather than showing as a bar. */
-          <div className="relative aspect-4/5 w-full overflow-hidden rounded-media bg-slot [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_74%,transparent_100%)] [mask-image:linear-gradient(to_bottom,#000_0%,#000_74%,transparent_100%)]">
+             and floor go.
+             The cut is HARD (user, 2026-09-03): overflow-hidden and nothing
+             else. A gradient mask was tried here and removed — the frame is
+             meant to read as a window the picture sits inside, and a fade
+             makes it read as the picture dissolving into the page instead,
+             which is the opposite of an edge. */
+          <div className="relative aspect-4/5 w-full overflow-hidden rounded-media bg-slot">
             <Image
               src={aboutSection.image}
               alt={aboutSection.imageAlt}
