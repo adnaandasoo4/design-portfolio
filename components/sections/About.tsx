@@ -7,24 +7,25 @@
  * the page no longer uses, setting the thesis and the argument supporting
  * it as one undifferentiated block.
  *
- * The left column replaces Spread's default label/hairline/note rail
- * outright: an index reading "Myself" over the illustration. The index was
- * removed earlier on 2026-09-03 and restored later the same day, once the
- * section shrank to a teaser — an unlabelled image beside one paragraph and
- * a link reads as a fragment, and a word above it makes it a section again.
- * The location line stayed gone. Because the rail is one grid cell under
- * `items-start`, the index's top edge sits level with the heading's without
- * a margin doing the work — which holds at every width, however many lines
- * the heading wraps to.
+ * The section index and the location line are both gone (user, 2026-09-03):
+ * the left column is the illustration alone, replacing Spread's default
+ * label/hairline/note rail outright. An index reading "Myself" was tried
+ * over the image the same day and removed again. Because the rail is one
+ * grid cell under `items-start`, the image's top edge sits level with the
+ * heading's without a margin doing the work — which holds at every width,
+ * however many lines the heading wraps to.
  *
  * CUT BACK to a teaser (user, 2026-09-03): the statement, ONE paragraph and
  * a "Read more" into /about, where the rest of the piece now lives. The
  * paragraph is `about.homeTeaser` — the same string that page renders, not
  * a copy, so the two cannot drift.
  *
- * The body runs the full width of its column, matching the heading above it
- * (user, 2026-09-03). That is a long measure, so the tier takes a looser
- * line-height here (1.85) than the two-line captions it was drawn for.
+ * The teaser runs the full width of its column, matching the heading above
+ * it (user, 2026-09-03). It is the larger --text-meta-lg tier in full `ink`
+ * rather than small and grey (user, 2026-09-03): with only one paragraph
+ * left, the section has no body copy for it to be the quiet part OF, so it
+ * is the section's second voice, not its footnote. Line-height eases to
+ * 1.75 to carry the extra size across a long measure.
  *
  * The layout itself lives in components/site/Spread, shared with the
  * Branding page, so the two cannot drift apart.
@@ -122,31 +123,24 @@ export default function About() {
         ariaLabel="About"
         className="z-(--z-about)"
         rail={
-          /* Index over the illustration. The rail is already a flex column
-             at the section's small tier, so the label needs no type classes
-             of its own — inheriting is what keeps it in the same register as
-             the Branding page's rails. */
-          <>
-            <p>{aboutSection.eyebrow}</p>
-            {/* The file is 9:16 and ran the height of the whole section at
-                that ratio. Shown at 4:5 and anchored to the top, so
-                object-cover takes the crop off the BOTTOM — desk, window and
-                moon stay, bed and floor go.
-                The cut is HARD (user, 2026-09-03): overflow-hidden and
-                nothing else. A gradient mask was tried here and removed —
-                the frame is meant to read as a window the picture sits
-                inside, and a fade makes it read as the picture dissolving
-                into the page instead, which is the opposite of an edge. */}
-            <div className="relative aspect-4/5 w-full overflow-hidden rounded-media bg-slot">
-              <Image
-                src={aboutSection.image}
-                alt={aboutSection.imageAlt}
-                fill
-                sizes="(max-width: 860px) 100vw, 26vw"
-                className="object-cover object-top"
-              />
-            </div>
-          </>
+          /* The file is 9:16 and ran the height of the whole section at that
+             ratio. Shown at 4:5 and anchored to the top, so object-cover
+             takes the crop off the BOTTOM — desk, window and moon stay, bed
+             and floor go.
+             The cut is HARD (user, 2026-09-03): overflow-hidden and nothing
+             else. A gradient mask was tried here and removed — the frame is
+             meant to read as a window the picture sits inside, and a fade
+             makes it read as the picture dissolving into the page instead,
+             which is the opposite of an edge. */
+          <div className="relative aspect-4/5 w-full overflow-hidden rounded-media bg-slot">
+            <Image
+              src={aboutSection.image}
+              alt={aboutSection.imageAlt}
+              fill
+              sizes="(max-width: 860px) 100vw, 26vw"
+              className="object-cover object-top"
+            />
+          </div>
         }
       >
         <h2
@@ -157,7 +151,7 @@ export default function About() {
         </h2>
         <p
           data-reveal=""
-          className="mt-[clamp(28px,4vh,56px)] font-manrope text-meta/[1.85] text-muted-2"
+          className="mt-[clamp(28px,4vh,56px)] font-manrope text-meta-lg/[1.75] text-ink"
         >
           {aboutSection.teaser}
         </p>

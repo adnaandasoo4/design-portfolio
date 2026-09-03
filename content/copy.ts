@@ -66,20 +66,15 @@ export const hero = {
  * one paragraph, and a link. The paragraph is not duplicated here: it is
  * `about.homeTeaser`, imported, so the two pages cannot drift.
  *
- * The rail index is back (user, 2026-09-03) after being removed earlier the
- * same day, reading "Myself" above the illustration. It returns because the
- * section now has somewhere to send you: an unlabelled image beside a
- * paragraph and a link reads as a loose fragment, and a word above it makes
- * it a section again. Still no location line.
+ * No eyebrow and no note: the section index and the location line were both
+ * removed (user, 2026-09-03), leaving the illustration alone in the left
+ * column. A "Myself" index was tried over the image later the same day and
+ * removed again.
  *
  * `statement` is the §A6 blurb's opening sentence, kept verbatim, and takes
  * the section's h2.
  */
 export const aboutSection = {
-  /** Rail index, above the illustration. Unbracketed, unlike the Branding
-   *  page's "( branding )" — the user gave the word, and it labels a person
-   *  rather than a section of work. */
-  eyebrow: "Myself",
   /** Left column of the section. The file is 736x1308 (9:16); it is
    *  displayed at 4:5 and top-anchored, so the crop comes off the BOTTOM —
    *  the desk, window and moon survive, the bed and floor do not. */

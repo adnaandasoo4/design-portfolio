@@ -15,9 +15,11 @@
 
 import { Fragment, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { gsap, useGSAP } from "@/lib/gsap/register";
 import { EASE, MQ } from "@/lib/gsap/motion";
 import ArrowLink from "@/components/site/ArrowLink";
+import { useVeiledRoute } from "@/components/site/RouteVeil";
 import { projects, type Project } from "@/content/projects";
 import { workList } from "@/content/copy";
 
@@ -57,6 +59,7 @@ function MarqueeGroup({ project }: { project: Project }) {
 
 export default function WorkList() {
   const sectionRef = useRef<HTMLElement>(null);
+  const goRoute = useVeiledRoute();
 
   useGSAP(
     () => {
@@ -106,9 +109,13 @@ export default function WorkList() {
 
       {/* Project rows */}
       {projects.map((p) => (
-        <a
+        /* Was a bare <a>, which meant every work row triggered a full page
+           RELOAD — no client navigation and no veil. Routed through the veil
+           like every other internal link (2026-09-03). */
+        <Link
           key={p.name}
           href={p.href}
+          onClick={goRoute(p.href)}
           data-wrow
           className="group relative flex h-[clamp(128px,21vh,196px)] cursor-pointer items-center justify-center overflow-hidden border-t border-line-09 max-b700:h-27.5"
         >
@@ -143,7 +150,7 @@ export default function WorkList() {
               <MarqueeGroup project={p} />
             </span>
           </span>
-        </a>
+        </Link>
       ))}
 
       {/* CTA — See All */}

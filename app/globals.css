@@ -185,19 +185,20 @@ html[data-theme="light"] {
   --font-ja: var(--font-manrope-next), "Hiragino Kaku Gothic ProN", "Yu Gothic",
     "Noto Sans JP", sans-serif;
 
-  /* TWO meta sizes, because the hero's tier outgrew the site's.
+  /* TWO meta sizes. --text-meta-lg is the larger one, for secondary text
+     that has to carry a whole screen: the hero's eyebrow, right-hand
+     paragraph and showreel caption (those three must read as a single tier,
+     user 2026-09-02) and the home About section's teaser. At 13px each of
+     those read as fine print under a masthead rather than as its subtitle.
 
-     --text-hero-meta is the hero's secondary text: the eyebrow, the
-     right-hand paragraph and the showreel caption. Those three must read as
-     a single tier (user, 2026-09-02) and are now a step LARGER than the
-     rest of the site (user, 2026-09-03) — the hero is the one screen with
-     room for it, and at 13px the block was reading as fine print under a
-     masthead rather than as its subtitle.
+     It was --text-hero-meta for a few hours on 2026-09-03; About took the
+     same size later the same day, and a token named for one section that
+     two sections use is a token that gets copied instead of shared.
 
      --text-meta stays the site-wide small tier: rails, captions, labels and
      body blocks on About, Branding and Works. Keeping them separate is what
-     lets the hero grow without dragging nineteen other elements with it. */
-  --text-hero-meta: clamp(15px, 1.2vw, 18px);
+     lets these few grow without dragging nineteen other elements along. */
+  --text-meta-lg: clamp(15px, 1.2vw, 18px);
   --text-meta: clamp(13px, 1vw, 15px);
 
   /* ---- Radius ---- */

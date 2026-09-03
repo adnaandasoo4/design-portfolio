@@ -57,7 +57,7 @@ import { gsap, useGSAP } from "@/lib/gsap/register";
 import { DUR, EASE, MQ } from "@/lib/gsap/motion";
 import { onPreloaderDone } from "@/lib/preloader";
 import { subscribeChrome } from "@/lib/chromeReveal";
-import { navigateWithVeil } from "@/components/site/RouteVeil";
+import { navigateWithVeil, useVeiledRoute } from "@/components/site/RouteVeil";
 import { scrollToSection, scrollToTop } from "@/lib/gsap/SmoothScroll";
 import { nav as navCopy } from "@/content/copy";
 import ThemeToggle from "@/components/site/ThemeToggle";
@@ -118,13 +118,10 @@ export default function Nav() {
     else scrollToSection(target);
   };
 
-  /** about / work: intercept the real <a> and route through the page veil. */
-  const goRoute = (target: string) => (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    setOpen(false);
-    if (pathname === target) return;
-    navigateWithVeil((href) => router.push(href), target);
-  };
+  /** about / work: intercept the real <a> and route through the page veil.
+   *  The panel closes on every click, same-page ones included. */
+  const veiledRoute = useVeiledRoute();
+  const goRoute = (target: string) => veiledRoute(target, () => setOpen(false));
 
   /** The wordmark — home from anywhere, top-of-page when already home. */
   const goHome = (e: MouseEvent<HTMLAnchorElement>) => {

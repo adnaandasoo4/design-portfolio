@@ -29,7 +29,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { gsap, useGSAP, ScrollTrigger } from "@/lib/gsap/register";
 import { DUR, EASE, MQ } from "@/lib/gsap/motion";
 import { scrollToSection, scrollToTop } from "@/lib/gsap/SmoothScroll";
-import { navigateWithVeil } from "@/components/site/RouteVeil";
+import { navigateWithVeil, useVeiledRoute } from "@/components/site/RouteVeil";
 import FooterGradient from "@/components/site/FooterGradient";
 import { footer, askAiPrompt, EMAIL, nav as navCopy } from "@/content/copy";
 
@@ -442,11 +442,7 @@ export default function Footer() {
   };
 
   /** About / Work: intercept the real <a> and route through the page veil. */
-  const goRoute = (target: string) => (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (pathname === target) return;
-    navigateWithVeil((href) => router.push(href), target);
-  };
+  const goRoute = useVeiledRoute();
 
   /** Copy email — no choreography (user-removed); SR confirmation kept. */
   const onCopyClick = () => {

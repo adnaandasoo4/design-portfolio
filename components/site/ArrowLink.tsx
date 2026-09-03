@@ -1,3 +1,5 @@
+"use client";
+
 /*
  * ArrowLink — the arrow-tailed text-link idiom (§A6 #4 work-list "See All",
  * the home About section's "Read more"): Manrope 500 clamp(20px,1.8vw,26px)
@@ -19,8 +21,13 @@
  * the CSS `translate` property, which is exactly the property transitioned
  * here — so the rest/hover states use translate-* and never [transform:].
  * Reduced motion: motion-safe-gated, so nothing moves.
+ *
+ * NAVIGATION goes through the route veil (2026-09-03) — it used to be a bare
+ * next/link, so "Read more" and "See All" hard-cut to the next page while
+ * every nav link faded. See components/site/RouteVeil.
  */
 import Link from "next/link";
+import { useVeiledRoute } from "@/components/site/RouteVeil";
 
 const LABEL =
   "[transition:translate_var(--dur-track)_var(--ease-out-quart)] " +
@@ -39,9 +46,12 @@ export default function ArrowLink({
   children: React.ReactNode;
   className?: string;
 }) {
+  const goRoute = useVeiledRoute();
+
   return (
     <Link
       href={href}
+      onClick={goRoute(href)}
       className={`group inline-flex items-center gap-3.5 font-medium leading-none text-ink text-[clamp(20px,1.8vw,26px)] ${className}`}
     >
       <span className={LABEL}>{children}</span>

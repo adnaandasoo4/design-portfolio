@@ -19,7 +19,7 @@
  *
  * Eyebrow and paragraph are the page's secondary tier: both grey
  * (--color-muted-2) against the white headline, both Manrope, and both on
- * the shared --text-hero-meta size the showreel caption also uses — one
+ * the shared --text-meta-lg size the showreel caption also uses — one
  * tier in size AND family, so the three cannot drift apart. That token is a
  * step larger than the site-wide --text-meta (user, 2026-09-03); the hero
  * is the only screen with the room for it. The paragraph's column
@@ -110,7 +110,7 @@ export default function Hero() {
       <div className="shrink-0">
         <p
           data-hero-intro=""
-          className="font-manrope text-hero-meta/[1.6] tracking-[0.02em] text-muted-2"
+          className="font-manrope text-meta-lg/[1.6] tracking-[0.02em] text-muted-2"
         >
           {hero.eyebrow.map((line) => (
             <span key={line} className="block">
@@ -133,7 +133,7 @@ export default function Hero() {
 
           <p
             data-hero-intro=""
-            className="w-[clamp(250px,26vw,360px)] shrink-0 pb-[0.4em] font-manrope text-hero-meta/[1.6] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
+            className="w-[clamp(250px,26vw,360px)] shrink-0 pb-[0.4em] font-manrope text-meta-lg/[1.6] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
           >
             {hero.paragraph}
           </p>
