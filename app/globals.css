@@ -61,14 +61,23 @@
   --c-preloader-slide: #26262b;
 }
 
-/* ---- RAW palette: light ---- */
+/* ---- RAW palette: light ----
+   The page is PURE WHITE (user, 2026-09-03). It was a warm off-white
+   (#f2f1ef) mirroring the dark theme's off-black; that carried a beige cast
+   through every raised surface, which is exactly what reads as "not white".
+   So the whole surface family is neutral grey now — no hue at all — and the
+   raises step DOWN from the page the way the dark theme's step UP from it.
+   The inks keep their faint blue, because they are tints of --c-ink
+   (#111214), not of the background. */
 html[data-theme="light"] {
-  --c-bg: #f2f1ef;
-  --c-raise: #eae8e3;
-  --c-raise-2: #e2e0da;
-  --c-panel: #f8f7f5;
-  --c-slot: #e4e2dc;
-  --c-slot-2: #e8e6e1;
+  --c-bg: #ffffff;
+  --c-raise: #f5f5f5;
+  --c-raise-2: #ededed;
+  /* Level with the page, as in dark (where panel == bg): the inner panel
+     punches back to the page tone inside a raised card. */
+  --c-panel: #ffffff;
+  --c-slot: #efefef;
+  --c-slot-2: #f3f3f3;
   --c-ink: #111214;
   --c-ink-soft: #1b1c1f;
   --c-ink-1: #35353a;
@@ -76,11 +85,11 @@ html[data-theme="light"] {
   --c-muted-1: #5f5f67;
   --c-muted-2: #6f6f77;
   --c-muted-3: #7e7e86;
-  --c-muted-ja: #b9b7b2;
-  --c-band-dark: #cbc9c4;
+  --c-muted-ja: #b8b8b8;
+  --c-band-dark: #cacaca;
   --c-accent: #574d66;
   --c-surface-light: #111214;
-  --c-link-light: #f2f1ef;
+  --c-link-light: #ffffff;
   --c-link-light-hover: #a5a5aa;
 
   --c-text-50: rgba(17, 18, 20, 0.56);
@@ -94,13 +103,13 @@ html[data-theme="light"] {
   --c-fill-035: rgba(17, 18, 20, 0.045);
 
   --c-selection-bg: #111214;
-  --c-selection-ink: #f2f1ef;
+  --c-selection-ink: #ffffff;
 
   /* Inverted with everything else: a light page opens from a DARK stage,
      so the reveal always reads as the page pushing its own colour out over
      the opposite one, whichever way round the site is. */
   --c-preloader: #111214;
-  --c-preloader-slide: #e4e2dc;
+  --c-preloader-slide: #f2f2f2;
 
   color-scheme: light;
 }
