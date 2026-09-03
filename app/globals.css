@@ -326,34 +326,50 @@ html[data-pageleave] [data-veil] {
 }
 
 /* ---- Footer "let's collaborate" underline (user, 2026-09-02) ----
-   The rule leaves to the RIGHT and returns from the LEFT as one gesture:
-   accelerating out, decelerating back in. A keyframe rather than a
-   transition, because a transition cannot turn a single property around
-   mid-flight — it can only travel to one destination and back the way it
-   came. The two easings live inside the keyframes so each half of the
-   sweep carries its own. */
-@keyframes ad-rule-swipe {
-  0% {
+   The rule leaves to the RIGHT and returns from the LEFT.
+
+   TWO bars, not one. A single bar had to jump from +102% to −102% inside
+   the keyframes, and a keyframe jump is still an interpolation: across that
+   1% slice the bar swept the whole visible width at enormous speed, and
+   whenever a frame landed inside it the bar was drawn somewhere in the
+   middle — a ghost streak, and the reason the sweep read as stuttering
+   rather than smooth. Two bars remove the jump entirely: one only ever
+   leaves, the other only ever arrives.
+
+   The halves are exactly equal in time and their easings are exact
+   mirrors, so the sweep accelerates and decelerates by the same curve
+   either side of the handoff and the speed peaks precisely where the bar
+   is off-screen. cubic-bezier(0.64,0,0.78,0) is the reflection of
+   --ease-out-quart through the diagonal — the same shape, run backwards.
+
+   The rest and end states both show a bar at 0, so when the animations are
+   dropped on mouse-out the underline is already where it started and there
+   is nothing to snap. */
+@keyframes ad-rule-out {
+  from {
     transform: translateX(0);
-    animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
   }
-  46% {
-    transform: translateX(102%);
+  to {
+    transform: translateX(101%);
   }
-  47% {
-    transform: translateX(-102%);
-    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes ad-rule-in {
+  from {
+    transform: translateX(-101%);
   }
-  100% {
+  to {
     transform: translateX(0);
   }
 }
-[data-collab]:hover [data-collab-rule],
-[data-collab]:focus-visible [data-collab-rule] {
-  /* --dur-clip (0.55s), down from --dur-swap (0.85s) — user, 2026-09-02.
-     Kept a little longer than one letter's swap because this covers two
-     full widths of travel, out and back, not one. */
-  animation: ad-rule-swipe var(--dur-clip) both;
+[data-collab]:hover [data-collab-rule="out"],
+[data-collab]:focus-visible [data-collab-rule="out"] {
+  animation: ad-rule-out calc(var(--dur-clip) / 2) cubic-bezier(0.64, 0, 0.78, 0)
+    both;
+}
+[data-collab]:hover [data-collab-rule="in"],
+[data-collab]:focus-visible [data-collab-rule="in"] {
+  animation: ad-rule-in calc(var(--dur-clip) / 2) var(--ease-out-quart)
+    calc(var(--dur-clip) / 2) both;
 }
 @media (prefers-reduced-motion: reduce) {
   [data-collab]:hover [data-collab-rule],

@@ -616,15 +616,22 @@ export default function Footer() {
                 className={`group inline-flex flex-col items-start gap-3 ${FOOTER_DISPLAY} font-semibold tracking-[-0.02em] text-ink max-b700:gap-2`}
               >
                 <SwapText text={footer.collaborate} />
-                {/* The rule that leaves right and returns from the left —
-                    keyframe and clip live in globals.css (ad-rule-swipe) */}
+                {/* The rule that leaves right and returns from the left.
+                    TWO bars: one only ever exits, the other only ever
+                    arrives — a single bar would have to teleport across the
+                    visible width between the two halves. Keyframes and
+                    easings live in globals.css (ad-rule-out / ad-rule-in). */}
                 <span
                   aria-hidden="true"
                   className="relative block h-px w-full overflow-hidden"
                 >
                   <span
-                    data-collab-rule=""
+                    data-collab-rule="out"
                     className="absolute inset-0 block bg-ink"
+                  />
+                  <span
+                    data-collab-rule="in"
+                    className="absolute inset-0 block bg-ink [transform:translateX(-101%)]"
                   />
                 </span>
               </a>
