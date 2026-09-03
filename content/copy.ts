@@ -58,8 +58,9 @@ export const hero = {
  * different things under one name in one folder is an import waiting to go
  * to the wrong file.
  *
- * No eyebrow: the section index was removed (user, 2026-09-03) and the
- * illustration takes the left column on its own.
+ * No eyebrow and no note: the section index and the location line were both
+ * removed (user, 2026-09-03), leaving the illustration alone in the left
+ * column.
  *
  * `statement` is the §A6 blurb's opening sentence, kept verbatim, and takes
  * the section's h2. The paragraphs beneath it are new (user, 2026-09-03) —
@@ -68,8 +69,9 @@ export const hero = {
  * the same is true of a page.
  */
 export const aboutSection = {
-  note: "Baltimore, MD\nStill taking touches.",
-  /** Left column of the section — 736x1308, i.e. exactly 9:16 */
+  /** Left column of the section. The file is 736x1308 (9:16); it is
+   *  displayed at 4:5 and top-anchored, so the crop comes off the BOTTOM —
+   *  the desk, window and moon survive, the bed and floor do not. */
   image: "/assets/about-desk-night.png",
   imageAlt:
     "Illustration of a figure working at a desk late at night, lit by a monitor and a full moon through the window.",

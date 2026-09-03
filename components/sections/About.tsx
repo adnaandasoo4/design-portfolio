@@ -7,9 +7,9 @@
  * the page no longer uses, setting the thesis and the argument supporting
  * it as one undifferentiated block.
  *
- * The section index is gone (user, 2026-09-03): the left column is the
- * illustration, with the location note beneath it, and it replaces Spread's
- * default label/hairline/note rail outright. Because the rail is one grid
+ * The section index and the location line are both gone (user, 2026-09-03):
+ * the left column is the illustration alone, replacing Spread's default
+ * label/hairline/note rail outright. Because the rail is one grid
  * cell under `items-start`, the image's top edge sits level with the
  * heading's without a margin doing the work — which holds at every width,
  * however many lines the heading wraps to.
@@ -114,19 +114,22 @@ export default function About() {
         ariaLabel="About"
         className="z-(--z-about)"
         rail={
-          <>
-            {/* 9:16, the file's own ratio — no crop */}
-            <div className="relative aspect-9/16 w-full overflow-hidden rounded-media bg-slot">
-              <Image
-                src={aboutSection.image}
-                alt={aboutSection.imageAlt}
-                fill
-                sizes="(max-width: 860px) 100vw, 26vw"
-                className="object-cover"
-              />
-            </div>
-            <p className="whitespace-pre-line">{aboutSection.note}</p>
-          </>
+          /* The file is 9:16 and ran the height of the whole section at that
+             ratio. Shown at 4:5 and anchored to the top, so object-cover
+             takes the crop off the BOTTOM — desk, window and moon stay, bed
+             and floor go. The gradient mask then softens the cut into the
+             page instead of ending on a hard horizon, and because a mask
+             applies to the element's own background too, the bg-slot
+             loading backdrop fades with it rather than showing as a bar. */
+          <div className="relative aspect-4/5 w-full overflow-hidden rounded-media bg-slot [-webkit-mask-image:linear-gradient(to_bottom,#000_0%,#000_74%,transparent_100%)] [mask-image:linear-gradient(to_bottom,#000_0%,#000_74%,transparent_100%)]">
+            <Image
+              src={aboutSection.image}
+              alt={aboutSection.imageAlt}
+              fill
+              sizes="(max-width: 860px) 100vw, 26vw"
+              className="object-cover object-top"
+            />
+          </div>
         }
       >
         <h2
