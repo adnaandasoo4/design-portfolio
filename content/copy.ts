@@ -7,17 +7,31 @@ export const EMAIL = "adnaandasoo@gmail.com";
 /* Preloader is purely visual (stills + off-black expand) — no copy. */
 
 /*
- * Hero — full-bleed dimmed gradient + collaborate CTA + bottom name
- * (user-directed, 2026-07-20).
+ * Hero — centered showreel over a stacked statement block (user-directed,
+ * 2026-09-02). Three text slots below the reel: a mono eyebrow, the giant
+ * masthead headline (the page's single h1), and a right-aligned paragraph
+ * that bottoms out with the headline's last line.
+ *
+ * All three are drawn from copy the site already owned: the eyebrow from
+ * the old hero statement, the headline from the site's own OG description
+ * ("design and engineering held to the same standard"), the paragraph from
+ * the About blurb.
  */
 export const hero = {
-  /** Centered statement — one array item per display line */
-  statement: [
-    "Visual identity and production-grade websites",
-    "for brands that sweat every detail.",
-  ],
-  /** Bottom name — the two words spread edge-to-edge */
-  giantName: "ADNAAN DASOO",
+  /** Mono eyebrow — one array item per display line */
+  eyebrow: ["FOR BRANDS THAT SWEAT", "EVERY DETAIL"],
+  /** Masthead headline — one array item per display line */
+  headline: ["DESIGN & ENGINEERING", "HELD TO THE SAME", "STANDARD"],
+  /** Right-hand paragraph, bottom-aligned to the headline */
+  paragraph:
+    "I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.",
+  /** Showreel captions, sitting on the reel's bottom edge */
+  reel: {
+    label: "Projects Showreel",
+    action: "Watch",
+    /** Screen-reader description of the placeholder card */
+    alt: "Projects showreel — coming soon",
+  },
 };
 
 /** About blurb — preserve verbatim (§A6 #2); rendered static at full ink. */
@@ -99,11 +113,30 @@ export const footer = {
   metaJa: "デザイナー × エンジニア",
 };
 
+/*
+ * Top chrome (user-directed, 2026-09-02) — four elements across one row:
+ *   ADNAAN · [designer × engineer banner] … [Menu +] · DASOO
+ * The name is split across the header as a single wordmark; both halves
+ * lead home. Links live behind the Menu, which opens downward on hover.
+ */
 export const nav = {
+  /** The wordmark, split left/right across the header */
+  wordmarkFirst: "Adnaan",
+  wordmarkLast: "Dasoo",
+  /** Vermilion banner beside the first name */
+  bannerLatin: "designer × engineer",
+  bannerJa: "デザイナー × エンジニア",
+  menuLabel: "Menu",
+  /** Menu panel links. "Branding" has no destination yet (Open Q, 2026-09-02)
+   *  — type "pending" renders the row and its hover, with no navigation. */
   links: [
-    { label: "home", type: "scroll", target: "#hero" },
-    { label: "about", type: "route", target: "/about" },
-    { label: "work", type: "route", target: "/works" },
-    { label: "contact", type: "scroll", target: "#footer" },
+    { label: "Home", type: "scroll", target: "#hero" },
+    { label: "About", type: "route", target: "/about" },
+    { label: "Work", type: "route", target: "/works" },
+    { label: "Branding", type: "pending", target: "#" },
+    { label: "Disciplines", type: "scroll", target: "#disciplines" },
+    { label: "Contact", type: "scroll", target: "#footer" },
   ] as const,
+  /** Theme toggle, bottom-right */
+  themeToggleLabel: "Switch between light and dark mode",
 };

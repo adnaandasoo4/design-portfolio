@@ -1,31 +1,38 @@
 "use client";
 
+/*
+ * Hero — centred showreel over a bottom-anchored statement block
+ * (user-directed, 2026-09-02; reference = ethansuero.com). Replaces the
+ * full-bleed WebGL gradient layout: the section is now flat --color-bg in
+ * both themes, and the gradient survives only in the footer band.
+ *
+ * LAYOUT, top to bottom:
+ *   1. the reel, centred in whatever height is left between the fixed nav
+ *      and the statement block — which lands it slightly ABOVE the vertical
+ *      centre of the viewport, as in the reference;
+ *   2. a mono eyebrow;
+ *   3. the masthead headline (the page's single <h1>, §A10) with the
+ *      paragraph BOTTOM-aligned to its last line — `items-end` is doing
+ *      that, not a hand-tuned offset, so it holds at every width.
+ *
+ * Bottom padding clears the fixed theme toggle in the bottom-right gutter;
+ * below 860px the paragraph stacks under the headline instead of beside it.
+ * Below 700px the headline drops off the clamp onto a pure vw size — the
+ * clamp's 34px floor is wider than a phone can hold at this face's set
+ * width, and the authored line breaks would start wrapping a second time.
+ *
+ * Reveal: the preloader expands its off-black layer to the full viewport,
+ * then markPreloaderDone fires and the [data-hero-intro] blocks rise in
+ * (y 32→0, .85 out-quart, .06 stagger). Reduced motion: the markup renders
+ * visible statically — the branch is intentionally empty.
+ */
+
 import { useRef } from "react";
 import { gsap, useGSAP } from "@/lib/gsap/register";
 import { DUR, EASE, MQ } from "@/lib/gsap/motion";
 import { onPreloaderDone } from "@/lib/preloader";
 import { hero } from "@/content/copy";
-import FooterGradient from "@/components/site/FooterGradient";
-
-/*
- * Hero — full-bleed gradient layout (user-directed, 2026-07-20; pared down
- * from the pill experiment).
- *
- * The footer's WebGL gradient spans the ENTIRE section as a dimmed
- * background layer (wrapper opacity ~40% so it reads as atmosphere, not
- * artwork; FooterGradient self-gates its rAF loop via IntersectionObserver
- * on the canvas — no [data-band-clip] ancestor here). Above it: only the
- * small "let's collaborate" CTA top-right (the fixed nav hides its own CTA
- * at the top of the page — see Nav.tsx), and the reduced-scale name at the
- * BOTTOM of the section — the two WORDS spread edge-to-edge, letters at
- * natural tracking.
- *
- * Reveal: the preloader expands its off-black layer to the full viewport,
- * then markPreloaderDone fires and the [data-hero-intro] blocks rise in
- * (y 32→0, autoAlpha, .85 out-quart, .06 stagger). The gradient layer is
- * NOT an intro block — it simply sits there as the stage fades, reading as
- * the page background. Reduced motion: markup renders visible statically.
- */
+import Showreel from "@/components/sections/Showreel";
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -67,35 +74,49 @@ export default function Hero() {
       id="hero"
       ref={sectionRef}
       aria-label="Hero"
-      className="relative z-(--z-section) flex h-screen flex-col bg-bg px-9 pt-4 pb-5 max-b700:h-svh max-b700:px-3"
+      className="relative z-(--z-section) flex h-svh flex-col bg-bg px-5 pt-[92px] pb-[clamp(80px,10vh,108px)] max-b700:px-4 max-b700:pt-[76px]"
     >
-      {/* FULL-BLEED GRADIENT — dimmed ambient background across the whole
-          section: half-speed flow, hold-to-distort active, but no cursor
-          pill and no pointer cursor */}
-      <div aria-hidden="true" className="absolute inset-0 opacity-40">
-        <FooterGradient speed={0.5} pill={false} />
-      </div>
-      {/* CENTER STATEMENT — dead-center over the gradient */}
+      {/* Reel — centred in the space the statement block leaves over */}
       <div
         data-hero-intro=""
-        className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center font-medium text-ink text-[clamp(15px,1.25vw,20px)]/[1.45] tracking-[-0.008em] max-b700:px-6"
+        className="flex flex-1 items-center justify-center"
       >
-        {hero.statement.map((line) => (
-          <p key={line}>{line}</p>
-        ))}
+        <Showreel />
       </div>
 
-      {/* NAME — bottom of the section; the two WORDS spread edge-to-edge,
-          letters at natural tracking */}
-      <h1
-        aria-label="Adnaan Dasoo"
-        data-hero-intro=""
-        className="relative mt-auto flex items-end justify-between px-2 font-hkgw font-semibold whitespace-nowrap text-ink uppercase select-none text-[clamp(38px,calc((100vw-88px)/13.5),170px)] leading-[0.94] max-b700:text-[clamp(24px,calc((100vw-40px)/9.6),38px)]"
-      >
-        {hero.giantName.split(" ").map((word) => (
-          <span key={word}>{word}</span>
-        ))}
-      </h1>
+      {/* Statement block — anchored to the bottom of the viewport */}
+      <div className="shrink-0">
+        <p
+          data-hero-intro=""
+          className="font-mono-ui text-[clamp(10px,0.78vw,11px)]/[1.6] tracking-[0.1em] text-muted-2 uppercase"
+        >
+          {hero.eyebrow.map((line) => (
+            <span key={line} className="block">
+              {line}
+            </span>
+          ))}
+        </p>
+
+        <div className="mt-[clamp(16px,2.4vh,30px)] flex items-end justify-between gap-[clamp(24px,5vw,90px)] max-b860:flex-col max-b860:items-start max-b860:gap-7">
+          <h1
+            data-hero-intro=""
+            className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-semibold tracking-[-0.02em] text-ink uppercase max-b700:text-[6.2vw]"
+          >
+            {hero.headline.map((line) => (
+              <span key={line} className="block">
+                {line}
+              </span>
+            ))}
+          </h1>
+
+          <p
+            data-hero-intro=""
+            className="w-[clamp(240px,25vw,340px)] shrink-0 pb-[0.4em] text-[clamp(14px,1.2vw,17px)]/[1.5] text-ink-1 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
+          >
+            {hero.paragraph}
+          </p>
+        </div>
+      </div>
     </section>
   );
 }

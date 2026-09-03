@@ -2,10 +2,11 @@
 
 /*
  * Global Lenis smooth-scroll provider (§A7).
- * - reference values from the handoff: lerp .045, wheelMultiplier .9,
- *   touchMultiplier 1.4, smoothWheel true
- * - ALL widths (user 2026-07-21): the slow glide survives on mobile via
- *   syncTouch, which lerps touch/flick scrolling like the wheel path
+ * - STOCK LENIS SETTINGS (user 2026-09-02): the deliberately slowed glide
+ *   (lerp .045 / wheelMultiplier .9 / touchMultiplier 1.4 / syncTouch) is
+ *   gone. Lenis is constructed with no options at all, so scroll speed and
+ *   feel are the library defaults and touch falls back to native momentum.
+ *   Smoothing stays — only the pacing was reverted.
  * - reduced-motion: no Lenis at all (native scroll)
  * - driven by the GSAP ticker; ScrollTrigger.update on every scroll
  *
@@ -69,15 +70,7 @@ export default function SmoothScroll({
     const mm = gsap.matchMedia();
     // Every width — only reduced-motion opts out to native scroll.
     mm.add(MQ.motionOk, () => {
-      lenis = new Lenis({
-        lerp: 0.045,
-        wheelMultiplier: 0.9,
-        touchMultiplier: 1.4,
-        smoothWheel: true,
-        // Smooth TOUCH scrolling too — without this, phones/tablets fall
-        // back to native momentum and the slow glide disappears.
-        syncTouch: true,
-      });
+      lenis = new Lenis();
       if (pendingLenisTop) lenis.scrollTo(0, { immediate: true, force: true });
       lenis.on("scroll", ScrollTrigger.update);
       const raf = (time: number) => lenis?.raf(time * 1000);

@@ -3,48 +3,153 @@
 /*
   Design tokens — HANDOFF.md §A2, expressed in the Tailwind v4 CSS-first idiom
   (@theme replaces tailwind.config theme.extend; same semantic names).
-*/
-@theme {
-  /* ---- Color palette (semantic) ---- */
-  --color-bg: #111214; /* page background everywhere — never pure #000; also ink on light surfaces */
-  --color-raise: #15151a; /* disciplines outer card (base) */
-  --color-raise-2: #1d1d21; /* disciplines card (applied), nav-hover block */
-  --color-panel: #111214; /* disciplines inner panel (rendered value) */
-  --color-slot: #1c1c20; /* image-slot placeholder (disciplines media) */
-  --color-slot-2: #1a1a1e; /* video placeholder (footer/reel) */
-  --color-preloader: #f7f6f4; /* preloader stage (§A1) */
-  --color-preloader-slide: #26262b; /* preloader image-slide backing */
-  --color-hero-dim: #050506; /* hero dim overlay (smoke variant only) */
-  --color-ink: #ffffff; /* primary white ink */
-  --color-ink-soft: #ecebe8; /* softened white (pureWhite=false) */
-  --color-ink-1: #d5d3ce; /* work-row side labels */
-  --color-ink-2: #b8b8be; /* discipline tag text */
-  --color-muted-1: #9a9aa0; /* discipline descriptions */
-  --color-muted-2: #8a8a8e; /* eyebrows, numerals, meta, apostrophes */
-  --color-muted-3: #77777d; /* work-list header labels, footer AI icons (rest), footer JP */
-  --color-muted-ja: #3d3d42; /* Japanese labels inside white marquee */
-  --color-band-dark: #37373b; /* second divider band ("Works") */
-  --color-accent: #c7c2ce; /* lilac — copy-success, check icon, accent lines */
-  --color-surface-light: #f2f1ef; /* light-theme surface / marquee fill */
-  --color-link-light: #111214; /* link ink on light pages */
-  --color-link-light-hover: #6b6b70; /* link hover on light pages */
 
-  /* Alpha inks (white-on-dark) */
-  --color-text-50: rgba(255, 255, 255, 0.5);
-  --color-text-38: rgba(255, 255, 255, 0.38);
-  --color-text-24: rgba(255, 255, 255, 0.24); /* About-blurb unfilled word */
+  THEMING (2026-09-02): every color token is now a two-layer construct —
+  a RAW layer (`--c-*`, declared on :root for dark and re-declared on
+  html[data-theme="light"]) and the SEMANTIC @theme layer that points at it.
+  Because both layers resolve on <html>, flipping one attribute repaints the
+  whole site and every `bg-*`/`text-*` utility follows automatically.
+  Components must keep using the semantic names only — never a `--c-*` var
+  and never a raw hex.
+
+  The light palette is a true inversion, not a tint: surfaces that are dark
+  in dark mode become light, and INVERTED surfaces (the white CTA bar, the
+  nav hover flood, the work-row marquee) become dark — they are authored as
+  `bg-ink` + `text-bg`, so swapping ink↔bg inverts them for free.
+*/
+
+/* ---- RAW palette: dark (default) ---- */
+:root {
+  --c-bg: #111214; /* page background everywhere — never pure #000 */
+  --c-raise: #15151a; /* disciplines outer card (base) */
+  --c-raise-2: #1d1d21; /* disciplines card (applied), nav-hover block */
+  --c-panel: #111214; /* disciplines inner panel */
+  --c-slot: #1c1c20; /* image-slot placeholder (disciplines media) */
+  --c-slot-2: #1a1a1e; /* video placeholder (footer/reel) */
+  --c-ink: #ffffff; /* primary ink */
+  --c-ink-soft: #ecebe8; /* softened ink (pureWhite=false) */
+  --c-ink-1: #d5d3ce; /* work-row side labels, nav hover flood */
+  --c-ink-2: #b8b8be; /* discipline tag text */
+  --c-muted-1: #9a9aa0; /* discipline descriptions, hero paragraph */
+  --c-muted-2: #8a8a8e; /* eyebrows, numerals, meta, apostrophes */
+  --c-muted-3: #77777d; /* work-list header labels, footer AI icons, footer JP */
+  --c-muted-ja: #3d3d42; /* Japanese labels inside the inverted marquee */
+  --c-band-dark: #37373b; /* second divider band ("Works") */
+  --c-accent: #c7c2ce; /* lilac — copy-success, check icon, accent lines */
+  --c-surface-light: #f2f1ef; /* inverted surface / marquee fill */
+  --c-link-light: #111214; /* link ink on inverted surfaces */
+  --c-link-light-hover: #6b6b70;
+
+  /* Alpha inks — tinted from the OPPOSITE of the surface */
+  --c-text-50: rgba(255, 255, 255, 0.5);
+  --c-text-38: rgba(255, 255, 255, 0.38);
+  --c-text-24: rgba(255, 255, 255, 0.24); /* About-blurb unfilled word */
 
   /* Hairlines + fills */
-  --color-line-055: rgba(255, 255, 255, 0.055); /* disciplines row rule */
-  --color-line-09: rgba(255, 255, 255, 0.09); /* work rows, footer top */
-  --color-line-13: rgba(255, 255, 255, 0.13); /* tag border */
-  --color-line-14: rgba(255, 255, 255, 0.14); /* hero rule */
-  --color-fill-035: rgba(255, 255, 255, 0.035); /* tag background */
+  --c-line-055: rgba(255, 255, 255, 0.055); /* disciplines row rule */
+  --c-line-09: rgba(255, 255, 255, 0.09); /* work rows, footer top */
+  --c-line-13: rgba(255, 255, 255, 0.13); /* tag border, chrome boxes */
+  --c-line-14: rgba(255, 255, 255, 0.14); /* hero rule */
+  --c-fill-035: rgba(255, 255, 255, 0.035); /* tag background */
+
+  --c-selection-bg: #ffffff;
+  --c-selection-ink: #111214;
+}
+
+/* ---- RAW palette: light ---- */
+html[data-theme="light"] {
+  --c-bg: #f2f1ef;
+  --c-raise: #eae8e3;
+  --c-raise-2: #e2e0da;
+  --c-panel: #f8f7f5;
+  --c-slot: #e4e2dc;
+  --c-slot-2: #e8e6e1;
+  --c-ink: #111214;
+  --c-ink-soft: #1b1c1f;
+  --c-ink-1: #35353a;
+  --c-ink-2: #46464c;
+  --c-muted-1: #5f5f67;
+  --c-muted-2: #6f6f77;
+  --c-muted-3: #7e7e86;
+  --c-muted-ja: #b9b7b2;
+  --c-band-dark: #cbc9c4;
+  --c-accent: #574d66;
+  --c-surface-light: #111214;
+  --c-link-light: #f2f1ef;
+  --c-link-light-hover: #a5a5aa;
+
+  --c-text-50: rgba(17, 18, 20, 0.56);
+  --c-text-38: rgba(17, 18, 20, 0.44);
+  --c-text-24: rgba(17, 18, 20, 0.28);
+
+  --c-line-055: rgba(17, 18, 20, 0.08);
+  --c-line-09: rgba(17, 18, 20, 0.13);
+  --c-line-13: rgba(17, 18, 20, 0.17);
+  --c-line-14: rgba(17, 18, 20, 0.18);
+  --c-fill-035: rgba(17, 18, 20, 0.045);
+
+  --c-selection-bg: #111214;
+  --c-selection-ink: #f2f1ef;
+
+  color-scheme: light;
+}
+
+/*
+  Tailwind variant for light-theme-only styling. Used sparingly — the token
+  layer above handles ~all of it; this is for the handful of places where a
+  SHAPE, not a color, differs between themes (e.g. which half of the theme
+  toggle's icon stack is parked off-screen).
+*/
+@custom-variant theme-light (html[data-theme="light"] &);
+
+@theme {
+  /* ---- Color palette (semantic) — all theme-reactive via the raw layer ---- */
+  --color-bg: var(--c-bg);
+  --color-raise: var(--c-raise);
+  --color-raise-2: var(--c-raise-2);
+  --color-panel: var(--c-panel);
+  --color-slot: var(--c-slot);
+  --color-slot-2: var(--c-slot-2);
+  --color-ink: var(--c-ink);
+  --color-ink-soft: var(--c-ink-soft);
+  --color-ink-1: var(--c-ink-1);
+  --color-ink-2: var(--c-ink-2);
+  --color-muted-1: var(--c-muted-1);
+  --color-muted-2: var(--c-muted-2);
+  --color-muted-3: var(--c-muted-3);
+  --color-muted-ja: var(--c-muted-ja);
+  --color-band-dark: var(--c-band-dark);
+  --color-accent: var(--c-accent);
+  --color-surface-light: var(--c-surface-light);
+  --color-link-light: var(--c-link-light);
+  --color-link-light-hover: var(--c-link-light-hover);
+
+  --color-text-50: var(--c-text-50);
+  --color-text-38: var(--c-text-38);
+  --color-text-24: var(--c-text-24);
+
+  --color-line-055: var(--c-line-055);
+  --color-line-09: var(--c-line-09);
+  --color-line-13: var(--c-line-13);
+  --color-line-14: var(--c-line-14);
+  --color-fill-035: var(--c-fill-035);
+
+  /* ---- Fixed colors (identical in both themes) ---- */
+  /* Brand vermilion — the designer × engineer banner and the showreel frame.
+     4.64:1 against white, so the banner label clears AA at 14px semibold. */
+  --color-brand: #d43f18;
+  --color-brand-ink: #ffffff;
+  /* Content sitting ON the WebGL artwork band, which stays dark in both
+     themes because it is artwork, not a surface. */
+  --color-on-art: #f2f1ef;
+  --color-on-art-ink: #111214;
+  /* Preloader owns its own light stage in both themes (§A1). */
+  --color-preloader: #f7f6f4;
+  --color-preloader-slide: #26262b;
+  --color-hero-dim: #050506; /* hero dim overlay (smoke variant only) */
 
   /* ---- Typography ---- */
   --font-manrope: var(--font-manrope-next), "Helvetica Neue", sans-serif;
-  /* HK Grotesk Wide: self-host pending license (§A10 Open Q6). Falls back to
-     Manrope until the OTFs land — only the deferred smoke masthead uses it. */
   --font-hkgw: var(--font-hkgw-next, var(--font-manrope-next)), "Manrope",
     sans-serif;
   --font-ja: var(--font-manrope-next), "Hiragino Kaku Gothic ProN", "Yu Gothic",
@@ -84,6 +189,7 @@
   --dur-rect: 0.9s; /* preloader */
   --dur-veil: 0.32s; /* route veil */
   --dur-marquee: 32s; /* loop */
+  --dur-theme: 0.62s; /* theme view-transition sweep */
 }
 
 /* ---- Z-index layers (§A2) ---- */
@@ -103,6 +209,7 @@
 /* ---- Base ---- */
 html {
   background: var(--color-bg);
+  color-scheme: dark;
 }
 
 /* TEMPORARY (user request): hide the scrollbar entirely — the preloader
@@ -125,8 +232,8 @@ body {
 }
 
 ::selection {
-  background: #ffffff;
-  color: #111214;
+  background: var(--c-selection-bg);
+  color: var(--c-selection-ink);
 }
 
 a {
@@ -138,6 +245,39 @@ a {
 :focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+/*
+  ---- Theme swap: circular View Transition from the toggle ----
+  lib/theme.ts sets --theme-x/--theme-y to the toggle's center and the
+  radius needed to cover the furthest viewport corner, then flips
+  data-theme inside document.startViewTransition(). The OLD snapshot holds
+  still underneath while the NEW one is clipped open from that point, so the
+  new theme wipes across the page instead of hard-cutting. Browsers without
+  the API (and reduced-motion users) get the instant flip — the attribute
+  change is the whole mechanism, the animation is decoration.
+*/
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}
+html[data-theme-anim]::view-transition-new(root) {
+  animation: ad-theme-wipe var(--dur-theme) var(--ease-out-quart) forwards;
+}
+@keyframes ad-theme-wipe {
+  from {
+    clip-path: circle(0px at var(--theme-x, 50%) var(--theme-y, 50%));
+  }
+  to {
+    clip-path: circle(var(--theme-r, 150vmax) at var(--theme-x, 50%) var(--theme-y, 50%));
+  }
 }
 
 /* ---- Route transition veil (§A5 / §A7 #18) ---- */
@@ -185,6 +325,7 @@ html[data-pageleave] [data-veil] {
    Reduced-motion users never match — content stays visible. */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-preloaded="true"]) [data-topnav],
+  html:not([data-preloaded="true"]) [data-chrome-item],
   html:not([data-preloaded="true"]) [data-hero-panel],
   html:not([data-preloaded="true"]) [data-hero-intro] {
     visibility: hidden;

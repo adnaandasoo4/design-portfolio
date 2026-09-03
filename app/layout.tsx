@@ -1,8 +1,15 @@
 /*
  * Root layout — site metadata/JSON-LD, Manrope, and the fixed chrome
- * (RouteVeil, Preloader, Nav) mounted OUTSIDE <SmoothScroll> (§A2 z-layers;
- * the preloader inerts the #smooth-wrapper during its lock window).
- * The site is permanently dark — no theme toggle, no light mode.
+ * (RouteVeil, Preloader, Nav, ThemeToggle) mounted OUTSIDE <SmoothScroll>
+ * (§A2 z-layers; the preloader inerts the #smooth-wrapper during its lock
+ * window).
+ *
+ * THEME (2026-09-02): the site is dark by default with an opt-in light mode
+ * the visitor toggles bottom-right. `data-theme` on <html> is the only
+ * state; NO_FLASH_SCRIPT restores the stored choice from localStorage
+ * BEFORE first paint, so a returning light-mode visitor never sees a dark
+ * frame. It is inlined rather than imported because it has to run ahead of
+ * every bundle.
  */
 import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
@@ -12,6 +19,8 @@ import SmoothScroll from "@/lib/gsap/SmoothScroll";
 import Nav from "@/components/site/Nav";
 import Preloader from "@/components/site/Preloader";
 import RouteVeil from "@/components/site/RouteVeil";
+import ThemeToggle from "@/components/site/ThemeToggle";
+import { NO_FLASH_SCRIPT } from "@/lib/theme";
 
 const manrope = Manrope({
   variable: "--font-manrope-next",
@@ -98,6 +107,8 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Must be the first thing that runs — see the THEME note above. */}
+        <script dangerouslySetInnerHTML={{ __html: NO_FLASH_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
@@ -111,6 +122,7 @@ export default function RootLayout({
         <header>
           <Nav />
         </header>
+        <ThemeToggle />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

@@ -34,7 +34,7 @@ function MarqueeGroup({ project }: { project: Project }) {
             />
           </span>
           <span className="flex shrink-0 flex-col gap-[7px]">
-            <span className="font-semibold leading-none tracking-[-0.01em] text-[#111214] text-[clamp(24px,2.1vw,36px)]">
+            <span className="font-semibold leading-none tracking-[-0.01em] text-bg text-[clamp(24px,2.1vw,36px)]">
               {project.marqueeName}
             </span>
             <span
