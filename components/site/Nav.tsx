@@ -29,19 +29,21 @@
  *   the 45°, landing on the same glyph from the long way round. Spin and
  *   wipe share --dur-copy so they read as one gesture.
  *
- * SCROLL BEHAVIOUR (lib/chromeReveal — one shared ScrollTrigger, also
- * driving ThemeToggle): any scroll DOWN swipes each side clean off its OWN
- * edge of the viewport, and any scroll UP swipes it back. The travel is the
- * element's own width plus the gutter, measured per element, so the piece
- * genuinely leaves the frame instead of dimming in place — the nav clips on
- * the x axis so nothing shows past the edge. Visibility is only dropped
- * once the slide has finished, which keeps it out of the tab order without
- * turning the exit into a fade.
+ * SCROLL BEHAVIOUR (lib/chromeReveal — one shared ScrollTrigger): the bar
+ * swipes UP out of the frame on any scroll down and back DOWN on any scroll
+ * up, moving as one piece rather than the two halves parting sideways. The
+ * travel is measured — the bar's own offsetTop plus its height — so it
+ * clears the viewport's top edge exactly, whatever the gutter is at this
+ * width. Visibility is dropped only once the slide has landed, which keeps
+ * the bar out of the tab order without the exit becoming a fade.
  *
- * The children carry every scroll tween; the ROOT is owned by the intro
+ * The BAR, not the nav root, is what moves. The root is owned by the intro
  * below and by Footer.tsx's ScrollTrigger, which hides [data-topnav] over
- * the footer and must keep winning (root autoAlpha 0 blankets the children,
- * and GSAP autoAlpha restores `inherit`, never forcing children visible).
+ * the footer and must keep winning; giving the scroll watcher its own inner
+ * element keeps those three off each other's properties entirely.
+ *
+ * (Root autoAlpha 0 blankets the bar, and GSAP autoAlpha restores
+ * `inherit`, never forcing descendants visible.)
  *
  * Intro (§A7 #2): the root slides down from the top after the preloader
  * (ease-out-quart .85); the reduced-motion branch shows instantly and every
@@ -78,8 +80,8 @@ const LABEL =
   "group-hover:text-bg group-focus-visible:text-bg " +
   "motion-safe:group-hover:translate-x-2 motion-safe:group-focus-visible:translate-x-2";
 
-/* Extra travel past the viewport edge, so nothing sits flush against it */
-const OUT_PAD_PX = 48;
+/* Extra travel past the viewport's top edge, so nothing sits flush to it */
+const OUT_PAD_PX = 12;
 
 function RowInner({ label, index }: { label: string; index: number }) {
   return (
@@ -157,9 +159,8 @@ export default function Nav() {
     () => {
       const el = scope.current;
       if (!el) return;
-      const left = gsap.utils.toArray<HTMLElement>("[data-chrome-left]", el);
-      const right = gsap.utils.toArray<HTMLElement>("[data-chrome-right]", el);
-      const all = [...left, ...right];
+      const bar = el.querySelector<HTMLElement>("[data-chrome-bar]");
+      if (!bar) return;
       const mm = gsap.matchMedia();
 
       mm.add(MQ.motionOk, () => {
@@ -175,43 +176,32 @@ export default function Nav() {
           });
         });
 
-        /** Slide one side clean past its own edge of the viewport.
+        /** Lift the bar clear of the viewport's top edge.
          *
-         *  The distance is derived from `offsetLeft`/`offsetWidth`, never
-         *  from getBoundingClientRect: offsets are LAYOUT positions and
-         *  ignore the transform we are mid-way through applying, so this
-         *  stays correct even when called again before the last tween has
-         *  landed. Both animated elements are direct children of the nav,
-         *  which is `fixed` and therefore their offsetParent — so offsetLeft
-         *  is measured against the viewport, and `el.offsetWidth` alone
-         *  would be wrong for anything not already touching its edge. */
-        const slide = (els: HTMLElement[], dir: 1 | -1, shown: boolean) => {
-          const frame = el.offsetWidth;
-          for (const item of els) {
-            if (shown) gsap.set(item, { visibility: "inherit" });
-            const out =
-              dir < 0
-                ? -(item.offsetLeft + item.offsetWidth + OUT_PAD_PX)
-                : frame - item.offsetLeft + OUT_PAD_PX;
-            gsap.to(item, {
-              x: shown ? 0 : out,
-              duration: shown ? DUR.copy2 : DUR.copy,
-              ease: EASE.outQuart,
-              overwrite: "auto",
-              // Hide only once it is off-frame — never a fade in place.
-              onComplete: shown
-                ? undefined
-                : () => gsap.set(item, { visibility: "hidden" }),
-            });
-          }
+         *  The distance comes from `offsetTop`/`offsetHeight` — LAYOUT
+         *  values, which ignore the transform we may be part-way through
+         *  applying, so this stays correct when recomputed mid-tween
+         *  (getBoundingClientRect would not). The bar's offsetParent is the
+         *  nav, which is `fixed`, so offsetTop is the gutter above it. */
+        const swipe = (shown: boolean) => {
+          if (shown) gsap.set(bar, { visibility: "inherit" });
+          gsap.to(bar, {
+            y: shown ? 0 : -(bar.offsetTop + bar.offsetHeight + OUT_PAD_PX),
+            duration: shown ? DUR.copy2 : DUR.copy,
+            ease: EASE.outQuart,
+            overwrite: "auto",
+            // Hide only once it is off-frame — never a fade in place.
+            onComplete: shown
+              ? undefined
+              : () => gsap.set(bar, { visibility: "hidden" }),
+          });
         };
 
         const offChrome = subscribeChrome(({ shown }) => {
           // Any scroll down closes the panel — an open menu floating over a
           // hidden Menu button would be orphaned.
           if (!shown) setOpen(false);
-          slide(left, -1, shown);
-          slide(right, 1, shown);
+          swipe(shown);
         });
 
         return () => {
@@ -224,11 +214,11 @@ export default function Nav() {
         gsap.set(el, { yPercent: 0, autoAlpha: 1 });
         const offChrome = subscribeChrome(({ shown }) => {
           if (!shown) setOpen(false);
-          gsap.set(all, { autoAlpha: shown ? 1 : 0 });
+          gsap.set(bar, { autoAlpha: shown ? 1 : 0 });
         });
         return () => {
           offChrome();
-          gsap.set(all, { autoAlpha: 1 });
+          gsap.set(bar, { autoAlpha: 1 });
         };
       });
 
@@ -242,119 +232,143 @@ export default function Nav() {
       ref={scope}
       data-topnav=""
       aria-label="Primary"
-      className="pointer-events-none fixed inset-x-0 top-0 z-(--z-nav) flex items-start justify-between gap-6 overflow-x-clip px-5 py-5 max-b700:px-4 max-b700:py-4"
+      className="pointer-events-none fixed inset-x-0 top-0 z-(--z-nav) px-5 py-5 max-b700:px-4 max-b700:py-4"
     >
-      {/* ---- LEFT: the wordmark, whole ---- */}
-      <Link
-        data-chrome-left=""
-        href="/"
-        onClick={goHome}
-        aria-label={`${navCopy.wordmark} — home`}
-        className="pointer-events-auto flex h-11 items-center font-hkgw text-[clamp(20px,2.1vw,30px)] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink uppercase transition-opacity duration-(--dur-hover) ease-(--ease-std) hover:opacity-70"
+      {/* The bar is the moving part — see SCROLL BEHAVIOUR above */}
+      <div
+        data-chrome-bar=""
+        className="flex items-start justify-between gap-6"
       >
-        {navCopy.wordmark}
-      </Link>
-
-      {/* ---- RIGHT: theme toggle + the Menu, which extends into its own
-           panel. The CLUSTER is what animates — it is a direct child of the
-           nav, so its offsetLeft is viewport-relative (see slide above). --- */}
-      <div data-chrome-right="" className="flex items-center gap-2">
-        <ThemeToggle />
-
-        <div
-          ref={menuWrap}
-          className="pointer-events-auto relative"
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
-          onFocus={() => setOpen(true)}
-          onBlur={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget as Node))
-              setOpen(false);
-          }}
+        {/* ---- LEFT: the wordmark, whole ---- */}
+        <Link
+          href="/"
+          onClick={goHome}
+          aria-label={`${navCopy.wordmark} — home`}
+          className="pointer-events-auto flex h-11 items-center font-hkgw text-[clamp(20px,2.1vw,30px)] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink uppercase transition-opacity duration-(--dur-hover) ease-(--ease-std) hover:opacity-70"
         >
-          <button
-            type="button"
-            aria-expanded={open}
-            aria-controls="nav-menu-panel"
-            onClick={() => setOpen((o) => !o)}
-            className={`flex h-11 w-[clamp(160px,14vw,196px)] cursor-pointer items-center justify-between rounded-t-btn bg-raise-2 pr-4 pl-5 text-[15px] leading-none font-medium text-ink max-b700:w-[124px] max-b700:pr-3 max-b700:pl-4 ${
-              open ? "" : "rounded-b-btn"
-            }`}
-          >
-            {navCopy.menuLabel}
-            {/* A full turn PLUS the 45° that makes the "+" an "×" — same glyph,
-              arrived at the long way round. */}
-            <svg
-              viewBox="0 0 24 24"
-              className={`size-[15px] transition-transform duration-(--dur-copy) ease-(--ease-out-quart) motion-reduce:transition-none ${
-                open ? "rotate-[405deg]" : "rotate-0"
-              }`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.9"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
+          {navCopy.wordmark}
+        </Link>
 
-          {/* Panel — flush under the button, same surface, so the bar simply
-            grows downward. The ROLL is two things moving together: the panel
-            unclips from its top edge while the list travels down from behind
-            the button. `invisible` when closed keeps it out of the tab order
-            and off the pointer. */}
+        {/* ---- RIGHT: theme toggle + the Menu, which extends into its own
+           panel ---- */}
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+
           <div
-            id="nav-menu-panel"
-            className={`absolute top-full left-0 w-full overflow-hidden rounded-b-btn bg-raise-2 [transition:clip-path_var(--dur-copy)_var(--ease-out-quart),visibility_0s_linear_var(--vis-delay)] motion-reduce:transition-none ${
-              open
-                ? "visible [--vis-delay:0s] [clip-path:inset(0_0_0_0)]"
-                : "invisible [--vis-delay:var(--dur-copy)] [clip-path:inset(0_0_100%_0)]"
-            }`}
+            ref={menuWrap}
+            className="pointer-events-auto relative"
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+            onFocus={() => setOpen(true)}
+            onBlur={(e) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node))
+                setOpen(false);
+            }}
           >
-            <ul
-              className={`flex flex-col py-1.5 [transition:transform_var(--dur-copy)_var(--ease-out-quart)] motion-reduce:transition-none ${
-                open
-                  ? "[transform:translateY(0px)]"
-                  : "[transform:translateY(-100%)]"
+            <button
+              type="button"
+              aria-expanded={open}
+              aria-controls="nav-menu-panel"
+              onClick={() => setOpen((o) => !o)}
+              className={`flex h-11 w-[clamp(160px,14vw,196px)] cursor-pointer items-center justify-between rounded-t-btn bg-raise-2 pr-4 pl-5 text-[15px] leading-none font-medium text-ink max-b700:w-[124px] max-b700:pr-3 max-b700:pl-4 ${
+                open ? "" : "rounded-b-btn"
               }`}
             >
-              {navCopy.links.map((link, i) => (
-                <li key={link.label}>
-                  {link.type === "route" ? (
-                    <Link
-                      data-navlink=""
-                      href={link.target}
-                      onClick={goRoute(link.target)}
-                      className={ROW_LINK}
-                    >
-                      <RowInner label={link.label} index={i} />
-                    </Link>
-                  ) : link.type === "scroll" ? (
-                    <Link
-                      data-navlink=""
-                      data-scrollto={link.target}
-                      href={`/${link.target}`}
-                      onClick={goScroll(link.target)}
-                      className={ROW_LINK}
-                    >
-                      <RowInner label={link.label} index={i} />
-                    </Link>
-                  ) : (
-                    /* "pending": the row exists and hovers, but has nowhere to
+              {navCopy.menuLabel}
+              {/* Half a turn PLUS the 45° that makes the "+" an "×" — enough
+              rotation to read as a spin, short of the full revolution that
+              read as too much. */}
+              <svg
+                viewBox="0 0 24 24"
+                className={`size-[15px] transition-transform duration-(--dur-copy) ease-(--ease-out-quart) motion-reduce:transition-none ${
+                  open ? "rotate-[225deg]" : "rotate-0"
+                }`}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+            </button>
+
+            {/* Panel — flush under the button, same surface, so the bar simply
+            grows downward.
+
+            TWO elements, and the split matters. The OUTER is the hit area:
+            it is full height the instant the menu opens, transparent, and
+            unclipped. The INNER carries the visual roll — and a clip-path
+            does not merely hide what it cuts, it makes it untargetable by
+            the pointer. With the roll on a single element, moving the mouse
+            from the button down into a panel that had not finished
+            unrolling landed on nothing, which fired mouseleave on the
+            wrapper and shut the menu the moment you tried to reach it. The
+            outer shield keeps the pointer inside the wrapper the whole way
+            down.
+
+            `invisible` when closed takes the whole subtree out of the tab
+            order and off the pointer. */}
+            <div
+              id="nav-menu-panel"
+              className={`absolute top-full left-0 w-full [transition:visibility_0s_linear_var(--vis-delay)] ${
+                open
+                  ? "visible [--vis-delay:0s]"
+                  : "invisible [--vis-delay:var(--dur-copy)]"
+              }`}
+            >
+              <div
+                className={`overflow-hidden rounded-b-btn bg-raise-2 [transition:clip-path_var(--dur-copy)_var(--ease-out-quart)] motion-reduce:transition-none ${
+                  open
+                    ? "[clip-path:inset(0_0_0_0)]"
+                    : "[clip-path:inset(0_0_100%_0)]"
+                }`}
+              >
+                <ul
+                  className={`flex flex-col py-1.5 [transition:transform_var(--dur-copy)_var(--ease-out-quart)] motion-reduce:transition-none ${
+                    open
+                      ? "[transform:translateY(0px)]"
+                      : "[transform:translateY(-100%)]"
+                  }`}
+                >
+                  {navCopy.links.map((link, i) => (
+                    <li key={link.label}>
+                      {link.type === "route" ? (
+                        <Link
+                          data-navlink=""
+                          href={link.target}
+                          onClick={goRoute(link.target)}
+                          className={ROW_LINK}
+                        >
+                          <RowInner label={link.label} index={i} />
+                        </Link>
+                      ) : link.type === "scroll" ? (
+                        <Link
+                          data-navlink=""
+                          data-scrollto={link.target}
+                          href={`/${link.target}`}
+                          onClick={goScroll(link.target)}
+                          className={ROW_LINK}
+                        >
+                          <RowInner label={link.label} index={i} />
+                        </Link>
+                      ) : (
+                        /* "pending": the row exists and hovers, but has nowhere to
                      go yet — announced as disabled rather than faked. */
-                    <a
-                      href={link.target}
-                      aria-disabled="true"
-                      onClick={(e) => e.preventDefault()}
-                      className={`${ROW_LINK} cursor-default`}
-                    >
-                      <RowInner label={link.label} index={i} />
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
+                        <a
+                          href={link.target}
+                          aria-disabled="true"
+                          onClick={(e) => e.preventDefault()}
+                          className={`${ROW_LINK} cursor-default`}
+                        >
+                          <RowInner label={link.label} index={i} />
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </div>
