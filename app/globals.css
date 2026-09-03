@@ -223,6 +223,10 @@ html[data-theme="light"] {
 
   /* ---- Motion tokens (§A2) ---- */
   --ease-out-quart: cubic-bezier(0.22, 1, 0.36, 1);
+  /* The reflection of --ease-out-quart through the diagonal: the same shape
+     run backwards. Pairs with it wherever a move has to accelerate away and
+     decelerate back — see the footer collaborate rule. */
+  --ease-in-quart: cubic-bezier(0.64, 0, 0.78, 0);
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
   --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
   --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -333,55 +337,68 @@ html[data-pageleave] [data-veil] {
 }
 
 /* ---- Footer "let's collaborate" underline (user, 2026-09-02) ----
-   The rule leaves to the RIGHT and returns from the LEFT.
+   The rule leaves to the RIGHT and returns from the LEFT, and on mouse-out
+   it runs that sweep backwards (user, 2026-09-03).
 
-   TWO bars, not one. A single bar had to jump from +102% to −102% inside
-   the keyframes, and a keyframe jump is still an interpolation: across that
-   1% slice the bar swept the whole visible width at enormous speed, and
-   whenever a frame landed inside it the bar was drawn somewhere in the
-   middle — a ghost streak, and the reason the sweep read as stuttering
-   rather than smooth. Two bars remove the jump entirely: one only ever
-   leaves, the other only ever arrives.
+   TWO bars, not one. A single bar had to jump from +102% to −102% mid-sweep,
+   and such a jump is still an interpolation: across that 1% slice the bar
+   swept the whole visible width at enormous speed, and whenever a frame
+   landed inside it the bar was drawn somewhere in the middle — a ghost
+   streak, and the reason the sweep read as stuttering rather than smooth.
+   Two bars remove the jump entirely: one only ever leaves, the other only
+   ever arrives.
 
-   The halves are exactly equal in time and their easings are exact
-   mirrors, so the sweep accelerates and decelerates by the same curve
-   either side of the handoff and the speed peaks precisely where the bar
-   is off-screen. cubic-bezier(0.64,0,0.78,0) is the reflection of
-   --ease-out-quart through the diagonal — the same shape, run backwards.
+   TRANSITIONS, not keyframes. It was two @keyframes animations bound to
+   :hover, which meant mouse-out simply dropped them: the bars reset to their
+   rest positions with no motion at all. It read as nothing rather than as a
+   snap — a bar sits at 0 in both the rest and the hovered state — but a
+   sweep that only ever plays forwards is not a reversible gesture. As
+   transitions, the browser reverses it for free, and from wherever the sweep
+   had got to if the pointer leaves mid-flight.
 
-   The rest and end states both show a bar at 0, so when the animations are
-   dropped on mouse-out the underline is already where it started and there
-   is nothing to snap. */
-@keyframes ad-rule-out {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(101%);
-  }
+   The DELAYS and EASINGS swap between the two states, which is what makes
+   the reverse a true mirror rather than the same sequence played again:
+
+     entering   out leaves right (ease-in, no delay)
+                in arrives from left (ease-out, half-duration delay)
+     leaving    in leaves left (ease-in, no delay)
+                out arrives from right (ease-out, half-duration delay)
+
+   So whichever bar is departing accelerates and whichever is arriving
+   decelerates, in both directions. The halves are equal in time and the two
+   easings are exact mirrors, so speed peaks precisely where the bar is
+   off-screen and the handoff is invisible. */
+[data-collab-rule] {
+  transition-property: transform;
+  transition-duration: calc(var(--dur-clip) / 2);
 }
-@keyframes ad-rule-in {
-  from {
-    transform: translateX(-101%);
-  }
-  to {
-    transform: translateX(0);
-  }
+/* Rest AND leaving: the departed bar comes back from the right, second. */
+[data-collab-rule="out"] {
+  transform: translateX(0);
+  transition-timing-function: var(--ease-out-quart);
+  transition-delay: calc(var(--dur-clip) / 2);
+}
+/* Rest AND leaving: the arrived bar exits to the left, first. */
+[data-collab-rule="in"] {
+  transform: translateX(-101%);
+  transition-timing-function: var(--ease-in-quart);
+  transition-delay: 0s;
 }
 [data-collab]:hover [data-collab-rule="out"],
 [data-collab]:focus-visible [data-collab-rule="out"] {
-  animation: ad-rule-out calc(var(--dur-clip) / 2) cubic-bezier(0.64, 0, 0.78, 0)
-    both;
+  transform: translateX(101%);
+  transition-timing-function: var(--ease-in-quart);
+  transition-delay: 0s;
 }
 [data-collab]:hover [data-collab-rule="in"],
 [data-collab]:focus-visible [data-collab-rule="in"] {
-  animation: ad-rule-in calc(var(--dur-clip) / 2) var(--ease-out-quart)
-    calc(var(--dur-clip) / 2) both;
+  transform: translateX(0);
+  transition-timing-function: var(--ease-out-quart);
+  transition-delay: calc(var(--dur-clip) / 2);
 }
 @media (prefers-reduced-motion: reduce) {
-  [data-collab]:hover [data-collab-rule],
-  [data-collab]:focus-visible [data-collab-rule] {
-    animation: none;
+  [data-collab-rule] {
+    transition: none;
   }
 }
 
