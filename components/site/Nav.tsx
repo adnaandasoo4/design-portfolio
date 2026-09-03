@@ -45,10 +45,13 @@
  * (Root autoAlpha 0 blankets the bar, and GSAP autoAlpha restores
  * `inherit`, never forcing descendants visible.)
  *
- * Intro (§A7 #2): the root slides down from the top after the preloader
- * (ease-out-quart .85); the reduced-motion branch shows instantly and every
- * scroll tween degrades to an instant set — content is never permanently
- * hidden.
+ * Intro (§A7 #2, rebuilt 2026-09-03): the bar arrives by the SAME swipe it
+ * uses returning from a scroll up — same element, same measured distance,
+ * same duration and ease, and no fade. It used to be a gesture of its own,
+ * the nav ROOT sliding yPercent -100 with autoAlpha over DUR.intro, so the
+ * nav entered one way on load and a different way for the rest of the
+ * visit. The reduced-motion branch shows instantly and every scroll tween
+ * degrades to an instant set — content is never permanently hidden.
  */
 import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
@@ -161,29 +164,20 @@ export default function Nav() {
       const mm = gsap.matchMedia();
 
       mm.add(MQ.motionOk, () => {
-        // Intro: the root slides down after the preloader (fires immediately
-        // on pages that never show one).
-        gsap.set(el, { yPercent: -100, autoAlpha: 0 });
-        const offPreloader = onPreloaderDone(() => {
-          gsap.to(el, {
-            yPercent: 0,
-            autoAlpha: 1,
-            duration: DUR.intro,
-            ease: EASE.outQuart,
-          });
-        });
-
-        /** Lift the bar clear of the viewport's top edge.
+        /** How far up the bar sits when hidden — clear of the viewport's
+         *  top edge.
          *
          *  The distance comes from `offsetTop`/`offsetHeight` — LAYOUT
          *  values, which ignore the transform we may be part-way through
          *  applying, so this stays correct when recomputed mid-tween
          *  (getBoundingClientRect would not). The bar's offsetParent is the
          *  nav, which is `fixed`, so offsetTop is the gutter above it. */
+        const outY = () => -(bar.offsetTop + bar.offsetHeight + OUT_PAD_PX);
+
         const swipe = (shown: boolean) => {
           if (shown) gsap.set(bar, { visibility: "inherit" });
           gsap.to(bar, {
-            y: shown ? 0 : -(bar.offsetTop + bar.offsetHeight + OUT_PAD_PX),
+            y: shown ? 0 : outY(),
             duration: shown ? DUR.copy2 : DUR.copy,
             ease: EASE.outQuart,
             overwrite: "auto",
@@ -194,10 +188,30 @@ export default function Nav() {
           });
         };
 
+        // Intro: the bar arrives by the SAME swipe it uses coming back on a
+        // scroll up (user, 2026-09-03) — same element, same distance, same
+        // duration and ease, no fade. It used to be its own gesture: the
+        // nav ROOT sliding yPercent -100 with autoAlpha over DUR.intro,
+        // which meant the nav entered one way on load and another way for
+        // the rest of the visit.
+        gsap.set(bar, { y: outY(), visibility: "hidden" });
+        let introDone = false;
+        const offPreloader = onPreloaderDone(() => {
+          introDone = true;
+          swipe(true);
+        });
+
         const offChrome = subscribeChrome(({ shown }) => {
           // Any scroll down closes the panel — an open menu floating over a
           // hidden Menu button would be orphaned.
           if (!shown) setOpen(false);
+          // subscribeChrome calls back IMMEDIATELY on subscribe with the
+          // current state (shown: true at the top of the page), which would
+          // slide the bar in the instant this mounts and skip the intro
+          // entirely. The intro owns the bar until it has landed. Nothing is
+          // lost by ignoring the interim: scroll is locked for the
+          // preloader's duration, so the state cannot have changed.
+          if (!introDone) return;
           swipe(shown);
         });
 

@@ -26,8 +26,13 @@
  * permanent lean wherever the cursor happened to rest.) Speed reads as
  * angle for free, with no velocity sampling and no timers to keep in sync.
  *
- * Only `transform` is touched (§A7), from a single gsap.ticker callback
- * rather than a tween per event. Coarse pointers and reduced-motion
+ * INTRO. The card does not reveal itself — Hero conducts the whole opening
+ * as one timeline, and reaches in for [data-reel-clip] and
+ * [data-reel-caption]. Split that across two components and the reel and
+ * the type it sits above drift apart the first time either duration moves.
+ *
+ * Only `transform` is touched by the sweep (§A7), from a single gsap.ticker
+ * callback rather than a tween per event. Coarse pointers and reduced-motion
  * visitors get the card square and still — the effect is decoration over a
  * layout that is already correct without it.
  */
@@ -125,7 +130,14 @@ export default function Showreel() {
     <div ref={scope} className="flex w-full justify-center">
       {/* The card and its caption bank as one piece */}
       <figure ref={frame} className="m-0 will-change-transform">
-        <div className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px]">
+        {/* data-reel-clip: the hero's intro opens this from a centre line.
+            It is the MEDIA box, not the figure — the figure carries the
+            pointer sweep's x/rotation, and the two must not share an
+            element. See components/sections/Hero. */}
+        <div
+          data-reel-clip=""
+          className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px]"
+        >
           <video
             className="size-full object-cover"
             ref={video}
@@ -143,9 +155,19 @@ export default function Showreel() {
         {/* Label carries the ink; the action sits back in the same grey as
             the hero's eyebrow and paragraph, so the secondary tier is
             consistent across the whole section. */}
-        <figcaption className="mt-[clamp(12px,1.4vw,20px)] flex items-center justify-between gap-6 font-manrope text-meta-lg leading-none text-ink">
-          <span>{hero.reel.label}</span>
-          <span className="text-muted-2">{hero.reel.note}</span>
+        {/* The figcaption is the clipping box; the row inside it is what
+            travels, so the caption rises out from under an edge like every
+            other line in the hero. SplitText cannot do this one — it would
+            wrap the flex children in line divs and take the
+            justify-between apart. */}
+        <figcaption className="mt-[clamp(12px,1.4vw,20px)] overflow-hidden">
+          <span
+            data-reel-caption=""
+            className="flex items-center justify-between gap-6 font-manrope text-meta-lg leading-none text-ink"
+          >
+            <span>{hero.reel.label}</span>
+            <span className="text-muted-2">{hero.reel.note}</span>
+          </span>
         </figcaption>
       </figure>
     </div>

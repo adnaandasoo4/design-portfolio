@@ -43,18 +43,50 @@
  * clamp's 34px floor is wider than a phone can hold at this face's set
  * width, and the authored line breaks would start wrapping a second time.
  *
- * Reveal: the preloader expands its off-black layer to the full viewport,
- * then markPreloaderDone fires and the [data-hero-intro] blocks rise in
- * (y 32→0, .85 out-quart, .06 stagger). Reduced motion: the markup renders
- * visible statically — the branch is intentionally empty.
+ * INTRO (rebuilt 2026-09-03). Every block used to rise 32px and fade in
+ * together — the same gesture applied four times, which is a transition
+ * rather than an opening. It is now ONE timeline of line reveals, conducted
+ * from here so the reel and the type beneath it cannot drift:
+ *
+ *   1. the reel opens from a centre line — clip-path inset(50%) → inset(0),
+ *      the same wipe the work-list marquee uses, so the site opens in a
+ *      shape it already speaks;
+ *   2. its caption rises out from under the card's bottom edge;
+ *   3. the eyebrow, headline and paragraph split into LINES, each in its own
+ *      clipping box, and rise through it in DOM order — which is also
+ *      top-to-bottom on screen, so the page assembles downward.
+ *
+ * Nothing fades. A mask reveal and a fade are different claims about where
+ * the content came from, and mixing them reads as neither. autoAlpha is set
+ * on the text only to hold it unsplit-and-unstyled off the screen until
+ * both gates below have opened; it is restored in the same frame the lines
+ * start moving, never animated.
+ *
+ * TWO GATES, and the timeline needs both: markPreloaderDone (the off-black
+ * has finished expanding) and document.fonts.ready (§A7 — split against the
+ * fallback face and the lines break in the wrong places, then the real face
+ * loads and the masks clip rows that no longer exist). Either can land
+ * first, so each one calls `start` and `start` runs only when both are in.
+ *
+ * Reduced motion: the branch is intentionally empty — no split, no clip, the
+ * markup renders visible and complete.
  */
 
 import { useRef } from "react";
-import { gsap, useGSAP } from "@/lib/gsap/register";
+import { gsap, useGSAP, SplitText } from "@/lib/gsap/register";
 import { DUR, EASE, MQ } from "@/lib/gsap/motion";
 import { onPreloaderDone } from "@/lib/preloader";
 import { hero } from "@/content/copy";
 import Showreel from "@/components/sections/Showreel";
+
+/** The reel's closed and open states. Percentages on every side in both,
+ *  so the browser can interpolate between them. */
+const REEL_SHUT = "inset(50% 0% 50% 0%)";
+const REEL_OPEN = "inset(0% 0% 0% 0%)";
+/** The caption and the type start a beat inside the reel's own opening, so
+ *  the hero reads as one gesture rather than a queue. */
+const CAPTION_AT = 0.34;
+const LINES_AT = 0.46;
 
 export default function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -63,30 +95,79 @@ export default function Hero() {
     () => {
       const section = sectionRef.current;
       if (!section) return;
-      const introEls = gsap.utils.toArray<HTMLElement>(
-        section.querySelectorAll("[data-hero-intro]"),
-      );
 
       const mm = gsap.matchMedia();
 
-      // §A7 #3 intro reveals: from-bottom +32px → 0, `.85 ease-out-quart`,
-      // stagger `.06` — fired when the preloader's expand completes.
       mm.add(MQ.motionOk, () => {
-        gsap.set(introEls, { y: 32, autoAlpha: 0 });
-        const offPreloader = onPreloaderDone(() => {
-          gsap.to(introEls, {
-            y: 0,
-            autoAlpha: 1,
-            duration: DUR.intro,
-            ease: EASE.outQuart,
-            stagger: 0.06,
+        const reel = section.querySelector<HTMLElement>("[data-reel-clip]");
+        const caption =
+          section.querySelector<HTMLElement>("[data-reel-caption]");
+        const textEls = gsap.utils.toArray<HTMLElement>(
+          "[data-hero-line]",
+          section,
+        );
+
+        // Closed state, set before the first paint. The text is held with
+        // autoAlpha rather than a mask because its masks do not exist yet —
+        // SplitText makes them, and only once the font has landed.
+        if (reel) gsap.set(reel, { clipPath: REEL_SHUT });
+        if (caption) gsap.set(caption, { yPercent: 108 });
+        gsap.set(textEls, { autoAlpha: 0 });
+
+        let split: SplitText | null = null;
+        let tl: gsap.core.Timeline | null = null;
+        let cancelled = false;
+        let fontsReady = false;
+        let preloaderDone = false;
+
+        const start = () => {
+          if (cancelled || tl || !fontsReady || !preloaderDone) return;
+
+          // linesClass gives every line its own clipping box, so the rise
+          // reads as type emerging from an edge rather than sliding.
+          split = new SplitText(textEls, {
+            type: "lines",
+            linesClass: "overflow-hidden",
           });
+          // Safe now: each line sits below its own mask, so revealing the
+          // element reveals nothing yet.
+          gsap.set(textEls, { autoAlpha: 1 });
+
+          tl = gsap.timeline({
+            defaults: { duration: DUR.intro, ease: EASE.outQuart },
+          });
+          if (reel) tl.to(reel, { clipPath: REEL_OPEN }, 0);
+          if (caption) tl.to(caption, { yPercent: 0 }, CAPTION_AT);
+          tl.from(split.lines, { yPercent: 108, stagger: 0.06 }, LINES_AT);
+        };
+
+        document.fonts.ready.then(() => {
+          fontsReady = true;
+          start();
         });
-        return () => offPreloader();
+        const offPreloader = onPreloaderDone(() => {
+          preloaderDone = true;
+          start();
+        });
+
+        return () => {
+          // Both gates resolve after this callback returns, so the timeline
+          // and the split are outside useGSAP's automatic cleanup and are
+          // killed by hand.
+          cancelled = true;
+          offPreloader();
+          tl?.kill();
+          split?.revert();
+          gsap.set(textEls, { clearProps: "visibility,opacity" });
+          if (reel) gsap.set(reel, { clearProps: "clipPath" });
+          if (caption) gsap.set(caption, { clearProps: "transform" });
+        };
       });
 
       // Reduced-motion branch: intentionally empty — the markup renders
-      // visible by default, i.e. instant show.
+      // visible and complete by default.
+
+      return () => mm.revert();
     },
     { scope: sectionRef },
   );
@@ -99,17 +180,14 @@ export default function Hero() {
       className="relative z-(--z-section) flex h-svh flex-col bg-bg px-5 pt-[92px] pb-5 max-b700:px-4 max-b700:pt-[76px] max-b700:pb-4"
     >
       {/* Reel — centred in the space the statement block leaves over */}
-      <div
-        data-hero-intro=""
-        className="flex flex-1 items-center justify-center"
-      >
+      <div className="flex flex-1 items-center justify-center">
         <Showreel />
       </div>
 
       {/* Statement block — anchored to the bottom of the viewport */}
       <div className="shrink-0">
         <p
-          data-hero-intro=""
+          data-hero-line=""
           className="font-manrope text-meta-lg/[1.6] tracking-[0.02em] text-muted-2"
         >
           {hero.eyebrow.map((line) => (
@@ -121,7 +199,7 @@ export default function Hero() {
 
         <div className="mt-[clamp(16px,2.4vh,30px)] flex items-end justify-between gap-[clamp(24px,5vw,90px)] max-b860:flex-col max-b860:items-start max-b860:gap-7">
           <h1
-            data-hero-intro=""
+            data-hero-line=""
             className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-bold tracking-[-0.02em] text-ink uppercase max-b700:text-[6.2vw]"
           >
             {hero.headline.map((line) => (
@@ -132,7 +210,7 @@ export default function Hero() {
           </h1>
 
           <p
-            data-hero-intro=""
+            data-hero-line=""
             className="w-[clamp(250px,26vw,360px)] shrink-0 pb-[0.4em] font-manrope text-meta-lg/[1.6] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
           >
             {hero.paragraph}
