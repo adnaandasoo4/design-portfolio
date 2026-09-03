@@ -8,12 +8,14 @@
  * rather than three near-misses. That is the hero's own size token, a step
  * above the site-wide --text-meta.
  *
- * MOBILE (user, 2026-09-03). The card goes edge to edge and loses both its
- * corner radius and its caption. w-screen is wider than the hero's padded
- * content box, and the track centres it, so it overhangs the 16px gutter
- * evenly on both sides and lands flush to the viewport edges; <main>'s
- * overflow-x-clip is what keeps that from becoming a scrollbar. The sweep
- * below is fine-pointer only, so nothing here fights it.
+ * MOBILE (user, 2026-09-03). The card fills the width of the hero's content
+ * box — margin to margin, NOT full-bleed: it stops at the page's own 16px
+ * gutters, which every other section on the phone also respects. (It was
+ * briefly w-screen, overhanging those gutters to reach the viewport edges;
+ * that is a different thing and not what was asked for.) The corner radius
+ * stays for the same reason — the card still has visible edges to round.
+ * Only the caption goes. The sweep below is fine-pointer only, so nothing
+ * here fights it.
  *
  * TRAVEL. The card sweeps the full width of the hero's content box —
  * margin to margin, never past the page gutters. The amplitude is measured,
@@ -145,7 +147,7 @@ export default function Showreel() {
             element. See components/sections/Hero. */}
         <div
           data-reel-clip=""
-          className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px] max-b700:w-screen max-b700:rounded-none"
+          className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px] max-b700:w-full"
         >
           <video
             data-reel-media=""
