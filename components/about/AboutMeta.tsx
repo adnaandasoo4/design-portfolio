@@ -1,50 +1,57 @@
 /*
- * About — Meta strip (§A9 About brief, section 3). The three about.meta items
- * (numeral · latin · ja) as a hairline-separated three-up row echoing the
- * disciplines numeral system. Vertical line-055 rules between cells on
- * desktop; the cells stack with horizontal rules ≤860 (§A4 sm). Standard
- * once-on-enter rise via RevealGroup.
+ * Three-line summary — numbered, ruled rows.
+ *
+ * Reuses the numeral device the nav menu and the Branding process both run
+ * on: mono, tabular-nums, in its own column so the labels stay on one left
+ * edge however wide the numerals get. Each row takes a top rule except the
+ * first, which would otherwise double the rail's own hairline.
  */
-
-import RevealGroup from "@/components/site/RevealGroup";
+import Spread from "@/components/site/Spread";
 import { about } from "@/content/about";
 
 export default function AboutMeta() {
   return (
-    <section
-      id="meta"
-      aria-label="At a glance"
-      className="relative z-(--z-section) bg-bg"
+    <Spread
+      tight
+      rail={
+        <>
+          <p>{about.metaEyebrow.latin}</p>
+          <span aria-hidden="true" className="block h-px w-full bg-line-09" />
+          <p lang="ja" className="font-ja tracking-[0.14em] text-muted-3">
+            {about.metaEyebrow.ja}
+          </p>
+        </>
+      }
     >
-      {/* Section hairline — edge to edge */}
-      <div aria-hidden="true" className="h-px bg-line-09" />
-
-      <RevealGroup className="grid grid-cols-3 gap-10 px-9 py-[clamp(56px,9vh,100px)] max-b860:grid-cols-1 max-b860:gap-0 max-b860:py-9 max-b700:px-5.5">
-        {about.meta.map((m, i) => (
-          <div
-            key={m.numeral}
-            data-reveal
-            className={`flex flex-col max-b860:py-7 ${
-              i > 0
-                ? "border-l border-line-055 pl-10 max-b860:border-t max-b860:border-l-0 max-b860:pl-0"
-                : ""
+      <ul className="flex flex-col">
+        {about.meta.map((item, i) => (
+          <li
+            key={item.numeral}
+            data-reveal=""
+            className={`grid grid-cols-[auto_1fr] items-baseline gap-x-[clamp(20px,3vw,56px)] py-[clamp(20px,2.8vh,38px)] ${
+              i === 0 ? "pt-0" : "border-t border-line-09"
             }`}
           >
-            <span className="text-[18px] leading-none font-normal text-muted-2">
-              {m.numeral}
-            </span>
-            <span className="mt-5.5 font-medium text-[clamp(22px,2vw,32px)] leading-[1.15] tracking-[-0.015em] text-ink">
-              {m.latin}
-            </span>
             <span
-              lang="ja"
-              className="mt-2.5 font-ja text-[15px] leading-none font-normal tracking-[0.12em] text-muted-2"
+              aria-hidden="true"
+              className="font-mono-ui text-meta leading-[1.6] text-muted-2 tabular-nums"
             >
-              {m.ja}
+              {item.numeral}
             </span>
-          </div>
+            <div className="flex flex-col gap-1.5">
+              <span className="text-[clamp(20px,1.7vw,28px)]/[1.2] font-semibold tracking-[-0.015em] text-ink">
+                {item.latin}
+              </span>
+              <span
+                lang="ja"
+                className="font-ja text-meta tracking-[0.14em] text-muted-3"
+              >
+                {item.ja}
+              </span>
+            </div>
+          </li>
         ))}
-      </RevealGroup>
-    </section>
+      </ul>
+    </Spread>
   );
 }
