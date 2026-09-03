@@ -31,7 +31,7 @@ import { DUR, EASE, MQ } from "@/lib/gsap/motion";
 import { scrollToSection, scrollToTop } from "@/lib/gsap/SmoothScroll";
 import { navigateWithVeil } from "@/components/site/RouteVeil";
 import FooterGradient from "@/components/site/FooterGradient";
-import { footer, askAiPrompt, EMAIL } from "@/content/copy";
+import { footer, askAiPrompt, EMAIL, nav as navCopy } from "@/content/copy";
 
 /** How long the SR "email copied" confirmation stays up (§A5 Copy-email) */
 const COPY_REVERT_MS = 1700;
@@ -324,10 +324,7 @@ export default function Footer() {
     if (target !== "#footer" && pathname !== "/") {
       if (target !== "#hero") {
         try {
-          sessionStorage.setItem(
-            PENDING_SCROLL_KEY,
-            `${target}|${Date.now()}`,
-          );
+          sessionStorage.setItem(PENDING_SCROLL_KEY, `${target}|${Date.now()}`);
         } catch {
           /* storage unavailable — land at top, same as the #hero case */
         }
@@ -376,7 +373,10 @@ export default function Footer() {
             </div>
             <nav aria-label="Footer">
               <ul className="mt-5 max-b700:mt-0">
-                {footer.links.map((link) => (
+                {/* The SAME list the top menu renders (user, 2026-09-02) —
+                    imported rather than duplicated, so the two can never
+                    drift apart. */}
+                {navCopy.links.map((link) => (
                   <li key={link.label} className="border-b border-line-09">
                     {link.type === "scroll" ? (
                       <Link
@@ -386,7 +386,7 @@ export default function Footer() {
                       >
                         <BigLinkInner label={link.label} />
                       </Link>
-                    ) : (
+                    ) : link.type === "route" ? (
                       <Link
                         href={link.target}
                         onClick={goRoute(link.target)}
@@ -394,6 +394,18 @@ export default function Footer() {
                       >
                         <BigLinkInner label={link.label} />
                       </Link>
+                    ) : (
+                      /* "pending" (Branding) — the row exists and hovers,
+                         but has nowhere to go yet; announced as disabled
+                         rather than faked, exactly as in the top menu. */
+                      <a
+                        href={link.target}
+                        aria-disabled="true"
+                        onClick={(e) => e.preventDefault()}
+                        className={`${BIG_LINK} cursor-default`}
+                      >
+                        <BigLinkInner label={link.label} />
+                      </a>
                     )}
                   </li>
                 ))}

@@ -54,6 +54,11 @@
 
   --c-selection-bg: #ffffff;
   --c-selection-ink: #111214;
+
+  /* Preloader is the page's INVERSE, not a fixed light stage — see the
+     light block below. */
+  --c-preloader: #f7f6f4;
+  --c-preloader-slide: #26262b;
 }
 
 /* ---- RAW palette: light ---- */
@@ -90,6 +95,12 @@ html[data-theme="light"] {
 
   --c-selection-bg: #111214;
   --c-selection-ink: #f2f1ef;
+
+  /* Inverted with everything else: a light page opens from a DARK stage,
+     so the reveal always reads as the page pushing its own colour out over
+     the opposite one, whichever way round the site is. */
+  --c-preloader: #111214;
+  --c-preloader-slide: #e4e2dc;
 
   color-scheme: light;
 }
@@ -134,18 +145,21 @@ html[data-theme="light"] {
   --color-line-14: var(--c-line-14);
   --color-fill-035: var(--c-fill-035);
 
+  --color-preloader: var(--c-preloader);
+  --color-preloader-slide: var(--c-preloader-slide);
+
   /* ---- Fixed colors (identical in both themes) ---- */
   /* Brand vermilion — the designer × engineer banner and the showreel frame.
      4.64:1 against white, so the banner label clears AA at 14px semibold. */
   --color-brand: #d43f18;
   --color-brand-ink: #ffffff;
-  /* Content sitting ON the WebGL artwork band, which stays dark in both
-     themes because it is artwork, not a surface. */
+  /* Content sitting ON artwork — the WebGL band, the contact photo — which
+     stays dark in both themes because it is artwork, not a surface. */
   --color-on-art: #f2f1ef;
   --color-on-art-ink: #111214;
-  /* Preloader owns its own light stage in both themes (§A1). */
-  --color-preloader: #f7f6f4;
-  --color-preloader-slide: #26262b;
+  /* Scrim over a photograph, so the type on top has a floor to sit on
+     regardless of what the image is doing underneath. */
+  --color-art-scrim: rgba(17, 18, 20, 0.42);
   --color-hero-dim: #050506; /* hero dim overlay (smoke variant only) */
 
   /* ---- Typography ---- */

@@ -93,14 +93,9 @@ export const askAiPrompt =
  */
 export const footer = {
   navEyebrow: "( navigation )",
-  /** Big footer nav links (reference-cased) */
-  links: [
-    { label: "Home", type: "scroll", target: "#hero" },
-    { label: "About", type: "route", target: "/about" },
-    { label: "Work", type: "route", target: "/works" },
-    { label: "Disciplines", type: "scroll", target: "#disciplines" },
-    { label: "Contact", type: "scroll", target: "#footer" },
-  ] as const,
+  /* Footer links deliberately DO NOT live here — Footer.tsx renders
+     `nav.links` below, so the footer and the top menu can never disagree
+     about what the site's navigation is (user, 2026-09-02). */
   detailsEyebrow: "( my details )",
   basedIn: "Based in Baltimore, MD.\nWorking worldwide.",
   socialsEyebrow: "( my socials )",
