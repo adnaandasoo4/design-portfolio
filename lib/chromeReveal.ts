@@ -9,22 +9,17 @@
  * — this module owns exactly ONE, created on the first subscribe and killed
  * when the last subscriber leaves.
  *
- * Two independent flags, because the chrome does not move as one piece:
- *   shown — the direction rule. Any scroll DOWN hides; any scroll UP shows.
- *           Drives the wordmarks, the Menu, and the theme toggle.
- *   atTop — within TOP_EPS_PX of the document top. Drives the
- *           designer × engineer banner alone, which flips up out of view on
- *           the first scroll down and returns ONLY at the very top (user
- *           spec) — scrolling up mid-page brings back everything else but
- *           deliberately not the banner.
+ * One flag, `shown`: any scroll DOWN hides the chrome, any scroll UP shows
+ * it, and sitting within TOP_EPS_PX of the document top always counts as
+ * shown. (An `atTop` flag lived here for the vermilion banner, which
+ * returned only at the very top; the banner was dropped 2026-09-02 and the
+ * flag went with it.)
  */
 import { ScrollTrigger } from "@/lib/gsap/register";
 
 export type ChromeState = {
   /** direction rule — false after any scroll down, true after any scroll up */
   shown: boolean;
-  /** within TOP_EPS_PX of the top of the document */
-  atTop: boolean;
 };
 
 type Listener = (state: ChromeState) => void;
@@ -32,12 +27,12 @@ type Listener = (state: ChromeState) => void;
 /** Within this many px of the top counts as "at the top". */
 const TOP_EPS_PX = 8;
 
-let state: ChromeState = { shown: true, atTop: true };
+let state: ChromeState = { shown: true };
 const listeners = new Set<Listener>();
 let trigger: ScrollTrigger | null = null;
 
 function publish(next: ChromeState) {
-  if (next.shown === state.shown && next.atTop === state.atTop) return;
+  if (next.shown === state.shown) return;
   state = next;
   for (const listener of listeners) listener(state);
 }
@@ -56,7 +51,7 @@ export function subscribeChrome(listener: Listener): () => void {
       end: "max",
       onUpdate(self) {
         const atTop = self.scroll() <= TOP_EPS_PX;
-        publish({ shown: atTop || self.direction === -1, atTop });
+        publish({ shown: atTop || self.direction === -1 });
       },
     });
   }
@@ -69,7 +64,7 @@ export function subscribeChrome(listener: Listener): () => void {
       trigger?.kill();
       trigger = null;
       // Next mount starts from a clean top-of-page assumption.
-      state = { shown: true, atTop: true };
+      state = { shown: true };
     }
   };
 }

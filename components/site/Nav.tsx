@@ -1,34 +1,31 @@
 "use client";
 
 /*
- * Fixed top chrome (§A5 [data-topnav], user-redesigned 2026-09-02 against
- * the ethansuero.com reference). Four elements on one centred row:
+ * Fixed top chrome (§A5 [data-topnav], user-redirected 2026-09-02). Two
+ * elements, one per side:
  *
- *   ADNAAN  [designer × engineer]  ……  [Menu +]  DASOO
+ *   ADNAAN DASOO  ……………………………………………………  [Menu +]
  *
- * - The name is ONE wordmark split across the header. Both halves are
- *   home links, set in HK Grotesk Wide SemiBold uppercase at the display
- *   scale the reference gives its logotype.
- * - The banner is the reference's partner badge re-cast as the bilingual
- *   designer × engineer sign-off, filled with the brand vermilion.
- * - The Menu box keeps the reference's proportions (≈4.3 : 1) and its "+"
- *   affordance; the plus rotates 45° into a "×" while the panel is open.
- * - The panel opens DOWNWARD on hover (and on click, and on keyboard
- *   focus): a clip-path wipe from the top edge with the rows staggering up
- *   behind it. Row hover is the footer-socials recipe carried over verbatim
- *   from the previous nav — light flood snaps ON, fades OFF, label glides
- *   right. (Tailwind v4: translate-* sets the CSS `translate` property, so
- *   the label transitions `translate`; the row <li> transitions `transform`
- *   — different elements, different properties, no conflict.)
+ * - The wordmark is whole again on the left (the earlier split halves and
+ *   the vermilion designer × engineer banner were both dropped), set in HK
+ *   Grotesk Wide SemiBold uppercase at the reference's logotype scale.
+ * - The Menu carries no outline — it is a bare surface, and the panel is
+ *   FLUSH beneath it with no gap, so opening reads as the bar extending
+ *   itself downward rather than a popover appearing under it. The button
+ *   drops its bottom radius while open so the two halves fuse.
+ * - Opening is a clip-path wipe from the button's bottom edge with the rows
+ *   staggering in behind it. Row hover is the footer-socials recipe carried
+ *   over verbatim — light flood snaps ON, fades OFF, label glides right.
+ *   (Tailwind v4: translate-* sets the CSS `translate` property, so the
+ *   label transitions `translate`; the row <li> transitions `transform` —
+ *   different elements, different properties, no conflict.)
+ * - The "+" does not merely tip 45° into an "×": it spins a full turn PLUS
+ *   the 45°, landing on the same glyph from the long way round. Spin and
+ *   wipe share --dur-copy so they read as one gesture.
  *
  * SCROLL BEHAVIOUR (lib/chromeReveal — one shared ScrollTrigger, also
- * driving ThemeToggle):
- * - wordmarks / Menu: any scroll DOWN slides them off to their OWN side
- *   (left cluster exits left, right cluster exits right); any scroll UP
- *   swipes them back in from those sides.
- * - the banner is deliberately different — it FLIPS up out of view about
- *   its top edge on the first scroll down and returns ONLY at the very top
- *   of the page, never on a mid-page scroll up (user spec).
+ * driving ThemeToggle): any scroll DOWN slides each side off its OWN edge;
+ * any scroll UP swipes them back in.
  *
  * The children carry every scroll tween; the ROOT is owned by the intro
  * below and by Footer.tsx's ScrollTrigger, which hides [data-topnav] over
@@ -53,7 +50,7 @@ import { nav as navCopy } from "@/content/copy";
 
 /* -------- Footer-socials hover recipe at menu scale -------- */
 const ROW_LINK =
-  "group relative flex w-full items-center py-[7px] pl-5 pr-4 text-[15px]/[1.3] " +
+  "group relative flex w-full items-center py-[7px] pr-4 pl-5 text-[15px]/[1.3] " +
   "font-medium text-ink";
 
 const FLOOD =
@@ -69,16 +66,7 @@ const LABEL =
   "group-hover:text-bg group-focus-visible:text-bg " +
   "motion-safe:group-hover:translate-x-2 motion-safe:group-focus-visible:translate-x-2";
 
-/* Wordmark — the reference logotype scale, in the display face */
-const WORDMARK =
-  "pointer-events-auto font-hkgw text-[clamp(20px,2.1vw,30px)] font-semibold " +
-  "uppercase leading-none tracking-[-0.02em] whitespace-nowrap text-ink " +
-  "transition-opacity duration-(--dur-hover) ease-(--ease-std) hover:opacity-70";
-
-/* Boxed chrome (Menu button + panel) share one surface recipe */
-const BOX = "rounded-btn border border-line-13 bg-raise-2";
-
-/* Hidden offsets — each cluster parks on its own side of the viewport */
+/* Hidden offsets — each side parks on its own edge of the viewport */
 const LEFT_OUT_X = -28;
 const RIGHT_OUT_X = 28;
 
@@ -125,7 +113,7 @@ export default function Nav() {
     navigateWithVeil((href) => router.push(href), target);
   };
 
-  /** The wordmark halves — home from anywhere, top-of-page when already home. */
+  /** The wordmark — home from anywhere, top-of-page when already home. */
   const goHome = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     setOpen(false);
@@ -160,11 +148,7 @@ export default function Nav() {
       if (!el) return;
       const left = gsap.utils.toArray<HTMLElement>("[data-chrome-left]", el);
       const right = gsap.utils.toArray<HTMLElement>("[data-chrome-right]", el);
-      const banner = el.querySelector<HTMLElement>("[data-chrome-banner]");
-      const all = [...left, ...right, ...(banner ? [banner] : [])];
-      // Hinge the banner on its TOP edge — the fold pivots there, matching
-      // the cluster's perspective.
-      if (banner) gsap.set(banner, { transformOrigin: "50% 0%" });
+      const all = [...left, ...right];
       const mm = gsap.matchMedia();
 
       mm.add(MQ.motionOk, () => {
@@ -180,7 +164,7 @@ export default function Nav() {
           });
         });
 
-        const offChrome = subscribeChrome(({ shown, atTop }) => {
+        const offChrome = subscribeChrome(({ shown }) => {
           // Any scroll down closes the panel — an open menu floating over a
           // hidden Menu button would be orphaned.
           if (!shown) setOpen(false);
@@ -199,16 +183,6 @@ export default function Nav() {
             ease: EASE.outQuart,
             overwrite: "auto",
           });
-          // The banner answers to atTop only: it flips away about its top
-          // edge and does not come back until the page is back at the top.
-          if (banner)
-            gsap.to(banner, {
-              rotationX: atTop ? 0 : -104,
-              autoAlpha: atTop ? 1 : 0,
-              duration: atTop ? DUR.copy2 : DUR.copy,
-              ease: EASE.outQuart,
-              overwrite: "auto",
-            });
         });
 
         return () => {
@@ -219,10 +193,9 @@ export default function Nav() {
 
       mm.add(MQ.reduced, () => {
         gsap.set(el, { yPercent: 0, autoAlpha: 1 });
-        const offChrome = subscribeChrome(({ shown, atTop }) => {
+        const offChrome = subscribeChrome(({ shown }) => {
           if (!shown) setOpen(false);
-          gsap.set([...left, ...right], { autoAlpha: shown ? 1 : 0 });
-          if (banner) gsap.set(banner, { autoAlpha: atTop ? 1 : 0 });
+          gsap.set(all, { autoAlpha: shown ? 1 : 0 });
         });
         return () => {
           offChrome();
@@ -240,152 +213,116 @@ export default function Nav() {
       ref={scope}
       data-topnav=""
       aria-label="Primary"
-      className="pointer-events-none fixed inset-x-0 top-0 z-(--z-nav) flex items-center justify-between gap-6 px-5 py-5 max-b700:px-4 max-b700:py-4"
+      className="pointer-events-none fixed inset-x-0 top-0 z-(--z-nav) flex items-start justify-between gap-6 px-5 py-5 max-b700:px-4 max-b700:py-4"
     >
-      {/* ---- LEFT: first name + bilingual banner ---- */}
-      {/* perspective lives on the CLUSTER so the banner's rotationX reads as
-          a fold in depth rather than a flat squash */}
-      <div className="flex items-center gap-[clamp(14px,2vw,28px)] [perspective:520px]">
-        <Link
-          data-chrome-left=""
-          href="/"
-          onClick={goHome}
-          aria-label={`${navCopy.wordmarkFirst} ${navCopy.wordmarkLast} — home`}
-          className={WORDMARK}
-        >
-          {navCopy.wordmarkFirst}
-        </Link>
+      {/* ---- LEFT: the wordmark, whole ---- */}
+      <Link
+        data-chrome-left=""
+        href="/"
+        onClick={goHome}
+        aria-label={`${navCopy.wordmark} — home`}
+        className="pointer-events-auto flex h-11 items-center font-hkgw text-[clamp(20px,2.1vw,30px)] leading-none font-semibold tracking-[-0.02em] whitespace-nowrap text-ink uppercase transition-opacity duration-(--dur-hover) ease-(--ease-std) hover:opacity-70"
+      >
+        {navCopy.wordmark}
+      </Link>
 
-        {/* Vermilion banner. transformPerspective + a top-edge origin give
-            the scroll-away its fold; the JP half drops below 1024px and the
-            whole banner below 860px, where the row runs out of width. */}
-        <div
-          data-chrome-banner=""
-          aria-label={`${navCopy.bannerLatin} (${navCopy.bannerJa})`}
-          className="flex h-[34px] items-center gap-2.5 rounded-btn bg-brand px-3.5 text-brand-ink max-b860:hidden"
+      {/* ---- RIGHT: the Menu, which extends into its own panel ---- */}
+      <div
+        data-chrome-right=""
+        ref={menuWrap}
+        className="pointer-events-auto relative"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onFocus={() => setOpen(true)}
+        onBlur={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget as Node))
+            setOpen(false);
+        }}
+      >
+        <button
+          type="button"
+          aria-expanded={open}
+          aria-controls="nav-menu-panel"
+          onClick={() => setOpen((o) => !o)}
+          className={`flex h-11 w-[clamp(160px,14vw,196px)] cursor-pointer items-center justify-between rounded-t-btn bg-raise-2 pr-4 pl-5 text-[15px] leading-none font-medium text-ink max-b700:w-[124px] max-b700:pr-3 max-b700:pl-4 ${
+            open ? "" : "rounded-b-btn"
+          }`}
         >
-          <span className="text-[13px] leading-none font-semibold tracking-[-0.005em] whitespace-nowrap">
-            {navCopy.bannerLatin}
-          </span>
-          <span
-            aria-hidden="true"
-            className="h-3 w-px bg-brand-ink/40 max-b1024:hidden"
-          />
-          <span
-            lang="ja"
-            className="font-ja text-[12px] leading-none font-medium whitespace-nowrap text-brand-ink/85 max-b1024:hidden"
-          >
-            {navCopy.bannerJa}
-          </span>
-        </div>
-      </div>
-
-      {/* ---- RIGHT: Menu box + last name ---- */}
-      <div className="flex items-center gap-2">
-        <div
-          data-chrome-right=""
-          ref={menuWrap}
-          className="pointer-events-auto relative"
-          onMouseEnter={() => setOpen(true)}
-          onMouseLeave={() => setOpen(false)}
-          onFocus={() => setOpen(true)}
-          onBlur={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget as Node))
-              setOpen(false);
-          }}
-        >
-          <button
-            type="button"
-            aria-expanded={open}
-            aria-controls="nav-menu-panel"
-            onClick={() => setOpen((o) => !o)}
-            className={`flex h-11 w-[clamp(160px,14vw,196px)] cursor-pointer items-center justify-between pr-4 pl-5 text-[15px] leading-none font-medium text-ink transition-colors duration-(--dur-hover) ease-(--ease-std) hover:border-line-14 max-b700:w-[124px] max-b700:pr-3 max-b700:pl-4 ${BOX}`}
-          >
-            {navCopy.menuLabel}
-            {/* "+" → "×" — a rotation, so it rides the transform-only rule */}
-            <svg
-              viewBox="0 0 24 24"
-              className={`size-[15px] transition-transform duration-(--dur-copy-2) ease-(--ease-out-quart) motion-reduce:transition-none ${open ? "rotate-45" : ""}`}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.9"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
-
-          {/* Panel — clip-path wipe down from the top edge. `invisible` when
-              closed keeps it out of the tab order and off the pointer. */}
-          <div
-            id="nav-menu-panel"
-            className={`absolute top-[calc(100%+7px)] left-0 w-full overflow-hidden py-1.5 [transition:clip-path_var(--dur-copy-2)_var(--ease-out-quart),opacity_var(--dur-copy)_var(--ease-std),visibility_0s_linear_var(--vis-delay)] motion-reduce:transition-none ${BOX} ${
-              open
-                ? "visible [--vis-delay:0s] opacity-100 [clip-path:inset(0_0_0_0)]"
-                : "invisible [--vis-delay:var(--dur-copy-2)] opacity-0 [clip-path:inset(0_0_100%_0)]"
+          {navCopy.menuLabel}
+          {/* A full turn PLUS the 45° that makes the "+" an "×" — same glyph,
+              arrived at the long way round. */}
+          <svg
+            viewBox="0 0 24 24"
+            className={`size-[15px] transition-transform duration-(--dur-copy) ease-(--ease-out-quart) motion-reduce:transition-none ${
+              open ? "rotate-[405deg]" : "rotate-0"
             }`}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.9"
+            strokeLinecap="round"
+            aria-hidden="true"
           >
-            <ul className="flex flex-col">
-              {navCopy.links.map((link, i) => (
-                <li
-                  key={link.label}
-                  style={{
-                    transitionDelay: open ? `${70 + i * 34}ms` : "0ms",
-                  }}
-                  className={`[transition:transform_var(--dur-copy-2)_var(--ease-out-quart),opacity_var(--dur-copy)_var(--ease-std)] motion-reduce:transition-none ${
-                    open
-                      ? "opacity-100 [transform:translateY(0px)]"
-                      : "opacity-0 [transform:translateY(-8px)]"
-                  }`}
-                >
-                  {link.type === "route" ? (
-                    <Link
-                      data-navlink=""
-                      href={link.target}
-                      onClick={goRoute(link.target)}
-                      className={ROW_LINK}
-                    >
-                      <RowInner label={link.label} index={i} />
-                    </Link>
-                  ) : link.type === "scroll" ? (
-                    <Link
-                      data-navlink=""
-                      data-scrollto={link.target}
-                      href={`/${link.target}`}
-                      onClick={goScroll(link.target)}
-                      className={ROW_LINK}
-                    >
-                      <RowInner label={link.label} index={i} />
-                    </Link>
-                  ) : (
-                    /* "pending": the row exists and hovers, but has nowhere
-                       to go yet — announced as disabled rather than faked. */
-                    <a
-                      href={link.target}
-                      aria-disabled="true"
-                      onClick={(e) => e.preventDefault()}
-                      className={`${ROW_LINK} cursor-default`}
-                    >
-                      <RowInner label={link.label} index={i} />
-                    </a>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
 
-        <Link
-          data-chrome-right=""
-          href="/"
-          onClick={goHome}
-          tabIndex={-1}
-          aria-hidden="true"
-          className={WORDMARK}
+        {/* Panel — flush under the button, same surface, so the bar simply
+            grows downward. `invisible` when closed keeps it out of the tab
+            order and off the pointer. */}
+        <div
+          id="nav-menu-panel"
+          className={`absolute top-full left-0 w-full overflow-hidden rounded-b-btn bg-raise-2 pb-1.5 [transition:clip-path_var(--dur-copy)_var(--ease-out-quart),opacity_var(--dur-micro)_var(--ease-std),visibility_0s_linear_var(--vis-delay)] motion-reduce:transition-none ${
+            open
+              ? "visible opacity-100 [--vis-delay:0s] [clip-path:inset(0_0_0_0)]"
+              : "invisible opacity-0 [--vis-delay:var(--dur-copy)] [clip-path:inset(0_0_100%_0)]"
+          }`}
         >
-          {navCopy.wordmarkLast}
-        </Link>
+          <ul className="flex flex-col">
+            {navCopy.links.map((link, i) => (
+              <li
+                key={link.label}
+                style={{ transitionDelay: open ? `${40 + i * 22}ms` : "0ms" }}
+                className={`[transition:transform_var(--dur-copy)_var(--ease-out-quart),opacity_var(--dur-micro)_var(--ease-std)] motion-reduce:transition-none ${
+                  open
+                    ? "opacity-100 [transform:translateY(0px)]"
+                    : "opacity-0 [transform:translateY(-8px)]"
+                }`}
+              >
+                {link.type === "route" ? (
+                  <Link
+                    data-navlink=""
+                    href={link.target}
+                    onClick={goRoute(link.target)}
+                    className={ROW_LINK}
+                  >
+                    <RowInner label={link.label} index={i} />
+                  </Link>
+                ) : link.type === "scroll" ? (
+                  <Link
+                    data-navlink=""
+                    data-scrollto={link.target}
+                    href={`/${link.target}`}
+                    onClick={goScroll(link.target)}
+                    className={ROW_LINK}
+                  >
+                    <RowInner label={link.label} index={i} />
+                  </Link>
+                ) : (
+                  /* "pending": the row exists and hovers, but has nowhere to
+                     go yet — announced as disabled rather than faked. */
+                  <a
+                    href={link.target}
+                    aria-disabled="true"
+                    onClick={(e) => e.preventDefault()}
+                    className={`${ROW_LINK} cursor-default`}
+                  >
+                    <RowInner label={link.label} index={i} />
+                  </a>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </nav>
   );

@@ -52,11 +52,18 @@ export function toggleTheme(origin?: HTMLElement | null) {
   // lib.dom.d.ts only recently gained it.
   const start = (
     document as Document & {
-      startViewTransition?: (cb: () => void) => { finished: Promise<void> };
+      startViewTransition?: (cb: () => void) => {
+        ready: Promise<void>;
+        updateCallbackDone: Promise<void>;
+        finished: Promise<void>;
+      };
     }
   ).startViewTransition;
 
-  if (!start || prefersReducedMotion()) {
+  // A hidden document cannot snapshot, so the browser aborts the transition
+  // the moment it starts. Skip straight to the flip rather than start one
+  // we know will fail.
+  if (!start || prefersReducedMotion() || document.visibilityState !== "visible") {
     applyTheme(next);
     return;
   }
@@ -76,11 +83,16 @@ export function toggleTheme(origin?: HTMLElement | null) {
   root.dataset.themeAnim = "";
 
   const transition = start.call(document, () => applyTheme(next));
-  // `finished` REJECTS whenever the browser skips the transition — the tab
-  // was hidden when it started, or a second toggle superseded this one. The
-  // theme has already been applied by the callback either way, so the only
-  // thing to do is clear the animation flag. Without the catch this surfaces
-  // as an unhandled "Transition was aborted because of invalid state".
+
+  // ALL THREE of a ViewTransition's promises reject when the browser skips
+  // the transition — the tab went hidden, or a second toggle superseded
+  // this one. Any of them left unhandled surfaces as an unhandled rejection
+  // ("InvalidStateError: Transition was aborted because of invalid state"),
+  // so every one needs a catch, not just the one we actually await. The
+  // theme itself is already applied by the callback regardless; the only
+  // thing left to do is clear the animation flag.
+  transition.ready.catch(() => {});
+  transition.updateCallbackDone.catch(() => {});
   transition.finished
     .catch(() => {})
     .finally(() => {

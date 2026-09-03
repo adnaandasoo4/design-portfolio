@@ -7,24 +7,29 @@ export const EMAIL = "adnaandasoo@gmail.com";
 /* Preloader is purely visual (stills + off-black expand) — no copy. */
 
 /*
- * Hero — centered showreel over a stacked statement block (user-directed,
+ * Hero — centred showreel over a stacked statement block (user-directed,
  * 2026-09-02). Three text slots below the reel: a mono eyebrow, the giant
  * masthead headline (the page's single h1), and a right-aligned paragraph
  * that bottoms out with the headline's last line.
  *
- * All three are drawn from copy the site already owned: the eyebrow from
- * the old hero statement, the headline from the site's own OG description
- * ("design and engineering held to the same standard"), the paragraph from
- * the About blurb.
+ * !! PLACEHOLDER COPY (user request, 2026-09-02) !!
+ * eyebrow / headline / paragraph are currently the REFERENCE SITE's own
+ * words, lifted verbatim so the layout can be judged at the right measure
+ * ("the exact same as the reference photo for now"). They describe another
+ * agency's B2B positioning, not Adnaan's, and MUST be replaced before this
+ * goes anywhere public. The previous draft — eyebrow "for brands that
+ * sweat every detail", headline "design & engineering held to the same
+ * standard", paragraph from aboutBlurb — is the fallback if nothing else
+ * arrives.
  */
 export const hero = {
   /** Mono eyebrow — one array item per display line */
-  eyebrow: ["FOR BRANDS THAT SWEAT", "EVERY DETAIL"],
+  eyebrow: ["FOR B2B TECH TEAMS THAT HAVE", "OUTGROWN THEIR WEBSITE"],
   /** Masthead headline — one array item per display line */
-  headline: ["DESIGN & ENGINEERING", "HELD TO THE SAME", "STANDARD"],
+  headline: ["BRANDING & WEBSITES", "THAT MOVE B2B TECH", "TEAMS FORWARD"],
   /** Right-hand paragraph, bottom-aligned to the headline */
   paragraph:
-    "I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.",
+    "We partner with ambitious B2B teams, scale-ups and brands to unlock their true potential and growth through strategy, design and technology.",
   /** Showreel captions, sitting on the reel's bottom edge */
   reel: {
     label: "Projects Showreel",
@@ -114,18 +119,14 @@ export const footer = {
 };
 
 /*
- * Top chrome (user-directed, 2026-09-02) — four elements across one row:
- *   ADNAAN · [designer × engineer banner] … [Menu +] · DASOO
- * The name is split across the header as a single wordmark; both halves
- * lead home. Links live behind the Menu, which opens downward on hover.
+ * Top chrome (user-redirected, 2026-09-02) — two elements, one per side:
+ *   ADNAAN DASOO  ……………………………………………………  [Menu +]
+ * The bilingual vermilion banner and the split wordmark were both dropped:
+ * the full name now sits whole on the left, and the Menu owns the right.
  */
 export const nav = {
-  /** The wordmark, split left/right across the header */
-  wordmarkFirst: "Adnaan",
-  wordmarkLast: "Dasoo",
-  /** Vermilion banner beside the first name */
-  bannerLatin: "designer × engineer",
-  bannerJa: "デザイナー × エンジニア",
+  /** Full wordmark, left side. The nav renders it uppercase. */
+  wordmark: "Adnaan Dasoo",
   menuLabel: "Menu",
   /** Menu panel links. "Branding" has no destination yet (Open Q, 2026-09-02)
    *  — type "pending" renders the row and its hover, with no navigation. */
