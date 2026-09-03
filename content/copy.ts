@@ -61,9 +61,10 @@ export const hero = {
  * to the wrong file.
  *
  * CUT BACK to a teaser (user, 2026-09-03). It ran three long paragraphs —
- * the whole personal piece — on a page whose job is to move you along. Two
- * of the three now live only on /about, and the section is the statement,
- * one paragraph, and a link. The paragraph is not duplicated here: it is
+ * the whole personal piece — on a page whose job is to move you along. The
+ * section is now the statement, two paragraphs and a link: the personal
+ * beat, then what holding design and engineering together actually buys a
+ * brand (added later the same day). Neither is duplicated here — they are
  * `about.homeTeaser`, imported, so the two pages cannot drift.
  *
  * No eyebrow and no note: the section index and the location line were both
@@ -83,9 +84,10 @@ export const aboutSection = {
     "Illustration of a figure working at a desk late at night, lit by a monitor and a full moon through the window.",
   statement:
     "The goal has always been to close the gap between design and engineering.",
-  /** The one paragraph the section keeps — the same string /about renders
-   *  second in its narrative, never a copy of it. */
-  teaser: about.homeTeaser,
+  /** The two paragraphs the section keeps — the eye, then what it is for.
+   *  The same strings /about renders inside its full narrative, never
+   *  copies of them. */
+  paragraphs: about.homeTeaser,
   /** Sends you to the rest of the piece. */
   readMoreText: "Read more",
   readMoreHref: "/about",

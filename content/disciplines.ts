@@ -1,5 +1,10 @@
 /*
  * Disciplines rows (§A6 #5) — copy verbatim from the reference `roles[]`.
+ *
+ * Rows 01 and 02 got new supporting work (user, 2026-09-03). The files are
+ * named for the rows they belong to now — the old disc-brand-strategy-2 /
+ * disc-digital-design-2 were named for headings these rows have not carried
+ * for a while. Row 03's image is unchanged, so its filename is too.
  */
 export type Discipline = {
   numeral: string;
@@ -32,7 +37,7 @@ export const disciplines: Discipline[] = [
       "naming",
       "brand systems",
     ],
-    image: "/assets/disc-brand-strategy-2.png",
+    image: "/assets/disc-visual-identity.png",
     line: false,
   },
   {
@@ -49,7 +54,7 @@ export const disciplines: Discipline[] = [
       "typography",
       "interaction",
     ],
-    image: "/assets/disc-digital-design-2.png",
+    image: "/assets/disc-digital-brand.png",
     line: true,
   },
   {

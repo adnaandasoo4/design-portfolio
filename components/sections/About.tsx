@@ -15,17 +15,17 @@
  * heading's without a margin doing the work — which holds at every width,
  * however many lines the heading wraps to.
  *
- * CUT BACK to a teaser (user, 2026-09-03): the statement, ONE paragraph and
- * a "Read more" into /about, where the rest of the piece now lives. The
- * paragraph is `about.homeTeaser` — the same string that page renders, not
- * a copy, so the two cannot drift.
+ * CUT BACK to a teaser (user, 2026-09-03): the statement, two paragraphs
+ * and a "Read more" into /about, where the rest of the piece lives. They
+ * are `about.homeTeaser` — the same strings that page renders inside its
+ * full narrative, not copies, so the two cannot drift.
  *
  * The teaser runs the full width of its column, matching the heading above
  * it (user, 2026-09-03). It is the larger --text-meta-lg tier in full `ink`
- * rather than small and grey (user, 2026-09-03): with only one paragraph
- * left, the section has no body copy for it to be the quiet part OF, so it
- * is the section's second voice, not its footnote. Line-height eases to
- * 1.75 to carry the extra size across a long measure.
+ * rather than small and grey (user, 2026-09-03): the section has no other
+ * body copy for it to be the quiet part OF, so it is the section's second
+ * voice, not its footnote. Line-height eases to 1.75 to carry the extra
+ * size across a long measure.
  *
  * The layout itself lives in components/site/Spread, shared with the
  * Branding page, so the two cannot drift apart.
@@ -149,12 +149,13 @@ export default function About() {
         >
           {aboutSection.statement}
         </h2>
-        <p
-          data-reveal=""
-          className="mt-[clamp(28px,4vh,56px)] font-manrope text-meta-lg/[1.75] text-ink"
-        >
-          {aboutSection.teaser}
-        </p>
+        <div className="mt-[clamp(28px,4vh,56px)] flex flex-col gap-[1.1em] font-manrope text-meta-lg/[1.75] text-ink">
+          {aboutSection.paragraphs.map((paragraph) => (
+            <p key={paragraph.slice(0, 24)} data-reveal="">
+              {paragraph}
+            </p>
+          ))}
+        </div>
         {/* Wrapped rather than marked directly: [data-reveal] is set to
             autoAlpha 0 and animated, and ArrowLink owns its own transitions
             — leaving the two on one element puts GSAP and CSS on the same
