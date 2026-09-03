@@ -3,23 +3,20 @@
  *
  * The home page's About section and every section of the Branding page are
  * the same layout: the hero's 20px gutters so the grid runs unbroken down
- * the site, a rail on the left holding a mono label, a hairline and an
- * optional note, and the content on the right. It lives here rather than in
- * either consumer because "the About format" is now a thing the site has,
- * not a thing one section does — and two hand-kept copies of a grid drift
- * the first time anyone adjusts one of them.
+ * the site, a rail on the left, and the content on the right. It lives here
+ * rather than in either consumer because "the About format" is now a thing
+ * the site has, not a thing one section does — and two hand-kept copies of
+ * a grid drift the first time anyone adjusts one of them.
  *
- * The rail is marked [data-reveal], so it rises with whatever reveal the
- * host page runs: RevealGroup on the Branding page, About's own scroll
- * trigger on home. Neither has to know about the other.
+ * The rail defaults to a mono label, a hairline and an optional note. Pass
+ * `rail` to replace that entirely, which is what About does to put its
+ * illustration there instead. Either way the rail is a single grid cell
+ * under `items-start`, so whatever leads it sits level with whatever leads
+ * the content — no margin to hand-tune per breakpoint.
  *
- * TWO ROWS, optionally. Pass `head` and the grid becomes 2x2: rail label
- * beside the heading, then `railExtra` beside `children`. That is what puts
- * the About portrait's top edge exactly level with the first line of body
- * text — the row does the aligning, so it holds however many lines the
- * heading wraps to at a given width. A margin could only ever be right at
- * one viewport. Without `head` the grid stays a single row and the
- * Branding page is unaffected.
+ * The rail is marked [data-reveal] and nothing more, so it rises with
+ * whichever reveal the host page runs: RevealGroup on the Branding page,
+ * About's own scroll trigger on home. Neither has to know about the other.
  *
  * Below 860px the columns stack, since a 0.3fr rail is not a column any
  * more at that width.
@@ -29,24 +26,19 @@ import type { ReactNode } from "react";
 export default function Spread({
   eyebrow,
   note,
+  rail,
   children,
   className = "",
   tight = false,
   id,
   ariaLabel,
-  railExtra,
-  head,
 }: {
-  /** Mono label at the top of the rail, e.g. "( branding )" */
-  eyebrow: string;
-  /** Optional line(s) under the rail's hairline; \n breaks are honoured */
+  /** Mono label at the top of the default rail, e.g. "( branding )" */
+  eyebrow?: string;
+  /** Optional line(s) under the default rail's hairline; \n is honoured */
   note?: string;
-  /** Optional block in the rail's SECOND row — an image, a stat, a link.
-   *  Only aligns to `children` when `head` is also supplied. */
-  railExtra?: ReactNode;
-  /** Optional heading, placed beside the rail label in row 1. Supplying it
-   *  splits the spread into two rows; see TWO ROWS above. */
-  head?: ReactNode;
+  /** Replaces the default rail contents outright */
+  rail?: ReactNode;
   children: ReactNode;
   className?: string;
   /** Half the vertical padding — for sections that follow a full-bleed band */
@@ -65,23 +57,24 @@ export default function Spread({
           : "py-[clamp(140px,20vh,260px)] max-b700:py-24"
       } ${className}`}
     >
-      {/* Auto-placement fills row 1 then row 2, so DOM order alone gives
-          rail/head then railExtra/children — no explicit row indices to keep
-          in sync. items-start stops a short cell stretching to its row. */}
-      <div className="grid grid-cols-[0.3fr_1fr] items-start gap-x-[6vw] gap-y-[clamp(28px,4vh,56px)] max-b860:grid-cols-1 max-b860:gap-y-12">
-        {/* RAIL — label, hairline, note. Mono/grey/--text-meta, the same
-            secondary tier the home page's eyebrow and paragraph use. */}
+      {/* items-start keeps each column's first element on the row's top edge
+          — that alignment is the grid's job, not a margin's. */}
+      <div className="grid grid-cols-[0.3fr_1fr] items-start gap-x-[6vw] max-b860:grid-cols-1 max-b860:gap-y-12">
         <div
           data-reveal=""
           className="flex flex-col items-start gap-5 font-mono-ui text-meta/[1.6] text-muted-2"
         >
-          <p>{eyebrow}</p>
-          <span aria-hidden="true" className="block h-px w-full bg-line-09" />
-          {note ? <p className="whitespace-pre-line">{note}</p> : null}
+          {rail ?? (
+            <>
+              {eyebrow ? <p>{eyebrow}</p> : null}
+              <span
+                aria-hidden="true"
+                className="block h-px w-full bg-line-09"
+              />
+              {note ? <p className="whitespace-pre-line">{note}</p> : null}
+            </>
+          )}
         </div>
-
-        {head ? <div>{head}</div> : null}
-        {head && railExtra ? <div>{railExtra}</div> : null}
 
         <div>{children}</div>
       </div>

@@ -58,6 +58,9 @@ export const hero = {
  * different things under one name in one folder is an import waiting to go
  * to the wrong file.
  *
+ * No eyebrow: the section index was removed (user, 2026-09-03) and the
+ * illustration takes the left column on its own.
+ *
  * `statement` is the §A6 blurb's opening sentence, kept verbatim, and takes
  * the section's h2. The paragraphs beneath it are new (user, 2026-09-03) —
  * a personal piece rather than a service description, built on the parallel
@@ -65,14 +68,11 @@ export const hero = {
  * the same is true of a page.
  */
 export const aboutSection = {
-  eyebrow: "( about )",
   note: "Baltimore, MD\nStill taking touches.",
-  /* PLACEHOLDER (2026-09-03): /assets/about-portrait.png is a 16KB stand-in
-     graphic reading "Adnaan Dasoo — portrait", not a photograph. The mirror
-     shot the user wanted is not in the project. Drop the real file at this
-     path and nothing else has to change. */
-  portrait: "/assets/about-portrait.png",
-  portraitAlt: "Adnaan Dasoo",
+  /** Left column of the section — 736x1308, i.e. exactly 9:16 */
+  image: "/assets/about-desk-night.png",
+  imageAlt:
+    "Illustration of a figure working at a desk late at night, lit by a monitor and a full moon through the window.",
   statement:
     "The goal has always been to close the gap between design and engineering.",
   paragraphs: [

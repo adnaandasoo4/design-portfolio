@@ -7,10 +7,12 @@
  * the page no longer uses, setting the thesis and the argument supporting
  * it as one undifferentiated block.
  *
- * Two rows (see Spread): the rail label sits beside the thesis — the
- * section's <h2>, which it never had — and the portrait sits beside the
- * personal piece, its top edge level with the first line of text because
- * they share a grid row rather than a hand-tuned margin.
+ * The section index is gone (user, 2026-09-03): the left column is the
+ * illustration, with the location note beneath it, and it replaces Spread's
+ * default label/hairline/note rail outright. Because the rail is one grid
+ * cell under `items-start`, the image's top edge sits level with the
+ * heading's without a margin doing the work — which holds at every width,
+ * however many lines the heading wraps to.
  *
  * The body runs the full width of its column, matching the heading above it
  * (user, 2026-09-03). That is a long measure for mono, so the tier takes a
@@ -110,30 +112,30 @@ export default function About() {
       <Spread
         id="about"
         ariaLabel="About"
-        eyebrow={aboutSection.eyebrow}
-        note={aboutSection.note}
         className="z-(--z-about)"
-        head={
-          <h2
-            data-about-statement=""
-            className="font-hkgw text-[clamp(26px,3.4vw,58px)]/[0.98] font-semibold tracking-[-0.018em] text-ink uppercase"
-          >
-            {aboutSection.statement}
-          </h2>
-        }
-        railExtra={
-          <div className="relative aspect-4/5 w-full overflow-hidden rounded-media bg-slot">
-            <Image
-              src={aboutSection.portrait}
-              alt={aboutSection.portraitAlt}
-              fill
-              sizes="(max-width: 860px) 100vw, 26vw"
-              className="object-cover"
-            />
-          </div>
+        rail={
+          <>
+            {/* 9:16, the file's own ratio — no crop */}
+            <div className="relative aspect-9/16 w-full overflow-hidden rounded-media bg-slot">
+              <Image
+                src={aboutSection.image}
+                alt={aboutSection.imageAlt}
+                fill
+                sizes="(max-width: 860px) 100vw, 26vw"
+                className="object-cover"
+              />
+            </div>
+            <p className="whitespace-pre-line">{aboutSection.note}</p>
+          </>
         }
       >
-        <div className="flex flex-col gap-[1.4em] font-mono-ui text-meta/[1.85] text-muted-2">
+        <h2
+          data-about-statement=""
+          className="font-hkgw text-[clamp(26px,3.4vw,58px)]/[0.98] font-semibold tracking-[-0.018em] text-ink uppercase"
+        >
+          {aboutSection.statement}
+        </h2>
+        <div className="mt-[clamp(28px,4vh,56px)] flex flex-col gap-[1.4em] font-mono-ui text-meta/[1.85] text-muted-2">
           {aboutSection.paragraphs.map((paragraph) => (
             <p key={paragraph.slice(0, 24)} data-reveal="">
               {paragraph}
