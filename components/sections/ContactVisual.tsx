@@ -19,7 +19,8 @@ import CtaButton from "@/components/site/CtaButton";
  * photograph is artwork, not a surface, so it must not invert with the
  * theme. Tying either to the theme tokens would have put dark type over a
  * near-white wash in light mode, which the colour restoration makes far
- * worse than it was in grayscale.
+ * worse than it was in grayscale. The collaborate CTA takes the same
+ * treatment (tone="art", 2026-09-03) for the same reason.
  *
  * Depth: the text/CTA block parallaxes against the fixed photo — a
  * scrubbed yPercent glide (+14 → −14 across the section's viewport
@@ -95,10 +96,14 @@ export default function ContactVisual() {
             </span>
           ))}
         </h2>
+        {/* tone="art": pinned to the fixed on-art pair, like the statement
+            above it. Inverting would have made it a dark bar on the dark
+            photo the moment the site went light. */}
         <CtaButton
           label={contactVisual.cta}
           href="/#footer"
           scrollTarget="#footer"
+          tone="art"
           className="mt-4"
         />
       </div>

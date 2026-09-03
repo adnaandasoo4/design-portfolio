@@ -33,12 +33,35 @@
  * Reduced motion (§A7 "instant"): every hover transform is
  * motion-safe-gated — nothing moves, base label + centered arrow stay
  * visible and readable. Focus-visible mirrors hover for keyboard users.
+ *
+ * TONE (2026-09-03). "theme" is the original inverted-surface bar —
+ * `bg-ink` + `text-bg`, so it flips with the palette like every other
+ * inverted surface. "art" pins it to the FIXED --color-on-art pair
+ * instead. ContactVisual needs that: its photo and scrim are artwork and
+ * stay dark in both themes, so a bar that inverted turned into dark-on-dark
+ * over the image the moment the site went light. On artwork the bar is
+ * always the light one.
  */
 
 import type { MouseEvent } from "react";
 import { scrollToSection } from "@/lib/gsap/SmoothScroll";
 
 type CtaSize = "md" | "sm";
+/** "theme" inverts with the palette; "art" is pinned light, for use on the
+ *  theme-fixed photography. */
+type CtaTone = "theme" | "art";
+
+/* Per-tone colour classes: the bar, its label, the chip and the arrow are
+   the four surfaces that have to move together. */
+const TONES: Record<CtaTone, { bar: string; label: string; chip: string; arrow: string }> = {
+  theme: { bar: "bg-ink", label: "text-bg", chip: "bg-bg", arrow: "text-ink" },
+  art: {
+    bar: "bg-on-art",
+    label: "text-on-art-ink",
+    chip: "bg-on-art-ink",
+    arrow: "text-on-art",
+  },
+};
 
 /* Per-size dimension classes. md strings are verbatim from the original
    single-size component — do not touch (ContactVisual must stay
@@ -68,7 +91,7 @@ const SIZES: Record<
 };
 
 const LABEL_BASE =
-  "col-start-1 row-start-1 block whitespace-nowrap font-bold text-bg " +
+  "col-start-1 row-start-1 block whitespace-nowrap font-bold " +
   "transition-[transform] duration-(--dur-swap) ease-(--ease-out-expo)";
 
 /* Each arrow layer fills the chip — the LAYER is what translates, so the
@@ -80,7 +103,7 @@ const ARROW_LAYER =
 function ArrowGlyph({ className }: { className: string }) {
   return (
     <svg
-      className={`${className} text-ink`}
+      className={className}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -100,6 +123,7 @@ export default function CtaButton({
   href,
   scrollTarget,
   size = "md",
+  tone = "theme",
   className = "",
 }: {
   label: string;
@@ -108,9 +132,13 @@ export default function CtaButton({
   scrollTarget?: string;
   /** "md" (default, ContactVisual scale) or "sm" (nav scale). */
   size?: CtaSize;
+  /** "theme" (default) inverts with the palette; "art" stays light on the
+   *  theme-fixed photography. */
+  tone?: CtaTone;
   className?: string;
 }) {
   const s = SIZES[size];
+  const t = TONES[tone];
   const onClick = scrollTarget
     ? (e: MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
@@ -123,18 +151,18 @@ export default function CtaButton({
       data-sayhi=""
       href={href}
       onClick={onClick}
-      className={`group pointer-events-auto inline-flex items-center rounded-btn bg-ink ${s.root} ${className}`}
+      className={`group pointer-events-auto inline-flex items-center rounded-btn ${t.bar} ${s.root} ${className}`}
     >
       {/* Vertical label swap — clip window, base + overlay stacked */}
       <span className={`grid overflow-hidden ${s.window}`}>
         <span
-          className={`${LABEL_BASE} ${s.label} motion-safe:group-hover:[transform:translateY(-105%)] motion-safe:group-focus-visible:[transform:translateY(-105%)]`}
+          className={`${LABEL_BASE} ${t.label} ${s.label} motion-safe:group-hover:[transform:translateY(-105%)] motion-safe:group-focus-visible:[transform:translateY(-105%)]`}
         >
           {label}
         </span>
         <span
           aria-hidden="true"
-          className={`${LABEL_BASE} ${s.label} [transform:translateY(105%)] motion-safe:group-hover:[transform:translateY(0px)] motion-safe:group-focus-visible:[transform:translateY(0px)]`}
+          className={`${LABEL_BASE} ${t.label} ${s.label} [transform:translateY(105%)] motion-safe:group-hover:[transform:translateY(0px)] motion-safe:group-focus-visible:[transform:translateY(0px)]`}
         >
           {label}
         </span>
@@ -143,19 +171,19 @@ export default function CtaButton({
       {/* Square chip — relative + overflow-hidden; two inset-0 arrow layers */}
       <span
         aria-hidden="true"
-        className={`relative shrink-0 overflow-hidden rounded-chip bg-bg ${s.chip}`}
+        className={`relative shrink-0 overflow-hidden rounded-chip ${t.chip} ${s.chip}`}
       >
         {/* A1 — visible at rest, exits top-right on hover */}
         <span
           className={`${ARROW_LAYER} motion-safe:group-hover:[transform:translate(130%,-130%)] motion-safe:group-focus-visible:[transform:translate(130%,-130%)]`}
         >
-          <ArrowGlyph className={s.arrow} />
+          <ArrowGlyph className={`${s.arrow} ${t.arrow}`} />
         </span>
         {/* A2 — parked off the bottom-left, arrives center on hover */}
         <span
           className={`${ARROW_LAYER} [transform:translate(-130%,130%)] motion-safe:group-hover:[transform:translate(0px,0px)] motion-safe:group-focus-visible:[transform:translate(0px,0px)]`}
         >
-          <ArrowGlyph className={s.arrow} />
+          <ArrowGlyph className={`${s.arrow} ${t.arrow}`} />
         </span>
       </span>
     </a>

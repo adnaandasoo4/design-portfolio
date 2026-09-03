@@ -8,10 +8,16 @@ import { divider } from "@/content/copy";
 /** Band speeds (§A2 named scroll constants) — top +0.12, bottom −0.10 (opposed). */
 const SPEEDS: readonly number[] = [SCROLL.bandSpeedTop, SCROLL.bandSpeedBottom];
 
+/** Band tone -> semantic colour utility. Keeps the hex out of content/copy. */
+const TONE: Record<(typeof divider.bands)[number]["tone"], string> = {
+  ink: "text-ink",
+  "band-dark": "text-band-dark",
+};
+
 /**
  * Big-word Divider (§A5 / §A6 #3 / §A7 row #8) — `#bands`.
  *
- * Two full-width oversized band rows ("Introduction" white, "Works"
+ * Two full-width oversized band rows ("Introduction" in ink, "Works" in
  * band-dark) drifting horizontally in opposite directions, scrubbed to
  * section progress: x = (0.5 − p) × vw × speed × 2.
  * Reduced-motion branch: static, no transform.
@@ -80,8 +86,7 @@ export default function Divider() {
             style={{ marginLeft: band.offset }}
           >
             <span
-              className="font-manrope font-normal text-[55vh] leading-none tracking-[-0.03em] max-b700:text-[25vw]"
-              style={{ color: band.color }}
+              className={`font-manrope font-normal text-[55vh] leading-none tracking-[-0.03em] max-b700:text-[25vw] ${TONE[band.tone]}`}
             >
               {[0, 1, 2].map((n) => (
                 <Fragment key={n}>

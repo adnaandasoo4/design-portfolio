@@ -91,12 +91,16 @@ export const aboutBlurb =
   "The goal has always been to close the gap between design and engineering. I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.";
 
 export const divider = {
-  /** [text, color, speed, preOffset marginLeft] */
+  /* `tone` names a SEMANTIC token, not a colour: the bands used to carry raw
+     hexes (#ffffff / #37373b), which pinned "Introduction" to white and left
+     it invisible on the light theme's near-white page. Divider maps the tone
+     to a text-* utility so both bands invert with everything else. */
+  /** [text, tone, speed, preOffset marginLeft] */
   bands: [
-    { text: "Introduction", color: "#ffffff", speed: 0.12, offset: "-6vw" },
-    { text: "Works", color: "#37373b", speed: -0.1, offset: "-115vw" },
+    { text: "Introduction", tone: "ink", speed: 0.12, offset: "-6vw" },
+    { text: "Works", tone: "band-dark", speed: -0.1, offset: "-115vw" },
   ],
-};
+} as const;
 
 export const workList = {
   headerLeft: "Industry",

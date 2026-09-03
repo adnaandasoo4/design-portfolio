@@ -6,6 +6,11 @@
  * §A7 #10/#11) is pure CSS (group-hover / group-focus-visible + the
  * `wlist-marq` keyframes in globals.css); the on-enter reveal (§A7 #9) is
  * GSAP inside the matchMedia default branch.
+ *
+ * Colour: the row names are `text-ink` and the marquee band is the site's
+ * INVERTED surface idiom — `bg-ink` under `text-bg` labels. Both were raw
+ * `white` until 2026-09-03, which left the names invisible and the band
+ * unreadable on the light theme; the tokens invert with it for free.
  */
 
 import { Fragment, useRef } from "react";
@@ -113,7 +118,7 @@ export default function WorkList() {
 
           <span
             data-wrow-name
-            className="font-medium leading-none tracking-[-0.02em] text-white text-[clamp(52px,6.2vw,126px)] max-b700:text-[38px]"
+            className="font-medium leading-none tracking-[-0.02em] text-ink text-[clamp(52px,6.2vw,126px)] max-b700:text-[38px]"
           >
             {p.name}
           </span>
@@ -127,7 +132,7 @@ export default function WorkList() {
           <span
             aria-hidden="true"
             data-wrow-marq
-            className="pointer-events-none absolute inset-0 flex items-center bg-white [clip-path:inset(50%_0_50%_0)] transition-[clip-path] duration-[0.55s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:[clip-path:inset(0)] group-focus-visible:[clip-path:inset(0)] motion-reduce:transition-none"
+            className="pointer-events-none absolute inset-0 flex items-center bg-ink [clip-path:inset(50%_0_50%_0)] transition-[clip-path] duration-[0.55s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:[clip-path:inset(0)] group-focus-visible:[clip-path:inset(0)] motion-reduce:transition-none"
           >
             {/* Track — 32s linear loop (#11) + 30px lift on reveal */}
             <span
