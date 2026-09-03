@@ -231,15 +231,22 @@ const EMAIL_LABEL =
  * flipping as a block. It is a transition delay rather than an animation,
  * so hovering out rakes back the same way rather than snapping.
  *
+ * SPEED (user, 2026-09-02): both numbers matter, not just the duration.
+ * Each cell now takes --dur-copy-2 (0.45s, was --dur-swap at 0.85s) and the
+ * step dropped 26ms -> 18ms, because the last letter does not start until
+ * every step before it has elapsed — leaving the step alone would have
+ * kept the tail nearly half a second behind the head no matter how fast an
+ * individual cell moved. Head to tail is now ~0.75s, down from ~1.3s.
+ *
  * Tailwind v4 pitfall, same as CtaButton: translate-* utilities set the
  * CSS `translate` property, so the rest and hover states here are
  * arbitrary [transform:…] values and the transition names `transform` —
  * the property that changes is exactly the one being transitioned.
  */
-const SWAP_STEP_MS = 26;
+const SWAP_STEP_MS = 18;
 
 const SWAP_LAYER =
-  "block transition-[transform] duration-(--dur-swap) ease-(--ease-out-expo) " +
+  "block transition-[transform] duration-(--dur-copy-2) ease-(--ease-out-expo) " +
   "motion-reduce:transition-none";
 
 function SwapCell({

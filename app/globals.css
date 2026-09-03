@@ -350,7 +350,10 @@ html[data-pageleave] [data-veil] {
 }
 [data-collab]:hover [data-collab-rule],
 [data-collab]:focus-visible [data-collab-rule] {
-  animation: ad-rule-swipe var(--dur-swap) both;
+  /* --dur-clip (0.55s), down from --dur-swap (0.85s) — user, 2026-09-02.
+     Kept a little longer than one letter's swap because this covers two
+     full widths of travel, out and back, not one. */
+  animation: ad-rule-swipe var(--dur-clip) both;
 }
 @media (prefers-reduced-motion: reduce) {
   [data-collab]:hover [data-collab-rule],
