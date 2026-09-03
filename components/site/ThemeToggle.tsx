@@ -19,7 +19,6 @@
  * html[data-theme], so there is no React state to hydrate and no flash of
  * the wrong glyph on first paint.
  */
-import { useRef } from "react";
 import { toggleTheme } from "@/lib/theme";
 import { nav as navCopy } from "@/content/copy";
 
@@ -63,13 +62,10 @@ function MoonGlyph() {
 }
 
 export default function ThemeToggle() {
-  const button = useRef<HTMLButtonElement>(null);
-
   return (
     <button
-      ref={button}
       type="button"
-      onClick={() => toggleTheme(button.current)}
+      onClick={() => toggleTheme()}
       title={navCopy.themeToggleLabel}
       aria-label={navCopy.themeToggleLabel}
       className="group pointer-events-auto grid size-11 cursor-pointer place-items-center rounded-btn border-0 bg-raise-2 p-0 text-ink transition-colors duration-(--dur-hover) ease-(--ease-std) hover:bg-ink hover:text-bg focus-visible:bg-ink focus-visible:text-bg"

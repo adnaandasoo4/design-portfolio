@@ -210,7 +210,6 @@ html[data-theme="light"] {
   --dur-rect: 0.9s; /* preloader */
   --dur-veil: 0.32s; /* route veil */
   --dur-marquee: 32s; /* loop */
-  --dur-theme: 0.62s; /* theme view-transition sweep */
 }
 
 /* ---- Z-index layers (§A2) ---- */
@@ -269,36 +268,14 @@ a {
 }
 
 /*
-  ---- Theme swap: circular View Transition from the toggle ----
-  lib/theme.ts sets --theme-x/--theme-y to the toggle's center and the
-  radius needed to cover the furthest viewport corner, then flips
-  data-theme inside document.startViewTransition(). The OLD snapshot holds
-  still underneath while the NEW one is clipped open from that point, so the
-  new theme wipes across the page instead of hard-cutting. Browsers without
-  the API (and reduced-motion users) get the instant flip — the attribute
-  change is the whole mechanism, the animation is decoration.
+  ---- Theme swap: hard cut ----
+  lib/theme.ts flags the root for the frame it flips data-theme, so nothing
+  eases into its new token — the whole page repaints at once.
 */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-::view-transition-old(root) {
-  z-index: 1;
-}
-::view-transition-new(root) {
-  z-index: 2;
-}
-html[data-theme-anim]::view-transition-new(root) {
-  animation: ad-theme-wipe var(--dur-theme) var(--ease-out-quart) forwards;
-}
-@keyframes ad-theme-wipe {
-  from {
-    clip-path: circle(0px at var(--theme-x, 50%) var(--theme-y, 50%));
-  }
-  to {
-    clip-path: circle(var(--theme-r, 150vmax) at var(--theme-x, 50%) var(--theme-y, 50%));
-  }
+html[data-theme-cut] *,
+html[data-theme-cut] *::before,
+html[data-theme-cut] *::after {
+  transition: none !important;
 }
 
 /* ---- Route transition veil (§A5 / §A7 #18) ---- */
