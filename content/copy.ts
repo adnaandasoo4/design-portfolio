@@ -28,26 +28,31 @@ export const hero = {
    *  lines run together and wrap to the measure instead (user, 2026-09-03):
    *  breaks authored for a desktop column just wrap a second time there. */
   eyebrow: ["For B2B tech teams that have", "outgrown their website"],
-  /* Masthead headline. NOT one item per line: the desktop and phone line
-     breaks fall in different places, so the copy is stored as the segments
-     between EVERY break either layout needs, and each says where it ends a
-     line. Hero toggles the <br> elements with a CSS variant, which keeps the
-     headline a single run of text — one copy for screen readers, and one
-     element for SplitText to split.
+  /* Masthead headline — one array item per DESKTOP line, exactly as it has
+     always been, so the desktop DOM is three block spans and nothing else.
+     The inner array splits a line at the point the PHONE breaks it: those
+     splits become <br> elements that only display below 700px, and the
+     spans go inline there so the halves either side of a split can join
+     across lines.
 
        desktop (3)   BRANDING & WEBSITES / THAT MOVE B2B TECH / TEAMS FORWARD
        phone   (4)   BRANDING & / WEBSITES THAT / MOVE B2B TECH / TEAMS FORWARD
 
-     Four on the phone, at the user's direction (2026-09-03), and authored
-     rather than left to wrap: at 9.4vw the three desktop lines each broke
-     again, which is five or six ragged rows. */
+     Four on the phone at the user's direction (2026-09-03), authored rather
+     than left to wrap: at 9.4vw each desktop line broke again, which is five
+     or six ragged rows.
+
+     An earlier attempt stored the whole headline as one flat run of
+     segments and <br>s. It produced the same four lines but replaced the
+     three block spans with inline text, which changed how the h1 sizes as a
+     flex item next to the paragraph — and broke the desktop line breaks it
+     was not supposed to touch. Hence this shape: the phone's breaks live
+     INSIDE a desktop line, never across the structure of one. */
   headline: [
-    { text: "BRANDING &", breakAfter: "mobile" },
-    { text: "WEBSITES", breakAfter: "desktop" },
-    { text: "THAT", breakAfter: "mobile" },
-    { text: "MOVE B2B TECH", breakAfter: "all" },
-    { text: "TEAMS FORWARD" },
-  ] satisfies { text: string; breakAfter?: "all" | "desktop" | "mobile" }[],
+    ["BRANDING &", "WEBSITES"],
+    ["THAT", "MOVE B2B TECH"],
+    ["TEAMS FORWARD"],
+  ],
   /** Right-hand paragraph, bottom-aligned to the headline */
   paragraph:
     "We partner with ambitious B2B teams, scale-ups and brands to unlock their true potential and growth through strategy, design and technology.",

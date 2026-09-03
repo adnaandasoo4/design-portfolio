@@ -49,12 +49,18 @@
  * to 1.5 with the size, as it does everywhere else here.
  *
  * At that size the headline's three authored lines each broke again, so the
- * phone gets four authored lines of its own — see content/copy, where the
- * headline is stored as the segments between every break either layout
- * needs. The <br> elements are all in the DOM; a CSS variant decides which
- * ones display. That keeps the headline ONE run of text: one copy for
- * screen readers, and one element for SplitText, which is what a second
- * hidden variant would have cost.
+ * phone gets four authored lines of its own. The desktop structure is
+ * untouched by that — still one block span per desktop line — and the
+ * phone's breaks live INSIDE those spans as <br>s that only display below
+ * 700px, with the spans going inline there so the halves either side of a
+ * break can join. An earlier version stored the whole headline as one flat
+ * run of segments and <br>s; it produced the right four lines but replaced
+ * the block spans with inline text, which changed how the h1 sizes as a
+ * flex item beside the paragraph and broke the DESKTOP breaks.
+ *
+ * Either way the headline stays one run of text — one copy for screen
+ * readers, one element for SplitText — which is what a second hidden
+ * variant of the whole headline would have cost.
  *
  * The eyebrow goes the other way — its authored breaks are dropped below
  * 700px and it simply wraps to the measure.
@@ -118,14 +124,10 @@ const REEL_OVERSCAN = 1.22;
  *  edge has stopped — the part that reads as weight. */
 const SETTLE_STRETCH = 1.3;
 
-/** Which widths each authored break applies at. The <br> is always in the
- *  DOM; only its `display` changes, so the headline stays one run of text
- *  for SplitText and for screen readers. */
-const BREAK_AT = {
-  all: "",
-  desktop: "max-b700:hidden",
-  mobile: "hidden max-b700:inline",
-} as const;
+/** A phone-only line break inside a desktop line. Always in the DOM; only
+ *  its `display` changes, so the headline is one run of text for screen
+ *  readers and one element for SplitText either way. */
+const PHONE_BREAK = "hidden max-b700:inline";
 
 /* Timeline positions, in seconds. Every move starts before the one above it
    has finished; played end to end this is a queue, not an opening. */
@@ -255,20 +257,33 @@ export default function Hero() {
             data-hero-line=""
             className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-bold tracking-[-0.02em] text-ink uppercase max-b700:text-[9.4vw]"
           >
-            {hero.headline.map((segment, i) => (
-              <Fragment key={segment.text}>
-                {/* The separating space sits BEFORE each segment, so on the
-                    width where the preceding break is showing it lands at
-                    the start of a line and collapses. */}
-                {i > 0 ? " " : null}
-                {segment.text}
-                {segment.breakAfter ? (
-                  <br
-                    aria-hidden="true"
-                    className={BREAK_AT[segment.breakAfter]}
-                  />
-                ) : null}
-              </Fragment>
+            {hero.headline.map((parts, i) => (
+              /* Every line is a block on desktop — the structure this has
+                 always had. Below 700px all but the LAST go inline, so the
+                 halves either side of a phone break can join across desktop
+                 lines ("WEBSITES" + "THAT"). The last stays block because on
+                 the phone it must still start its own line rather than run
+                 on from the one above. */
+              <span
+                key={parts.join(" ")}
+                className={
+                  i < hero.headline.length - 1
+                    ? "block max-b700:inline"
+                    : "block"
+                }
+              >
+                {parts.map((part, j) => (
+                  <Fragment key={part}>
+                    {j > 0 ? " " : null}
+                    {part}
+                    {j < parts.length - 1 ? (
+                      <br aria-hidden="true" className={PHONE_BREAK} />
+                    ) : null}
+                  </Fragment>
+                ))}
+                {/* Separates this line from the next once they are inline;
+                    collapses at the end of a block. */}{" "}
+              </span>
             ))}
           </h1>
 
