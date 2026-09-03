@@ -19,30 +19,26 @@
  * Interaction (their params): holding the pointer lerps amplitude ×2 and
  * clock speed ×1.5 with lerp factor 0.03/frame — flow accelerates and
  * distorts while held, relaxes on release. While hovering, a small
- * CURSOR (2026-09-02, third pass — user asked for simple and in-theme).
- * The vermilion ring-and-dot pair that preceded it was neither: two marks,
- * two lerps and a brand colour that fought the gradient underneath. What
- * is here now is the site's OWN hover recipe, borrowed wholesale from the
- * nav rows and footer socials — a small uppercase mono label that trails
- * the pointer, and on press a light flood snaps in behind it and the text
- * flips dark. Same gesture the visitor has already met everywhere else,
- * one mark, one lerp, no new colour. It sits beside the pointer rather
- * than under it, since the band keeps the native arrow.
+ * NO CURSOR FOLLOWER (user, 2026-09-02). Three designs were tried over
+ * this band — the reference's outlined "hold" pill, a vermilion ring-and-
+ * dot pair, and the site's own flood-and-invert label — and the answer was
+ * that the band does not want one. Press-and-hold still accelerates the
+ * flow exactly as before; it is simply undecorated now, discovered rather
+ * than advertised. The pointermove listener went with the follower, so the
+ * band no longer tracks the pointer at all.
  *
- * DOM elements, transform/opacity only, lerped inside the same rAF loop,
  * hover+fine-pointer devices only, pointer-events: none.
  *
  * Runtime rules:
  * - rAF loop runs only while the band is on screen (IntersectionObserver).
  * - prefers-reduced-motion: single static developed frame, no listeners,
- *   no loop, no cursor.
+ *   no loop.
  * - DPR capped at 1.75.
  * - No WebGL → canvas stays transparent over the dark footer (acceptable).
  * - Colors live in the shader — they have no CSS token equivalents.
  */
 
 import { useEffect, useRef } from "react";
-import { footer } from "@/content/copy";
 
 const VERT = `
 attribute vec2 aPos;
@@ -98,8 +94,6 @@ const TIME_SPEED = 0.008; // uTime increment per 60fps frame
 const HOLD_AMP_MULT = 2;
 const HOLD_SPEED_MULT = 1.5;
 const LERP_SPEED = 0.03; // per-frame lerp toward hold/rest targets
-/* Cursor follow — one speed, trailing enough to feel weighted */
-const CURSOR_LERP = 0.16;
 /* Palette presets — color1 is always the site off-black (#111214). The
  * ember/flame hues still emerge from mix() extrapolation, so each preset
  * only names three real colors. Two options per user direction 2026-07-20:
@@ -134,17 +128,13 @@ const STATIC_TIME = 40;
 
 export default function FooterGradient({
   speed = 1,
-  cursor: showCursor = true,
 }: {
   /** Clock-speed multiplier — <1 slows the flow. Only the footer band
    *  mounts this now (the hero's dimmed copy was dropped 2026-09-02), so
    *  both props sit at their defaults in practice. */
   speed?: number;
-  /** false = no ring/dot cursor and the default arrow (hold still works). */
-  cursor?: boolean;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const cursorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -210,14 +200,6 @@ export default function FooterGradient({
     const reduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    // The cursor is a hover-only cosmetic — fine pointers, full motion only
-    const finePointer = window.matchMedia(
-      "(hover: hover) and (pointer: fine)",
-    ).matches;
-    const cursor = cursorRef.current;
-    const cursorVisual = cursor?.firstElementChild as HTMLElement | null;
-    const cursorFill =
-      cursor?.querySelector<HTMLElement>("[data-cursor-fill]") ?? null;
 
     // Sim state — time/amplitude/speed accumulate in JS so the hold lerp
     // matches the reference exactly (per-frame factor, frame-rate corrected).
@@ -233,12 +215,6 @@ export default function FooterGradient({
     let lastFrame = performance.now();
     let raf = 0;
     let running = false;
-    // Cursor follow state (canvas-local px; lerped in the rAF loop)
-    let cursorOn = false;
-    let cx = 0;
-    let cy = 0;
-    let tx = 0;
-    let ty = 0;
 
     const resize = () => {
       const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
@@ -260,33 +236,6 @@ export default function FooterGradient({
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
-    /* The label is offset beside the pointer — the band keeps the native
-       arrow, so sitting on top of it would just collide. The offset itself
-       lives in the markup as the `translate` property, leaving `transform`
-       free for the follow. */
-    const placeCursor = () => {
-      if (cursor) cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
-    };
-
-    /** Frame-rate-corrected, so the trail is the same weight at 120Hz as
-     *  at 60 rather than half as heavy. */
-    const moveCursor = (frames: number) => {
-      if (!cursorOn) return;
-      const k = 1 - Math.pow(1 - CURSOR_LERP, frames);
-      cx += (tx - cx) * k;
-      cy += (ty - cy) * k;
-      placeCursor();
-    };
-
-    /** The press, in the site's own hover language: flood snaps in, text
-     *  flips dark against it. Script sets the target, the CLASSES declare
-     *  the transitions. */
-    const setHold = (on: boolean) => {
-      if (cursorFill) cursorFill.style.opacity = on ? "1" : "0";
-      if (cursorVisual)
-        cursorVisual.style.color = on ? "var(--color-on-art-ink)" : "";
-    };
-
     const loop = () => {
       const now = performance.now();
       const dt = Math.min((now - lastFrame) / 1000, 0.1);
@@ -302,7 +251,6 @@ export default function FooterGradient({
       simTime += curSpeed * frames;
 
       draw();
-      moveCursor(frames);
       raf = requestAnimationFrame(loop);
     };
     const play = () => {
@@ -336,37 +284,17 @@ export default function FooterGradient({
 
     const onDown = () => {
       holding = true;
-      setHold(true);
     };
     const onUp = () => {
       holding = false;
-      setHold(false);
     };
     const onLeave = () => {
       holding = false;
-      setHold(false);
-      cursorOn = false;
-      if (cursor) cursor.style.opacity = "0";
-    };
-    const onMove = (e: PointerEvent) => {
-      const r = canvas.getBoundingClientRect();
-      tx = e.clientX - r.left;
-      ty = e.clientY - r.top;
-      if (!cursorOn) {
-        // Snap onto the pointer on entry, or it flies in from 0,0
-        cx = tx;
-        cy = ty;
-        cursorOn = true;
-        placeCursor();
-        if (cursor) cursor.style.opacity = "1";
-      }
     };
     if (!reduced) {
       canvas.addEventListener("pointerdown", onDown);
       canvas.addEventListener("pointerleave", onLeave);
       window.addEventListener("pointerup", onUp);
-      if (showCursor && finePointer)
-        canvas.addEventListener("pointermove", onMove);
     }
 
     // DEV-ONLY palette switcher (keys 1–5) — stripped from prod bundles.
@@ -389,7 +317,6 @@ export default function FooterGradient({
       if (onKey) window.removeEventListener("keydown", onKey);
       canvas.removeEventListener("pointerdown", onDown);
       canvas.removeEventListener("pointerleave", onLeave);
-      canvas.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       gl.deleteProgram(program);
       gl.deleteShader(vs);
@@ -398,30 +325,13 @@ export default function FooterGradient({
       gl.getExtension("WEBGL_lose_context")?.loseContext();
       canvas.remove();
     };
-  }, [speed, showCursor]);
+  }, [speed]);
 
   return (
     <>
       {/* Canvas host — the canvas itself is created fresh per mount (see
           effect) so a lost WebGL context can never be inherited */}
       <div ref={hostRef} aria-hidden="true" className="absolute inset-0" />
-      {/* CURSOR — the site's own flood-and-invert hover, following the
-          pointer. The positioner's transform is written per frame by the
-          rAF loop; the offset beside the arrow is the `translate` property
-          on the visual, so the two never collide. */}
-      <div
-        ref={cursorRef}
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-0 opacity-0 transition-opacity duration-(--dur-hover) ease-(--ease-std)"
-      >
-        <span className="relative inline-block translate-x-5 -translate-y-1/2 px-2 py-1.5 font-mono-ui text-[11px] leading-none tracking-[0.16em] text-on-art uppercase transition-colors duration-(--dur-copy) ease-(--ease-std)">
-          <span
-            data-cursor-fill=""
-            className="absolute inset-0 bg-on-art opacity-0 transition-opacity duration-(--dur-copy) ease-(--ease-std)"
-          />
-          <span className="relative">{footer.holdLabel}</span>
-        </span>
-      </div>
     </>
   );
 }

@@ -51,12 +51,13 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Enter/return arrow before the email — straight corner per the reference */
+/** Enter/return arrow before the email — straight corner per the reference.
+ *  Sized in `em` so it tracks the email's own clamp rather than pinning to
+ *  one pixel value the type has since outgrown. */
 function EnterArrow() {
   return (
     <svg
-      width="14"
-      height="14"
+      className="size-[0.78em] shrink-0"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -173,7 +174,10 @@ const ARROW =
 
 const BIG_LINK =
   "group relative flex items-center justify-between gap-6 py-1.5 pr-4 " +
-  "text-[clamp(28px,min(3.2vw,6svh),54px)]/[1.12] " +
+  // The svh term is each row's share of the footer's fixed 70svh block — it
+  // dropped from 6svh to 5svh when the list went from five links to six
+  // (Branding), so the taller list still clears the meta row beneath it.
+  "text-[clamp(28px,min(3.2vw,5svh),54px)]/[1.12] " +
   // Mobile (MONOLOG ref): bigger rows, medium weight, taller tap targets
   "max-b700:py-3 max-b700:text-[34px] max-b700:font-medium";
 
@@ -362,8 +366,15 @@ export default function Footer() {
       ref={rootRef}
       className="relative z-(--z-section) bg-bg"
     >
-      {/* ---- Top block: navigation + columns — 70svh (7/10 viewport) ---- */}
-      <div className="flex min-h-[70svh] flex-col bg-bg px-9 pt-8 pb-5 max-b700:px-5.5">
+      {/* ---- Top block: navigation + columns — 70svh (7/10 viewport) ----
+           EXACT height on desktop, not a minimum. The band below is 30svh,
+           so pinning this at 70svh makes the whole footer exactly 100svh —
+           which is what lets its top edge land precisely at the viewport
+           top at maximum scroll. As a min-height it could exceed its share
+           (six nav rows did just that), pushing the footer past 100svh and
+           scrolling its own top padding out of sight. Phones keep the old
+           growing behaviour, where the page scrolls past the footer anyway. */}
+      <div className="flex h-[70svh] flex-col bg-bg px-9 pt-8 pb-5 max-b700:h-auto max-b700:min-h-[70svh] max-b700:px-5.5">
         <div className="grid grid-cols-[1fr_0.85fr] gap-x-[8vw] max-b860:grid-cols-1 max-b860:gap-y-14">
           {/* LEFT — "(navigation)" + big links. Mobile (MONOLOG ref): the
               eyebrow disappears and the ruled rows start immediately. */}
@@ -469,16 +480,15 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* (email) — the foot of this column. Set larger than it was in
-              the details cell: at the bottom of an otherwise empty stretch
-              it has to carry the corner, not just sit in it. */}
+            {/* Email — the foot of this column, unlabelled. Set larger than
+              it was in the details cell: at the bottom of an otherwise empty
+              stretch it has to carry the corner, not just sit in it. */}
             <div className="mt-auto pt-16 max-b860:mt-0 max-b860:pt-12">
-              <Eyebrow>{footer.emailEyebrow}</Eyebrow>
               <button
                 type="button"
                 data-foot-copy
                 onClick={onCopyClick}
-                className="group relative mt-5 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[clamp(20px,2.1vw,30px)]/[1.3] max-b700:text-[17px]/[1.4]"
+                className="group relative inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[clamp(20px,2.1vw,30px)]/[1.3] max-b700:text-[17px]/[1.4]"
               >
                 <span aria-hidden="true" className={EMAIL_FLOOD} />
                 {/* SR users need to know activation copies (not mails) — §A10 */}

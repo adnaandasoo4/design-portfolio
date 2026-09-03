@@ -2,9 +2,9 @@
 
 /*
  * Showreel (user-directed, 2026-09-02) — the card the home page opens on,
- * playing the branding reel. The video fills the card edge to edge; the
- * vermilion underneath is only what shows while it loads, which is why the
- * card keeps that fill.
+ * playing the branding reel and nothing else: no frame, no fill behind it,
+ * and no captions. It grew to take back the space the captions held, so the
+ * block it occupies is unchanged even though the card is larger.
  *
  * TRAVEL. The card sweeps the full width of the hero's content box —
  * margin to margin, never past the page gutters. The amplitude is measured,
@@ -42,23 +42,6 @@ const MAX_DEG = 18;
 /** Per-frame easing. Higher = the card snaps to the pointer harder. */
 const EASE_FRAME = 0.14;
 const EASE_ANGLE = 0.16;
-
-function PlayGlyph({ className }: { className: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.4"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="9.4" />
-      <path d="M10.2 8.6 15.6 12l-5.4 3.4Z" />
-    </svg>
-  );
-}
 
 export default function Showreel() {
   const scope = useRef<HTMLDivElement>(null);
@@ -138,13 +121,12 @@ export default function Showreel() {
     /* Full-width track: this element IS the hero's content box, so its
        width is what the amplitude above is measured against. */
     <div ref={scope} className="flex w-full justify-center">
-      {/* The whole group banks together — card AND captions, as in the
-          reference, so the captions read as printed on the card. */}
+      {/* The card banks as one piece */}
       <figure ref={frame} className="m-0 will-change-transform">
-        <div className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px] bg-brand">
+        <div className="aspect-16/9 w-[clamp(280px,30vw,540px)] overflow-hidden rounded-[3px]">
           <video
-            ref={video}
             className="size-full object-cover"
+            ref={video}
             src={hero.reel.src}
             aria-label={hero.reel.alt}
             autoPlay
@@ -154,15 +136,6 @@ export default function Showreel() {
             preload="auto"
           />
         </div>
-
-        {/* Captions sit on the card's own left and right edges */}
-        <figcaption className="mt-[clamp(12px,1.4vw,20px)] flex items-center justify-between text-meta leading-none font-medium text-ink">
-          <span className="inline-flex items-center gap-2">
-            {hero.reel.label}
-            <PlayGlyph className="size-[15px] text-ink" />
-          </span>
-          <span>{hero.reel.action}</span>
-        </figcaption>
       </figure>
     </div>
   );

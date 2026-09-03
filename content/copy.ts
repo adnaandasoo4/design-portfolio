@@ -42,9 +42,8 @@ export const hero = {
    *  loading state instead. */
   reel: {
     src: "/assets/brand-reel.mp4",
-    label: "Projects Showreel",
-    action: "Watch",
-    /** Accessible name for the video */
+    /** Accessible name for the video. The "Projects Showreel" / "Watch"
+     *  captions were removed 2026-09-02 — the card carries itself. */
     alt: "Branding showreel",
   },
 };
@@ -97,9 +96,6 @@ export const footer = {
      `nav.links` below, so the footer and the top menu can never disagree
      about what the site's navigation is (user, 2026-09-02). */
   detailsEyebrow: "( my details )",
-  /** Heads the email, which sits at the FOOT of the right column so that
-   *  side reaches the same depth as the navigation list (user, 2026-09-02). */
-  emailEyebrow: "( email )",
   basedIn: "Based in Baltimore, MD.\nWorking worldwide.",
   socialsEyebrow: "( my socials )",
   socials: [
@@ -115,8 +111,6 @@ export const footer = {
     { label: "gemini", base: "https://www.google.com/search?udm=50&q=", aria: "ask gemini about adnaan" },
     { label: "grok", base: "https://grok.com/?q=", aria: "ask grok about adnaan" },
   ],
-  /** Cursor pill shown while hovering the gradient band */
-  holdLabel: "hold",
   /** Live clock — city label + IANA zone it ticks in */
   clockCity: "Baltimore",
   clockZone: "America/New_York",
