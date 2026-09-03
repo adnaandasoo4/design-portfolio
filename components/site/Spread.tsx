@@ -13,6 +13,14 @@
  * host page runs: RevealGroup on the Branding page, About's own scroll
  * trigger on home. Neither has to know about the other.
  *
+ * TWO ROWS, optionally. Pass `head` and the grid becomes 2x2: rail label
+ * beside the heading, then `railExtra` beside `children`. That is what puts
+ * the About portrait's top edge exactly level with the first line of body
+ * text — the row does the aligning, so it holds however many lines the
+ * heading wraps to at a given width. A margin could only ever be right at
+ * one viewport. Without `head` the grid stays a single row and the
+ * Branding page is unaffected.
+ *
  * Below 860px the columns stack, since a 0.3fr rail is not a column any
  * more at that width.
  */
@@ -27,14 +35,18 @@ export default function Spread({
   id,
   ariaLabel,
   railExtra,
+  head,
 }: {
   /** Mono label at the top of the rail, e.g. "( branding )" */
   eyebrow: string;
   /** Optional line(s) under the rail's hairline; \n breaks are honoured */
   note?: string;
-  /** Optional block at the FOOT of the rail — an image, a stat, a link.
-   *  Sits inside the rail's reveal, so it rises with the label above it. */
+  /** Optional block in the rail's SECOND row — an image, a stat, a link.
+   *  Only aligns to `children` when `head` is also supplied. */
   railExtra?: ReactNode;
+  /** Optional heading, placed beside the rail label in row 1. Supplying it
+   *  splits the spread into two rows; see TWO ROWS above. */
+  head?: ReactNode;
   children: ReactNode;
   className?: string;
   /** Half the vertical padding — for sections that follow a full-bleed band */
@@ -53,7 +65,10 @@ export default function Spread({
           : "py-[clamp(140px,20vh,260px)] max-b700:py-24"
       } ${className}`}
     >
-      <div className="grid grid-cols-[0.3fr_1fr] gap-x-[6vw] max-b860:grid-cols-1 max-b860:gap-y-12">
+      {/* Auto-placement fills row 1 then row 2, so DOM order alone gives
+          rail/head then railExtra/children — no explicit row indices to keep
+          in sync. items-start stops a short cell stretching to its row. */}
+      <div className="grid grid-cols-[0.3fr_1fr] items-start gap-x-[6vw] gap-y-[clamp(28px,4vh,56px)] max-b860:grid-cols-1 max-b860:gap-y-12">
         {/* RAIL — label, hairline, note. Mono/grey/--text-meta, the same
             secondary tier the home page's eyebrow and paragraph use. */}
         <div
@@ -63,8 +78,10 @@ export default function Spread({
           <p>{eyebrow}</p>
           <span aria-hidden="true" className="block h-px w-full bg-line-09" />
           {note ? <p className="whitespace-pre-line">{note}</p> : null}
-          {railExtra}
         </div>
+
+        {head ? <div>{head}</div> : null}
+        {head && railExtra ? <div>{railExtra}</div> : null}
 
         <div>{children}</div>
       </div>

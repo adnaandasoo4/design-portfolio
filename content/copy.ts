@@ -62,10 +62,10 @@ export const hero = {
  * the section's h2. The paragraphs beneath it are new (user, 2026-09-03) —
  * a personal piece rather than a service description, built on the parallel
  * the user gave: in football everything runs through the first touch, and
- * the same is true of a page. The rail's label comes from that idea too.
+ * the same is true of a page.
  */
 export const aboutSection = {
-  eyebrow: "( first touch )",
+  eyebrow: "( about )",
   note: "Baltimore, MD\nStill taking touches.",
   /* PLACEHOLDER (2026-09-03): /assets/about-portrait.png is a 16KB stand-in
      graphic reading "Adnaan Dasoo — portrait", not a photograph. The mirror

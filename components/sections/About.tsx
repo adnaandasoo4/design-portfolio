@@ -7,14 +7,15 @@
  * the page no longer uses, setting the thesis and the argument supporting
  * it as one undifferentiated block.
  *
- * The rail carries the label, a short note and the portrait; the right
- * column carries the thesis as the section's <h2> — which it never had —
- * followed by a personal piece in the same mono/grey/--text-meta tier the
- * hero's eyebrow, paragraph and reel caption all share.
+ * Two rows (see Spread): the rail label sits beside the thesis — the
+ * section's <h2>, which it never had — and the portrait sits beside the
+ * personal piece, its top edge level with the first line of text because
+ * they share a grid row rather than a hand-tuned margin.
  *
- * That tier was chosen for two-line captions, so across three paragraphs it
- * gets a looser line-height and a measure capped in `ch`: mono at a
- * comfortable reading width, not a caption stretched to fill a column.
+ * The body runs the full width of its column, matching the heading above it
+ * (user, 2026-09-03). That is a long measure for mono, so the tier takes a
+ * looser line-height here (1.85) than the two-line captions it was drawn
+ * for.
  *
  * The layout itself lives in components/site/Spread, shared with the
  * Branding page, so the two cannot drift apart.
@@ -112,8 +113,16 @@ export default function About() {
         eyebrow={aboutSection.eyebrow}
         note={aboutSection.note}
         className="z-(--z-about)"
+        head={
+          <h2
+            data-about-statement=""
+            className="font-hkgw text-[clamp(26px,3.4vw,58px)]/[0.98] font-semibold tracking-[-0.018em] text-ink uppercase"
+          >
+            {aboutSection.statement}
+          </h2>
+        }
         railExtra={
-          <div className="relative mt-3 aspect-4/5 w-full overflow-hidden rounded-media bg-slot">
+          <div className="relative aspect-4/5 w-full overflow-hidden rounded-media bg-slot">
             <Image
               src={aboutSection.portrait}
               alt={aboutSection.portraitAlt}
@@ -124,13 +133,7 @@ export default function About() {
           </div>
         }
       >
-        <h2
-          data-about-statement=""
-          className="font-hkgw text-[clamp(26px,3.4vw,58px)]/[0.98] font-semibold tracking-[-0.018em] text-ink uppercase"
-        >
-          {aboutSection.statement}
-        </h2>
-        <div className="mt-[clamp(28px,4vh,56px)] flex max-w-[62ch] flex-col gap-[1.4em] font-mono-ui text-meta/[1.85] text-muted-2">
+        <div className="flex flex-col gap-[1.4em] font-mono-ui text-meta/[1.85] text-muted-2">
           {aboutSection.paragraphs.map((paragraph) => (
             <p key={paragraph.slice(0, 24)} data-reveal="">
               {paragraph}
