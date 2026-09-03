@@ -1,34 +1,44 @@
 import type { Metadata } from "next";
 import RevealGroup from "@/components/site/RevealGroup";
-import AboutMasthead from "@/components/about/AboutMasthead";
-import AboutBio from "@/components/about/AboutBio";
-import AboutMeta from "@/components/about/AboutMeta";
+import AboutOpening from "@/components/about/AboutOpening";
+import AboutLead from "@/components/about/AboutLead";
+import AboutPortrait from "@/components/about/AboutPortrait";
+import AboutFacts from "@/components/about/AboutFacts";
 import AboutClosing from "@/components/about/AboutClosing";
 import Footer from "@/components/site/Footer";
 import { about } from "@/content/about";
 
 /*
- * About (§A9) — rebuilt 2026-09-03 on the site's shared format.
+ * About (§A9) — rebuilt 2026-09-03, twice. The first attempt ran every
+ * section through the shared Spread; consistent, and dead. Four identical
+ * two-column blocks with the same rail in each read as a template rather
+ * than a page, and the illustration — the only real image in the project —
+ * was a thumbnail in a 0.3fr column.
  *
- * The previous build predated the revamp: 36px gutters nobody else uses, a
- * marquee band, a pinned SplitText opening and a portrait parallax — two
- * signature motion moments designed when the page was meant to be the
- * slow, editorial outlier. It is not the outlier any more; home, Branding
- * and this page now share one grid, and looking different was the only
- * thing keeping /about from looking like the same site.
+ * This version is built on CONTRAST instead of consistency, because the
+ * shared grid is the home page's job and an about page has a different one:
  *
- * Every section runs through components/site/Spread — the same rail-and-
- * content rhythm on the same 20px gutters as the home hero — except the
- * closing, which drops the rail on purpose so the break reads as emphasis.
+ *   Opening    a full viewport, mostly empty, headline pinned to the floor
+ *   Lead       one line, indented deep into the measure, alone on a screen
+ *   Portrait   asymmetric — a 9:16 image at 38vw with the narrative
+ *              bottom-aligned beside it
+ *   Facts      a wide, even, three-across row, the page's only regular grid
+ *   Closing    display scale, tight measure, the most air on the page
  *
- * Order: masthead → bio (illustration in the rail) → three-line summary →
- * closing → footer. The experience timeline is NOT here: its data is still
- * "20XX / role — tbd" (Open Q5), and three placeholder rows would read as a
- * broken section. The copy is held in content/about.ts, ready.
+ * No two of those are the same shape, and the vertical padding is
+ * deliberately uneven — generous, generous, tight, medium, widest — so the
+ * page has a pulse rather than a constant. Gutters stay at the site's 20px
+ * throughout, which is what keeps it recognisably the same site while
+ * nothing else repeats.
  *
- * Motion is now the site's ordinary vocabulary rather than two bespoke set
- * pieces: RevealGroup rises anything marked [data-reveal] once on enter,
- * and reduced motion renders everything static.
+ * Motion: ONE set piece — the opening headline splits into lines and rises
+ * through a mask on load — plus a scrub parallax on the portrait. Every
+ * other element uses RevealGroup's ordinary rise. Reduced motion renders
+ * everything static.
+ *
+ * The experience timeline is still NOT here: its data is "20XX / role —
+ * tbd" (Open Q5), and three placeholder rows would read as broken. The copy
+ * waits in content/about.ts.
  */
 
 export const metadata: Metadata = {
@@ -53,9 +63,10 @@ export default function AboutPage() {
         className="relative overflow-x-clip bg-bg outline-none"
       >
         <RevealGroup className="relative z-(--z-flow)">
-          <AboutMasthead />
-          <AboutBio />
-          <AboutMeta />
+          <AboutOpening />
+          <AboutLead />
+          <AboutPortrait />
+          <AboutFacts />
           <AboutClosing />
         </RevealGroup>
       </main>
