@@ -172,14 +172,20 @@ const ARROW =
   "motion-safe:group-hover:translate-x-0 motion-safe:group-focus-visible:translate-x-0 " +
   "group-hover:opacity-100 group-focus-visible:opacity-100";
 
+/* The footer's display size, shared by the navigation rows and the closing
+   CTA — the user set the two to match (2026-09-02), so they read from one
+   value rather than two that can drift.
+   The svh term is each row's share of the footer's fixed 70svh block: it
+   dropped from 6svh to 5svh when the list went from five links to six
+   (Branding), so the taller list still clears the meta row beneath it. */
+const FOOTER_DISPLAY =
+  "text-[clamp(28px,min(3.2vw,5svh),54px)]/[1.12] max-b700:text-[34px]";
+
 const BIG_LINK =
   "group relative flex items-center justify-between gap-6 py-1.5 pr-4 " +
-  // The svh term is each row's share of the footer's fixed 70svh block — it
-  // dropped from 6svh to 5svh when the list went from five links to six
-  // (Branding), so the taller list still clears the meta row beneath it.
-  "text-[clamp(28px,min(3.2vw,5svh),54px)]/[1.12] " +
+  `${FOOTER_DISPLAY} ` +
   // Mobile (MONOLOG ref): bigger rows, medium weight, taller tap targets
-  "max-b700:py-3 max-b700:text-[34px] max-b700:font-medium";
+  "max-b700:py-3 max-b700:font-medium";
 
 function BigLinkInner({ label }: { label: string }) {
   return (
@@ -595,19 +601,19 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Closing CTA — the foot of this column. Large, because at the
-                bottom of an otherwise empty stretch it has to carry the
-                corner rather than just sit in it; the clamp went up a step
-                when the copy shortened to two words, so the block it fills
-                stayed about the same. mailto, not the copy action the
-                address above uses: a different verb, not a second button
-                for the same one. */}
+            {/* Closing CTA — the foot of this column, set at FOOTER_DISPLAY,
+                exactly the navigation rows' size (user, 2026-09-02). It
+                stays semibold against their regular weight, which is what
+                separates it from the list opposite now that the two match
+                in scale. mailto, not the copy action the address above
+                uses: a different verb, not a second button for the same
+                one. */}
             <div className="mt-auto pt-16 max-b860:mt-0 max-b860:pt-12">
               <a
                 data-collab=""
                 href={`mailto:${EMAIL}`}
                 aria-label={footer.collaborate}
-                className="group inline-flex flex-col items-start gap-3 text-[clamp(28px,4.2vw,68px)] font-semibold tracking-[-0.02em] text-ink max-b700:gap-2 max-b700:text-[32px]"
+                className={`group inline-flex flex-col items-start gap-3 ${FOOTER_DISPLAY} font-semibold tracking-[-0.02em] text-ink max-b700:gap-2`}
               >
                 <SwapText text={footer.collaborate} />
                 {/* The rule that leaves right and returns from the left —
