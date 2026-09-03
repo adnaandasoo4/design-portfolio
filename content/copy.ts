@@ -75,8 +75,10 @@ export const workList = {
  */
 export const contactVisual = {
   lines: ["helping brands", "establish their", "visual presence."],
-  /** Large CTA pill below the statement — scrolls to #footer */
-  cta: "let's collaborate",
+  /** Large CTA pill below the statement — scrolls to #footer. Same words as
+   *  the footer's closing CTA (user, 2026-09-02); no arrow in the label
+   *  here, since the button already carries its own arrow chip. */
+  cta: "Let's Grab a Coffee",
   imageSrc: "/assets/contact-desk-3.png",
 };
 
@@ -97,6 +99,11 @@ export const footer = {
      about what the site's navigation is (user, 2026-09-02). */
   detailsEyebrow: "( my details )",
   basedIn: "Based in Baltimore, MD.\nWorking worldwide.",
+  /** Large closing CTA at the foot of the footer's right column, opening a
+   *  mail draft — a different action from the copy-to-clipboard address in
+   *  ( my details ), not a second button for the same one. The arrow is
+   *  drawn, not typed: it rides the same per-letter swap as the words. */
+  collaborate: "Let's Grab a Coffee",
   socialsEyebrow: "( my socials )",
   socials: [
     // TODO: real URLs (Open Q5) — placeholder "#" in the reference

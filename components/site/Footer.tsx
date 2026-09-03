@@ -207,7 +207,7 @@ function BigLinkInner({ label }: { label: string }) {
  * choreography (user-removed); SR announcement retained. The underline is a
  * border-bottom (currentColor) so it spans the enter arrow too. */
 const EMAIL_FLOOD =
-  "pointer-events-none absolute -left-3 -right-6 -inset-y-2.5 bg-ink-1 opacity-0 " +
+  "pointer-events-none absolute -left-2.5 -right-5 -inset-y-2 bg-ink-1 opacity-0 " +
   "transition-opacity duration-(--dur-copy-2) ease-(--ease-std) " +
   "group-hover:opacity-100 group-hover:duration-0 " +
   "group-focus-visible:opacity-100 group-focus-visible:duration-0";
@@ -218,6 +218,97 @@ const EMAIL_LABEL =
   "group-hover:[transition:color_0s_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
   "group-hover:text-bg group-focus-visible:text-bg " +
   "motion-safe:group-hover:translate-x-2 motion-safe:group-focus-visible:translate-x-2";
+
+/*
+ * Per-letter vertical swap (footer CTA, user 2026-09-02). Every character
+ * is its own clipped window holding two copies of itself: one resting in
+ * view, one parked a full line below. On hover the pair travels up
+ * together, so the visible glyph leaves through the top as its twin
+ * arrives from underneath.
+ *
+ * The DIAGONAL is a per-letter transition-delay — each cell starts a beat
+ * after the one to its left, so the swap rakes across the word instead of
+ * flipping as a block. It is a transition delay rather than an animation,
+ * so hovering out rakes back the same way rather than snapping.
+ *
+ * Tailwind v4 pitfall, same as CtaButton: translate-* utilities set the
+ * CSS `translate` property, so the rest and hover states here are
+ * arbitrary [transform:…] values and the transition names `transform` —
+ * the property that changes is exactly the one being transitioned.
+ */
+const SWAP_STEP_MS = 26;
+
+const SWAP_LAYER =
+  "block transition-[transform] duration-(--dur-swap) ease-(--ease-out-expo) " +
+  "motion-reduce:transition-none";
+
+function SwapCell({
+  index,
+  children,
+}: {
+  index: number;
+  children: React.ReactNode;
+}) {
+  const transitionDelay = `${index * SWAP_STEP_MS}ms`;
+  return (
+    <span className="relative block overflow-hidden leading-[1.1]">
+      <span
+        style={{ transitionDelay }}
+        className={`${SWAP_LAYER} motion-safe:group-hover:[transform:translateY(-100%)] motion-safe:group-focus-visible:[transform:translateY(-100%)]`}
+      >
+        {children}
+      </span>
+      <span
+        style={{ transitionDelay }}
+        className={`${SWAP_LAYER} absolute inset-0 [transform:translateY(100%)] motion-safe:group-hover:[transform:translateY(0px)] motion-safe:group-focus-visible:[transform:translateY(0px)]`}
+      >
+        {children}
+      </span>
+    </span>
+  );
+}
+
+/** Drawn, not typed — a → glyph would fall back to whatever font has one
+ *  and stop matching the words' weight. */
+function SwapArrow() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="size-[0.66em] translate-y-[0.06em]"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2.4}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 12h15" />
+      <path d="m13 6 6 6-6 6" />
+    </svg>
+  );
+}
+
+/** aria-hidden — the link carries the accessible name, or a screen reader
+ *  would announce every duplicated glyph one at a time. */
+function SwapText({ text }: { text: string }) {
+  return (
+    <span aria-hidden="true" className="flex items-center">
+      {[...text].map((ch, i) =>
+        ch === " " ? (
+          <span key={i} className="w-[0.26em]" />
+        ) : (
+          <SwapCell key={i} index={i}>
+            {ch}
+          </SwapCell>
+        ),
+      )}
+      <span className="w-[0.34em]" />
+      <SwapCell index={text.length}>
+        <SwapArrow />
+      </SwapCell>
+    </span>
+  );
+}
 
 /* Social links — same hover recipe at list scale */
 const SOCIAL_FLOOD =
@@ -432,11 +523,28 @@ export default function Footer() {
               ref): details + socials sit side by side, ask-AI spans below. */}
           <div className="flex flex-col">
             <div className="grid grid-cols-[1.3fr_1fr_1fr] content-start gap-x-10 gap-y-10 max-b700:grid-cols-[1.25fr_1fr] max-b700:gap-x-6 max-b700:gap-y-14">
-              {/* (details) — location only; the email moved to the foot of
-                this column, below */}
+              {/* (details) */}
               <div>
                 <Eyebrow>{footer.detailsEyebrow}</Eyebrow>
-                <p className="mt-5 text-[16px]/[1.55] whitespace-pre-line text-muted-1 max-b700:text-[13px]/[1.55]">
+                <button
+                  type="button"
+                  data-foot-copy
+                  onClick={onCopyClick}
+                  className="group relative mt-5 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[18px]/[1.4] max-b700:text-[15px]/[1.4]"
+                >
+                  <span aria-hidden="true" className={EMAIL_FLOOD} />
+                  {/* SR users need to know activation copies (not mails) — §A10 */}
+                  <span className="sr-only">copy email address: </span>
+                  <span className={EMAIL_LABEL}>
+                    <EnterArrow />
+                    {EMAIL}
+                  </span>
+                </button>
+                {/* Screen-reader confirmation (§A10) */}
+                <span aria-live="polite" className="sr-only">
+                  {copied ? "email copied" : ""}
+                </span>
+                <p className="mt-4 text-[16px]/[1.55] whitespace-pre-line text-muted-1 max-b700:text-[13px]/[1.55]">
                   {footer.basedIn}
                 </p>
               </div>
@@ -480,28 +588,31 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Email — the foot of this column, unlabelled. Set larger than
-              it was in the details cell: at the bottom of an otherwise empty
-              stretch it has to carry the corner, not just sit in it. */}
+            {/* Closing CTA — the foot of this column. Large, because at the
+                bottom of an otherwise empty stretch it has to carry the
+                corner rather than just sit in it. mailto, not the copy
+                action the address above uses: a different verb, not a
+                second button for the same one. */}
             <div className="mt-auto pt-16 max-b860:mt-0 max-b860:pt-12">
-              <button
-                type="button"
-                data-foot-copy
-                onClick={onCopyClick}
-                className="group relative inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[clamp(20px,2.1vw,30px)]/[1.3] max-b700:text-[17px]/[1.4]"
+              <a
+                data-collab=""
+                href={`mailto:${EMAIL}`}
+                aria-label={footer.collaborate}
+                className="group inline-flex flex-col items-start gap-3 text-[clamp(26px,3.6vw,58px)] font-semibold tracking-[-0.02em] text-ink max-b700:gap-2 max-b700:text-[30px]"
               >
-                <span aria-hidden="true" className={EMAIL_FLOOD} />
-                {/* SR users need to know activation copies (not mails) — §A10 */}
-                <span className="sr-only">copy email address: </span>
-                <span className={EMAIL_LABEL}>
-                  <EnterArrow />
-                  {EMAIL}
+                <SwapText text={footer.collaborate} />
+                {/* The rule that leaves right and returns from the left —
+                    keyframe and clip live in globals.css (ad-rule-swipe) */}
+                <span
+                  aria-hidden="true"
+                  className="relative block h-px w-full overflow-hidden"
+                >
+                  <span
+                    data-collab-rule=""
+                    className="absolute inset-0 block bg-ink"
+                  />
                 </span>
-              </button>
-              {/* Screen-reader confirmation (§A10) */}
-              <span aria-live="polite" className="sr-only">
-                {copied ? "email copied" : ""}
-              </span>
+              </a>
             </div>
           </div>
         </div>

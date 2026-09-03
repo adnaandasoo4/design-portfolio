@@ -325,6 +325,40 @@ html[data-pageleave] [data-veil] {
   }
 }
 
+/* ---- Footer "let's collaborate" underline (user, 2026-09-02) ----
+   The rule leaves to the RIGHT and returns from the LEFT as one gesture:
+   accelerating out, decelerating back in. A keyframe rather than a
+   transition, because a transition cannot turn a single property around
+   mid-flight — it can only travel to one destination and back the way it
+   came. The two easings live inside the keyframes so each half of the
+   sweep carries its own. */
+@keyframes ad-rule-swipe {
+  0% {
+    transform: translateX(0);
+    animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+  }
+  46% {
+    transform: translateX(102%);
+  }
+  47% {
+    transform: translateX(-102%);
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+[data-collab]:hover [data-collab-rule],
+[data-collab]:focus-visible [data-collab-rule] {
+  animation: ad-rule-swipe var(--dur-swap) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-collab]:hover [data-collab-rule],
+  [data-collab]:focus-visible [data-collab-rule] {
+    animation: none;
+  }
+}
+
 /* ---- Work-row marquee loop (§A5 Marquee) — CSS keyframes, GSAP-free path ---- */
 @keyframes wlist-marq {
   to {
