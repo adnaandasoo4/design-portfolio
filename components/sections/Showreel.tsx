@@ -2,9 +2,9 @@
 
 /*
  * Showreel (user-directed, 2026-09-02) — the card the home page opens on,
- * standing in for the projects reel until the video lands. Deliberately a
- * bare vermilion plate: the inset "screen" panel was removed, so there is
- * nothing inside to distract from the motion.
+ * playing the branding reel. The video fills the card edge to edge; the
+ * vermilion underneath is only what shows while it loads, which is why the
+ * card keeps that fill.
  *
  * TRAVEL. The card sweeps the full width of the hero's content box —
  * margin to margin, never past the page gutters. The amplitude is measured,
@@ -17,10 +17,12 @@
  * ANGLE. Not authored — it falls out of the lag. Each frame the card eases
  * toward the pointer's target x; the distance it is still behind converts
  * straight into degrees. Sweep fast and the gap is wide, so the card banks
- * hard into the direction of travel; let it settle and the gap closes, so
- * the angle relaxes to a small tilt held by pointer position alone. Speed
- * reads as angle for free, with no velocity sampling and no timers to keep
- * in sync.
+ * hard into the direction of travel. Stop moving and the gap closes to
+ * zero, which takes the angle with it — the card settles perfectly flat,
+ * because lag is the ONLY thing feeding rotation. (An earlier version also
+ * added a tilt from pointer POSITION, which left the card holding a
+ * permanent lean wherever the cursor happened to rest.) Speed reads as
+ * angle for free, with no velocity sampling and no timers to keep in sync.
  *
  * Only `transform` is touched (§A7), from a single gsap.ticker callback
  * rather than a tween per event. Coarse pointers and reduced-motion
@@ -32,10 +34,10 @@ import { gsap, useGSAP } from "@/lib/gsap/register";
 import { MQ } from "@/lib/gsap/motion";
 import { hero } from "@/content/copy";
 
-/** Steady tilt held by pointer POSITION once the card has caught up. */
-const TILT_POS_DEG = 5;
-/** Degrees of bank per pixel the card is still behind the pointer. */
-const LAG_TO_DEG = 0.075;
+/** Degrees of bank per pixel the card is still behind the pointer. This is
+ *  the only input to rotation, so rotation returns to 0 whenever the card
+ *  catches up — i.e. whenever the pointer stops. */
+const LAG_TO_DEG = 0.085;
 const MAX_DEG = 18;
 /** Per-frame easing. Higher = the card snaps to the pointer harder. */
 const EASE_FRAME = 0.14;
@@ -61,6 +63,7 @@ function PlayGlyph({ className }: { className: string }) {
 export default function Showreel() {
   const scope = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLElement>(null);
+  const video = useRef<HTMLVideoElement>(null);
 
   useGSAP(
     () => {
@@ -102,7 +105,7 @@ export default function Showreel() {
           frameX += (targetX - frameX) * EASE_FRAME;
           // Everything the card has not caught up on yet, in pixels.
           const lag = targetX - frameX;
-          const wantRot = clampDeg(nx * TILT_POS_DEG + lag * LAG_TO_DEG);
+          const wantRot = clampDeg(lag * LAG_TO_DEG);
           frameRot += (wantRot - frameRot) * EASE_ANGLE;
           gsap.set(frameEl, { x: frameX, rotation: frameRot });
         };
@@ -120,6 +123,12 @@ export default function Showreel() {
         };
       });
 
+      // Reduced motion: the reel is decorative and loops, so hold it on its
+      // first frame rather than autoplaying (§A7).
+      mm.add(MQ.reduced, () => {
+        video.current?.pause();
+      });
+
       return () => mm.revert();
     },
     { scope },
@@ -132,14 +141,22 @@ export default function Showreel() {
       {/* The whole group banks together — card AND captions, as in the
           reference, so the captions read as printed on the card. */}
       <figure ref={frame} className="m-0 will-change-transform">
-        <div
-          className="aspect-16/9 w-[clamp(260px,26vw,470px)] rounded-[3px] bg-brand"
-          role="img"
-          aria-label={hero.reel.alt}
-        />
+        <div className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px] bg-brand">
+          <video
+            ref={video}
+            className="size-full object-cover"
+            src={hero.reel.src}
+            aria-label={hero.reel.alt}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+          />
+        </div>
 
         {/* Captions sit on the card's own left and right edges */}
-        <figcaption className="mt-[clamp(12px,1.4vw,20px)] flex items-center justify-between text-[clamp(13px,1vw,15px)] leading-none font-medium text-ink">
+        <figcaption className="mt-[clamp(12px,1.4vw,20px)] flex items-center justify-between text-meta leading-none font-medium text-ink">
           <span className="inline-flex items-center gap-2">
             {hero.reel.label}
             <PlayGlyph className="size-[15px] text-ink" />

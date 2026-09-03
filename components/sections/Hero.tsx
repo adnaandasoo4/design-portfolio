@@ -15,8 +15,23 @@
  *      paragraph BOTTOM-aligned to its last line — `items-end` is doing
  *      that, not a hand-tuned offset, so it holds at every width.
  *
- * Bottom padding clears the fixed theme toggle in the bottom-right gutter;
- * below 860px the paragraph stacks under the headline instead of beside it.
+ * Eyebrow and paragraph are the page's secondary tier: both grey
+ * (--color-muted-2) against the white headline, and both on the shared
+ * --text-meta size the showreel caption also uses, so the three cannot
+ * drift apart.
+ *
+ * The masthead is font-bold (700), which the browser SYNTHESISES — only
+ * Regular (400) and SemiBold (600) cuts of HK Grotesk Wide are in
+ * app/fonts/. Chosen knowingly (user, 2026-09-02) to get the reference's
+ * weight now; drop a real Bold OTF in and this becomes a true cut with no
+ * other change.
+ *
+ * Bottom padding is the nav's own top gutter (20px, 16px on phones), so the
+ * statement sits as far off the bottom edge as the nav sits off the top —
+ * the two margins are deliberately the same number. Nothing else may live
+ * in the bottom-right corner at that depth, which is why the theme toggle
+ * moved up into the nav. Below 860px the paragraph stacks under the
+ * headline instead of beside it.
  * Below 700px the headline drops off the clamp onto a pure vw size — the
  * clamp's 34px floor is wider than a phone can hold at this face's set
  * width, and the authored line breaks would start wrapping a second time.
@@ -74,7 +89,7 @@ export default function Hero() {
       id="hero"
       ref={sectionRef}
       aria-label="Hero"
-      className="relative z-(--z-section) flex h-svh flex-col bg-bg px-5 pt-[92px] pb-[clamp(80px,10vh,108px)] max-b700:px-4 max-b700:pt-[76px]"
+      className="relative z-(--z-section) flex h-svh flex-col bg-bg px-5 pt-[92px] pb-5 max-b700:px-4 max-b700:pt-[76px] max-b700:pb-4"
     >
       {/* Reel — centred in the space the statement block leaves over */}
       <div
@@ -88,7 +103,7 @@ export default function Hero() {
       <div className="shrink-0">
         <p
           data-hero-intro=""
-          className="font-mono-ui text-[clamp(10px,0.78vw,11px)]/[1.6] tracking-[0.1em] text-muted-2 uppercase"
+          className="font-mono-ui text-meta/[1.6] tracking-[0.1em] text-muted-2 uppercase"
         >
           {hero.eyebrow.map((line) => (
             <span key={line} className="block">
@@ -100,7 +115,7 @@ export default function Hero() {
         <div className="mt-[clamp(16px,2.4vh,30px)] flex items-end justify-between gap-[clamp(24px,5vw,90px)] max-b860:flex-col max-b860:items-start max-b860:gap-7">
           <h1
             data-hero-intro=""
-            className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-semibold tracking-[-0.02em] text-ink uppercase max-b700:text-[6.2vw]"
+            className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-bold tracking-[-0.02em] text-ink uppercase max-b700:text-[6.2vw]"
           >
             {hero.headline.map((line) => (
               <span key={line} className="block">
@@ -111,7 +126,7 @@ export default function Hero() {
 
           <p
             data-hero-intro=""
-            className="w-[clamp(240px,25vw,340px)] shrink-0 pb-[0.4em] text-[clamp(14px,1.2vw,17px)]/[1.5] text-ink-1 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
+            className="w-[clamp(240px,25vw,340px)] shrink-0 pb-[0.4em] text-meta/[1.5] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0"
           >
             {hero.paragraph}
           </p>

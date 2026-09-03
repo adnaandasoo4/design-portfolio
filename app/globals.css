@@ -156,6 +156,12 @@ html[data-theme="light"] {
     "Noto Sans JP", sans-serif;
   --font-mono-ui: ui-monospace, "SF Mono", Menlo, monospace;
 
+  /* One shared size for the hero's secondary text. The eyebrow, the
+     right-hand paragraph and the showreel caption must read as a single
+     tier (user, 2026-09-02) — keeping it a token means they cannot drift
+     apart the next time one of them is touched. */
+  --text-meta: clamp(13px, 1vw, 15px);
+
   /* ---- Radius ---- */
   --radius-chip: 2px; /* say-hi arrow chip */
   --radius-btn: 3px; /* nav buttons / say-hi pill */
@@ -325,7 +331,6 @@ html[data-pageleave] [data-veil] {
    Reduced-motion users never match — content stays visible. */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-preloaded="true"]) [data-topnav],
-  html:not([data-preloaded="true"]) [data-chrome-item],
   html:not([data-preloaded="true"]) [data-hero-panel],
   html:not([data-preloaded="true"]) [data-hero-intro] {
     visibility: hidden;

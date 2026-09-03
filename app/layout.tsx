@@ -1,11 +1,11 @@
 /*
  * Root layout — site metadata/JSON-LD, Manrope, and the fixed chrome
- * (RouteVeil, Preloader, Nav, ThemeToggle) mounted OUTSIDE <SmoothScroll>
+ * (RouteVeil, Preloader, Nav) mounted OUTSIDE <SmoothScroll>
  * (§A2 z-layers; the preloader inerts the #smooth-wrapper during its lock
  * window).
  *
  * THEME (2026-09-02): the site is dark by default with an opt-in light mode
- * the visitor toggles bottom-right. `data-theme` on <html> is the only
+ * the visitor toggles from the nav. `data-theme` on <html> is the only
  * state; NO_FLASH_SCRIPT restores the stored choice from localStorage
  * BEFORE first paint, so a returning light-mode visitor never sees a dark
  * frame. It is inlined rather than imported because it has to run ahead of
@@ -19,7 +19,6 @@ import SmoothScroll from "@/lib/gsap/SmoothScroll";
 import Nav from "@/components/site/Nav";
 import Preloader from "@/components/site/Preloader";
 import RouteVeil from "@/components/site/RouteVeil";
-import ThemeToggle from "@/components/site/ThemeToggle";
 import { NO_FLASH_SCRIPT } from "@/lib/theme";
 
 const manrope = Manrope({
@@ -122,7 +121,6 @@ export default function RootLayout({
         <header>
           <Nav />
         </header>
-        <ThemeToggle />
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>

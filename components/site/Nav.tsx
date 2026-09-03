@@ -4,18 +4,24 @@
  * Fixed top chrome (§A5 [data-topnav], user-redirected 2026-09-02). Two
  * elements, one per side:
  *
- *   ADNAAN DASOO  ……………………………………………………  [Menu +]
+ *   ADNAAN DASOO  …………………………………………  [☀] [Menu +]
  *
  * - The wordmark is whole again on the left (the earlier split halves and
  *   the vermilion designer × engineer banner were both dropped), set in HK
  *   Grotesk Wide SemiBold uppercase at the reference's logotype scale.
+ * - The theme toggle rides here too (moved out of the bottom-right gutter
+ *   when the hero's paragraph was dropped to a 20px bottom margin and took
+ *   that corner). It carries no motion of its own — it is simply inside the
+ *   right cluster, so the choreography below already covers it.
  * - The Menu carries no outline — it is a bare surface, and the panel is
  *   FLUSH beneath it with no gap, so opening reads as the bar extending
  *   itself downward rather than a popover appearing under it. The button
  *   drops its bottom radius while open so the two halves fuse.
- * - Opening is a clip-path wipe from the button's bottom edge with the rows
- *   staggering in behind it. Row hover is the footer-socials recipe carried
- *   over verbatim — light flood snaps ON, fades OFF, label glides right.
+ * - Opening ROLLS: the panel's clip-path opens from the button's bottom
+ *   edge while the list inside travels down from translateY(-100%), so the
+ *   rows are drawn out from behind the button like a blind unrolling. No
+ *   opacity anywhere on the panel — a fade is exactly what this is not.
+ *   Row hover is the footer-socials recipe carried over verbatim —
  *   (Tailwind v4: translate-* sets the CSS `translate` property, so the
  *   label transitions `translate`; the row <li> transitions `transform` —
  *   different elements, different properties, no conflict.)
@@ -24,8 +30,13 @@
  *   wipe share --dur-copy so they read as one gesture.
  *
  * SCROLL BEHAVIOUR (lib/chromeReveal — one shared ScrollTrigger, also
- * driving ThemeToggle): any scroll DOWN slides each side off its OWN edge;
- * any scroll UP swipes them back in.
+ * driving ThemeToggle): any scroll DOWN swipes each side clean off its OWN
+ * edge of the viewport, and any scroll UP swipes it back. The travel is the
+ * element's own width plus the gutter, measured per element, so the piece
+ * genuinely leaves the frame instead of dimming in place — the nav clips on
+ * the x axis so nothing shows past the edge. Visibility is only dropped
+ * once the slide has finished, which keeps it out of the tab order without
+ * turning the exit into a fade.
  *
  * The children carry every scroll tween; the ROOT is owned by the intro
  * below and by Footer.tsx's ScrollTrigger, which hides [data-topnav] over
@@ -47,6 +58,7 @@ import { subscribeChrome } from "@/lib/chromeReveal";
 import { navigateWithVeil } from "@/components/site/RouteVeil";
 import { scrollToSection, scrollToTop } from "@/lib/gsap/SmoothScroll";
 import { nav as navCopy } from "@/content/copy";
+import ThemeToggle from "@/components/site/ThemeToggle";
 
 /* -------- Footer-socials hover recipe at menu scale -------- */
 const ROW_LINK =
@@ -66,9 +78,8 @@ const LABEL =
   "group-hover:text-bg group-focus-visible:text-bg " +
   "motion-safe:group-hover:translate-x-2 motion-safe:group-focus-visible:translate-x-2";
 
-/* Hidden offsets — each side parks on its own edge of the viewport */
-const LEFT_OUT_X = -28;
-const RIGHT_OUT_X = 28;
+/* Extra travel past the viewport edge, so nothing sits flush against it */
+const OUT_PAD_PX = 48;
 
 function RowInner({ label, index }: { label: string; index: number }) {
   return (
@@ -164,25 +175,43 @@ export default function Nav() {
           });
         });
 
+        /** Slide one side clean past its own edge of the viewport.
+         *
+         *  The distance is derived from `offsetLeft`/`offsetWidth`, never
+         *  from getBoundingClientRect: offsets are LAYOUT positions and
+         *  ignore the transform we are mid-way through applying, so this
+         *  stays correct even when called again before the last tween has
+         *  landed. Both animated elements are direct children of the nav,
+         *  which is `fixed` and therefore their offsetParent — so offsetLeft
+         *  is measured against the viewport, and `el.offsetWidth` alone
+         *  would be wrong for anything not already touching its edge. */
+        const slide = (els: HTMLElement[], dir: 1 | -1, shown: boolean) => {
+          const frame = el.offsetWidth;
+          for (const item of els) {
+            if (shown) gsap.set(item, { visibility: "inherit" });
+            const out =
+              dir < 0
+                ? -(item.offsetLeft + item.offsetWidth + OUT_PAD_PX)
+                : frame - item.offsetLeft + OUT_PAD_PX;
+            gsap.to(item, {
+              x: shown ? 0 : out,
+              duration: shown ? DUR.copy2 : DUR.copy,
+              ease: EASE.outQuart,
+              overwrite: "auto",
+              // Hide only once it is off-frame — never a fade in place.
+              onComplete: shown
+                ? undefined
+                : () => gsap.set(item, { visibility: "hidden" }),
+            });
+          }
+        };
+
         const offChrome = subscribeChrome(({ shown }) => {
           // Any scroll down closes the panel — an open menu floating over a
           // hidden Menu button would be orphaned.
           if (!shown) setOpen(false);
-
-          gsap.to(left, {
-            x: shown ? 0 : LEFT_OUT_X,
-            autoAlpha: shown ? 1 : 0,
-            duration: shown ? DUR.copy2 : DUR.copy,
-            ease: EASE.outQuart,
-            overwrite: "auto",
-          });
-          gsap.to(right, {
-            x: shown ? 0 : RIGHT_OUT_X,
-            autoAlpha: shown ? 1 : 0,
-            duration: shown ? DUR.copy2 : DUR.copy,
-            ease: EASE.outQuart,
-            overwrite: "auto",
-          });
+          slide(left, -1, shown);
+          slide(right, 1, shown);
         });
 
         return () => {
@@ -213,7 +242,7 @@ export default function Nav() {
       ref={scope}
       data-topnav=""
       aria-label="Primary"
-      className="pointer-events-none fixed inset-x-0 top-0 z-(--z-nav) flex items-start justify-between gap-6 px-5 py-5 max-b700:px-4 max-b700:py-4"
+      className="pointer-events-none fixed inset-x-0 top-0 z-(--z-nav) flex items-start justify-between gap-6 overflow-x-clip px-5 py-5 max-b700:px-4 max-b700:py-4"
     >
       {/* ---- LEFT: the wordmark, whole ---- */}
       <Link
@@ -221,107 +250,112 @@ export default function Nav() {
         href="/"
         onClick={goHome}
         aria-label={`${navCopy.wordmark} — home`}
-        className="pointer-events-auto flex h-11 items-center font-hkgw text-[clamp(20px,2.1vw,30px)] leading-none font-semibold tracking-[-0.02em] whitespace-nowrap text-ink uppercase transition-opacity duration-(--dur-hover) ease-(--ease-std) hover:opacity-70"
+        className="pointer-events-auto flex h-11 items-center font-hkgw text-[clamp(20px,2.1vw,30px)] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink uppercase transition-opacity duration-(--dur-hover) ease-(--ease-std) hover:opacity-70"
       >
         {navCopy.wordmark}
       </Link>
 
-      {/* ---- RIGHT: the Menu, which extends into its own panel ---- */}
-      <div
-        data-chrome-right=""
-        ref={menuWrap}
-        className="pointer-events-auto relative"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-        onFocus={() => setOpen(true)}
-        onBlur={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget as Node))
-            setOpen(false);
-        }}
-      >
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls="nav-menu-panel"
-          onClick={() => setOpen((o) => !o)}
-          className={`flex h-11 w-[clamp(160px,14vw,196px)] cursor-pointer items-center justify-between rounded-t-btn bg-raise-2 pr-4 pl-5 text-[15px] leading-none font-medium text-ink max-b700:w-[124px] max-b700:pr-3 max-b700:pl-4 ${
-            open ? "" : "rounded-b-btn"
-          }`}
-        >
-          {navCopy.menuLabel}
-          {/* A full turn PLUS the 45° that makes the "+" an "×" — same glyph,
-              arrived at the long way round. */}
-          <svg
-            viewBox="0 0 24 24"
-            className={`size-[15px] transition-transform duration-(--dur-copy) ease-(--ease-out-quart) motion-reduce:transition-none ${
-              open ? "rotate-[405deg]" : "rotate-0"
-            }`}
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.9"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
+      {/* ---- RIGHT: theme toggle + the Menu, which extends into its own
+           panel. The CLUSTER is what animates — it is a direct child of the
+           nav, so its offsetLeft is viewport-relative (see slide above). --- */}
+      <div data-chrome-right="" className="flex items-center gap-2">
+        <ThemeToggle />
 
-        {/* Panel — flush under the button, same surface, so the bar simply
-            grows downward. `invisible` when closed keeps it out of the tab
-            order and off the pointer. */}
         <div
-          id="nav-menu-panel"
-          className={`absolute top-full left-0 w-full overflow-hidden rounded-b-btn bg-raise-2 pb-1.5 [transition:clip-path_var(--dur-copy)_var(--ease-out-quart),opacity_var(--dur-micro)_var(--ease-std),visibility_0s_linear_var(--vis-delay)] motion-reduce:transition-none ${
-            open
-              ? "visible opacity-100 [--vis-delay:0s] [clip-path:inset(0_0_0_0)]"
-              : "invisible opacity-0 [--vis-delay:var(--dur-copy)] [clip-path:inset(0_0_100%_0)]"
-          }`}
+          ref={menuWrap}
+          className="pointer-events-auto relative"
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+          onFocus={() => setOpen(true)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget as Node))
+              setOpen(false);
+          }}
         >
-          <ul className="flex flex-col">
-            {navCopy.links.map((link, i) => (
-              <li
-                key={link.label}
-                style={{ transitionDelay: open ? `${40 + i * 22}ms` : "0ms" }}
-                className={`[transition:transform_var(--dur-copy)_var(--ease-out-quart),opacity_var(--dur-micro)_var(--ease-std)] motion-reduce:transition-none ${
-                  open
-                    ? "opacity-100 [transform:translateY(0px)]"
-                    : "opacity-0 [transform:translateY(-8px)]"
-                }`}
-              >
-                {link.type === "route" ? (
-                  <Link
-                    data-navlink=""
-                    href={link.target}
-                    onClick={goRoute(link.target)}
-                    className={ROW_LINK}
-                  >
-                    <RowInner label={link.label} index={i} />
-                  </Link>
-                ) : link.type === "scroll" ? (
-                  <Link
-                    data-navlink=""
-                    data-scrollto={link.target}
-                    href={`/${link.target}`}
-                    onClick={goScroll(link.target)}
-                    className={ROW_LINK}
-                  >
-                    <RowInner label={link.label} index={i} />
-                  </Link>
-                ) : (
-                  /* "pending": the row exists and hovers, but has nowhere to
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls="nav-menu-panel"
+            onClick={() => setOpen((o) => !o)}
+            className={`flex h-11 w-[clamp(160px,14vw,196px)] cursor-pointer items-center justify-between rounded-t-btn bg-raise-2 pr-4 pl-5 text-[15px] leading-none font-medium text-ink max-b700:w-[124px] max-b700:pr-3 max-b700:pl-4 ${
+              open ? "" : "rounded-b-btn"
+            }`}
+          >
+            {navCopy.menuLabel}
+            {/* A full turn PLUS the 45° that makes the "+" an "×" — same glyph,
+              arrived at the long way round. */}
+            <svg
+              viewBox="0 0 24 24"
+              className={`size-[15px] transition-transform duration-(--dur-copy) ease-(--ease-out-quart) motion-reduce:transition-none ${
+                open ? "rotate-[405deg]" : "rotate-0"
+              }`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.9"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+
+          {/* Panel — flush under the button, same surface, so the bar simply
+            grows downward. The ROLL is two things moving together: the panel
+            unclips from its top edge while the list travels down from behind
+            the button. `invisible` when closed keeps it out of the tab order
+            and off the pointer. */}
+          <div
+            id="nav-menu-panel"
+            className={`absolute top-full left-0 w-full overflow-hidden rounded-b-btn bg-raise-2 [transition:clip-path_var(--dur-copy)_var(--ease-out-quart),visibility_0s_linear_var(--vis-delay)] motion-reduce:transition-none ${
+              open
+                ? "visible [--vis-delay:0s] [clip-path:inset(0_0_0_0)]"
+                : "invisible [--vis-delay:var(--dur-copy)] [clip-path:inset(0_0_100%_0)]"
+            }`}
+          >
+            <ul
+              className={`flex flex-col py-1.5 [transition:transform_var(--dur-copy)_var(--ease-out-quart)] motion-reduce:transition-none ${
+                open
+                  ? "[transform:translateY(0px)]"
+                  : "[transform:translateY(-100%)]"
+              }`}
+            >
+              {navCopy.links.map((link, i) => (
+                <li key={link.label}>
+                  {link.type === "route" ? (
+                    <Link
+                      data-navlink=""
+                      href={link.target}
+                      onClick={goRoute(link.target)}
+                      className={ROW_LINK}
+                    >
+                      <RowInner label={link.label} index={i} />
+                    </Link>
+                  ) : link.type === "scroll" ? (
+                    <Link
+                      data-navlink=""
+                      data-scrollto={link.target}
+                      href={`/${link.target}`}
+                      onClick={goScroll(link.target)}
+                      className={ROW_LINK}
+                    >
+                      <RowInner label={link.label} index={i} />
+                    </Link>
+                  ) : (
+                    /* "pending": the row exists and hovers, but has nowhere to
                      go yet — announced as disabled rather than faked. */
-                  <a
-                    href={link.target}
-                    aria-disabled="true"
-                    onClick={(e) => e.preventDefault()}
-                    className={`${ROW_LINK} cursor-default`}
-                  >
-                    <RowInner label={link.label} index={i} />
-                  </a>
-                )}
-              </li>
-            ))}
-          </ul>
+                    <a
+                      href={link.target}
+                      aria-disabled="true"
+                      onClick={(e) => e.preventDefault()}
+                      className={`${ROW_LINK} cursor-default`}
+                    >
+                      <RowInner label={link.label} index={i} />
+                    </a>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </nav>
