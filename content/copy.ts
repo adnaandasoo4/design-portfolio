@@ -52,9 +52,22 @@ export const hero = {
   },
 };
 
-/** About blurb — preserve verbatim (§A6 #2); rendered static at full ink. */
-export const aboutBlurb =
-  "The goal has always been to close the gap between design and engineering. I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.";
+/*
+ * About (§A6 #2) — the mission blurb, split at its own sentence break so
+ * the thesis can take masthead treatment and the argument can sit in the
+ * secondary tier. NOT a rewrite: `statement` and `body` are the handoff
+ * text verbatim, and `aboutBlurb` below reassembles them so the §A6 string
+ * still exists in one piece and cannot drift from its halves.
+ */
+export const about = {
+  eyebrow: "( about )",
+  statement:
+    "The goal has always been to close the gap between design and engineering.",
+  body: "I build visual identities and digital brands for businesses that want every touchpoint to feel considered — then iterate relentlessly, refining until the details disappear into the whole.",
+};
+
+/** About blurb — preserve verbatim (§A6 #2). */
+export const aboutBlurb = `${about.statement} ${about.body}`;
 
 export const divider = {
   /** [text, color, speed, preOffset marginLeft] */
