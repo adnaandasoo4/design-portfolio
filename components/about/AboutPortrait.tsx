@@ -84,7 +84,7 @@ export default function AboutPortrait() {
               />
             </div>
           </div>
-          <figcaption className="mt-4 flex items-baseline justify-between gap-4 font-mono-ui text-meta leading-none text-muted-2">
+          <figcaption className="mt-4 flex items-baseline justify-between gap-4 font-manrope text-meta leading-none text-muted-2">
             <span>{about.image.caption.latin}</span>
             <span lang="ja" className="font-ja tracking-[0.14em] text-muted-3">
               {about.image.caption.ja}
@@ -92,7 +92,7 @@ export default function AboutPortrait() {
           </figcaption>
         </figure>
 
-        <div className="flex max-w-[54ch] flex-col gap-[1.5em] pb-[clamp(0px,6vh,90px)] font-mono-ui text-meta/[1.9] text-muted-2 max-b860:max-w-none max-b860:pb-0">
+        <div className="flex max-w-[54ch] flex-col gap-[1.5em] pb-[clamp(0px,6vh,90px)] font-manrope text-meta/[1.9] text-muted-2 max-b860:max-w-none max-b860:pb-0">
           {about.paragraphs.map((paragraph) => (
             <p key={paragraph.slice(0, 24)} data-reveal="">
               {paragraph}

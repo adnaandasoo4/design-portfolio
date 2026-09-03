@@ -14,7 +14,7 @@ import { branding } from "@/content/branding";
  *
  * Every section runs through components/branding/Spread, which is the About
  * section's two-column format captured once: 20px gutters shared with the
- * home hero, a mono rail on the left, content on the right. Reusing one
+ * home hero, a label rail on the left, content on the right. Reusing one
  * wrapper is what makes the rhythm identical section to section instead of
  * four approximations of it.
  *

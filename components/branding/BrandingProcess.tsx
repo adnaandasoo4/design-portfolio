@@ -24,7 +24,7 @@ export default function BrandingProcess() {
           >
             <span
               aria-hidden="true"
-              className="font-mono-ui text-meta leading-[1.6] text-muted-2 tabular-nums"
+              className="font-manrope text-meta leading-[1.6] text-muted-2 tabular-nums"
             >
               {step.numeral}
             </span>
@@ -32,7 +32,7 @@ export default function BrandingProcess() {
               <h2 className="text-[clamp(20px,1.7vw,28px)]/[1.2] font-semibold tracking-[-0.015em] text-ink">
                 {step.title}
               </h2>
-              <p className="mt-3 max-w-[58ch] font-mono-ui text-meta/[1.7] text-muted-2">
+              <p className="mt-3 max-w-[58ch] font-manrope text-meta/[1.7] text-muted-2">
                 {step.body}
               </p>
             </div>

@@ -3,11 +3,13 @@
  * measure so it starts where the headline above it ended rather than at the
  * gutter.
  *
- * Set in Manrope rather than the mono tier: it is the page's argument, not
- * its metadata, and it needs to sit between the display headline and the
- * mono body instead of joining one of them. The indent is the one device
- * carried over from the section this page replaces, which is the only part
- * of it that was working.
+ * It sits between the display headline and the body: the page's argument,
+ * not its metadata. That used to be a face distinction — the body tier was
+ * a system mono and this line was Manrope — but the site is two faces now
+ * (HK Grotesk Wide for headers, Manrope for everything else), so size and
+ * measure carry it alone. The indent is the one device carried over from
+ * the section this page replaces, which is the only part of it that was
+ * working.
  */
 import { about } from "@/content/about";
 

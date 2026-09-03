@@ -77,7 +77,7 @@ export default function BrandingBand() {
         {/* Scrim — fixed dark in both themes; the photograph is artwork, not
             a surface, so it must not invert with the theme */}
         <div aria-hidden="true" className="absolute inset-0 bg-art-scrim" />
-        <p className="absolute bottom-5 left-5 font-mono-ui text-meta leading-none text-on-art max-b700:bottom-4 max-b700:left-4">
+        <p className="absolute bottom-5 left-5 font-manrope text-meta leading-none text-on-art max-b700:bottom-4 max-b700:left-4">
           {branding.bandCaption}
         </p>
       </div>

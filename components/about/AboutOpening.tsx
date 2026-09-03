@@ -90,7 +90,7 @@ export default function AboutOpening() {
     >
       <div
         data-about-label=""
-        className="flex items-start justify-between gap-6 font-mono-ui text-meta leading-none text-muted-2"
+        className="flex items-start justify-between gap-6 font-manrope text-meta leading-none text-muted-2"
       >
         <p>{about.eyebrow.latin}</p>
         <p lang="ja" className="font-ja tracking-[0.14em]">

@@ -5,7 +5,7 @@
  * 3 → 2 → 1 at b1024 / b860. Cards use the home ratios and registers:
  * 16:10 media slot (radius-media 10px, bg-slot, next/image cover), then a
  * meta line — title Manrope 500 + dimmer lang="ja" line, and an index + meta
- * in the 13px mono/muted-3 register.
+ * in the 13px muted-3 register.
  *
  * Hover stays in the home language (§A9 — no new patterns): image scales
  * within its clip 1 → 1.04 (.55s ease-out-quart, transform-only) and the
@@ -95,7 +95,7 @@ export default function WorksIndex() {
                     {card.ja}
                   </span>
                 </span>
-                <span className="shrink-0 font-mono-ui text-[12px]/[1] font-medium tracking-[0.04em] text-muted-3">
+                <span className="shrink-0 font-manrope text-[12px]/[1] font-medium tracking-[0.04em] text-muted-3">
                   <span className="text-muted-2">
                     {String(i + 1).padStart(2, "0")}
                   </span>

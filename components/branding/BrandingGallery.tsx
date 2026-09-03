@@ -25,7 +25,7 @@ export default function BrandingGallery() {
                 className="object-cover"
               />
             </div>
-            <figcaption className="mt-4 font-mono-ui text-meta/[1.6] text-muted-2">
+            <figcaption className="mt-4 font-manrope text-meta/[1.6] text-muted-2">
               {item.caption}
             </figcaption>
           </figure>

@@ -22,7 +22,7 @@ export default function BrandingMasthead() {
       </h1>
       <p
         data-reveal=""
-        className="mt-[clamp(28px,4vh,56px)] max-w-[54ch] font-mono-ui text-meta/[1.7] text-muted-2"
+        className="mt-[clamp(28px,4vh,56px)] max-w-[54ch] font-manrope text-meta/[1.7] text-muted-2"
       >
         {branding.intro}
       </p>

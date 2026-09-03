@@ -8,7 +8,7 @@ export const EMAIL = "adnaandasoo@gmail.com";
 
 /*
  * Hero — centred showreel over a stacked statement block (user-directed,
- * 2026-09-02). Three text slots below the reel: a mono eyebrow, the giant
+ * 2026-09-02). Three text slots below the reel: an eyebrow, the giant
  * masthead headline (the page's single h1), and a right-aligned paragraph
  * that bottoms out with the headline's last line.
  *
@@ -23,7 +23,7 @@ export const EMAIL = "adnaandasoo@gmail.com";
  * arrives.
  */
 export const hero = {
-  /** Mono eyebrow — one array item per display line */
+  /** Eyebrow — one array item per display line */
   eyebrow: ["For B2B tech teams that have", "outgrown their website"],
   /** Masthead headline — one array item per display line */
   headline: ["BRANDING & WEBSITES", "THAT MOVE B2B TECH", "TEAMS FORWARD"],
@@ -44,9 +44,9 @@ export const hero = {
     src: "/assets/brand-reel.mp4",
     /** Accessible name for the video */
     alt: "Branding showreel",
-    /** Caption under the card — label left, action right. Set in the mono
-     *  face at --text-meta so it reads as one tier with the hero's eyebrow
-     *  and paragraph. Title case and unbracketed (user, 2026-09-03); it no
+    /** Caption under the card — label left, action right. Set at
+     *  --text-meta so it reads as one tier with the hero's eyebrow and
+     *  paragraph. Title case and unbracketed (user, 2026-09-03); it no
      *  longer borrows the footer eyebrows' parenthesised lowercase. */
     label: "Projects Showreel",
     note: "Watch",

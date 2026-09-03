@@ -100,7 +100,7 @@ export default function WorksHeader() {
             {works.headerEyebrow.ja}
           </span>
         </span>
-        <span className="shrink-0 font-mono-ui text-[13px]/[1] font-medium tracking-[0.08em] text-muted-2">
+        <span className="shrink-0 font-manrope text-[13px]/[1] font-medium tracking-[0.08em] text-muted-2">
           {works.count}
         </span>
       </p>

@@ -19,7 +19,7 @@ export default function AboutFacts() {
     >
       <div
         data-reveal=""
-        className="flex items-baseline justify-between gap-6 font-mono-ui text-meta leading-none text-muted-2"
+        className="flex items-baseline justify-between gap-6 font-manrope text-meta leading-none text-muted-2"
       >
         <p>{about.metaEyebrow.latin}</p>
         <p lang="ja" className="font-ja tracking-[0.14em]">
@@ -33,7 +33,7 @@ export default function AboutFacts() {
           <li key={item.numeral} data-reveal="" className="flex flex-col">
             <span
               aria-hidden="true"
-              className="font-mono-ui text-meta leading-none text-muted-3 tabular-nums"
+              className="font-manrope text-meta leading-none text-muted-3 tabular-nums"
             >
               {item.numeral}
             </span>

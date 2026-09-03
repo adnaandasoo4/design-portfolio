@@ -15,9 +15,8 @@
  * however many lines the heading wraps to.
  *
  * The body runs the full width of its column, matching the heading above it
- * (user, 2026-09-03). That is a long measure for mono, so the tier takes a
- * looser line-height here (1.85) than the two-line captions it was drawn
- * for.
+ * (user, 2026-09-03). That is a long measure, so the tier takes a looser
+ * line-height here (1.85) than the two-line captions it was drawn for.
  *
  * The layout itself lives in components/site/Spread, shared with the
  * Branding page, so the two cannot drift apart.
@@ -140,7 +139,7 @@ export default function About() {
         >
           {aboutSection.statement}
         </h2>
-        <div className="mt-[clamp(28px,4vh,56px)] flex flex-col gap-[1.4em] font-mono-ui text-meta/[1.85] text-muted-2">
+        <div className="mt-[clamp(28px,4vh,56px)] flex flex-col gap-[1.4em] font-manrope text-meta/[1.85] text-muted-2">
           {aboutSection.paragraphs.map((paragraph) => (
             <p key={paragraph.slice(0, 24)} data-reveal="">
               {paragraph}

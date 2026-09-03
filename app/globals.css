@@ -173,12 +173,17 @@ html[data-theme="light"] {
   --color-hero-dim: #050506; /* hero dim overlay (smoke variant only) */
 
   /* ---- Typography ---- */
+  /* TWO faces, and only two (user, 2026-09-03): HK Grotesk Wide sets the
+     display headers, Manrope sets everything else. --font-mono-ui (the
+     system ui-monospace stack) is gone with that rule — it had spread from
+     the handoff's one statement-bar micro-caps row, a section that no
+     longer exists, to every eyebrow, caption and body block on the site. */
   --font-manrope: var(--font-manrope-next), "Helvetica Neue", sans-serif;
   --font-hkgw: var(--font-hkgw-next, var(--font-manrope-next)), "Manrope",
     sans-serif;
+  /* Latin resolves to Manrope here too — this only adds the JP fallbacks. */
   --font-ja: var(--font-manrope-next), "Hiragino Kaku Gothic ProN", "Yu Gothic",
     "Noto Sans JP", sans-serif;
-  --font-mono-ui: ui-monospace, "SF Mono", Menlo, monospace;
 
   /* One shared size for the hero's secondary text. The eyebrow, the
      right-hand paragraph and the showreel caption must read as a single

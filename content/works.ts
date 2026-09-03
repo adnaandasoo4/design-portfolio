@@ -6,7 +6,7 @@
 
 export type WorkCard = {
   title: string;
-  /** mono meta line, e.g. "product · 2025" */
+  /** meta line, e.g. "product · 2025" */
   meta: string;
   ja: string;
   image: string;

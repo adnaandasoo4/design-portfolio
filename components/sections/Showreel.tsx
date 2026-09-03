@@ -3,9 +3,9 @@
 /*
  * Showreel (user-directed, 2026-09-02) — the card the home page opens on,
  * playing the branding reel: no frame and no fill behind it, with a caption
- * beneath. The caption is set in the mono face at --text-meta, the same
- * size and family as the hero's eyebrow and paragraph, so the three read as
- * one tier rather than three near-misses.
+ * beneath. The caption is set at --text-meta, the same size and family as
+ * the hero's eyebrow and paragraph, so the three read as one tier rather
+ * than three near-misses.
  *
  * TRAVEL. The card sweeps the full width of the hero's content box —
  * margin to margin, never past the page gutters. The amplitude is measured,
@@ -142,7 +142,7 @@ export default function Showreel() {
         {/* Label carries the ink; the action sits back in the same grey as
             the hero's eyebrow and paragraph, so the secondary tier is
             consistent across the whole section. */}
-        <figcaption className="mt-[clamp(12px,1.4vw,20px)] flex items-center justify-between gap-6 font-mono-ui text-meta leading-none text-ink">
+        <figcaption className="mt-[clamp(12px,1.4vw,20px)] flex items-center justify-between gap-6 font-manrope text-meta leading-none text-ink">
           <span>{hero.reel.label}</span>
           <span className="text-muted-2">{hero.reel.note}</span>
         </figcaption>

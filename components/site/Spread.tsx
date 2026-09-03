@@ -8,7 +8,7 @@
  * the site has, not a thing one section does — and two hand-kept copies of
  * a grid drift the first time anyone adjusts one of them.
  *
- * The rail defaults to a mono label, a hairline and an optional note. Pass
+ * The rail defaults to a small label, a hairline and an optional note. Pass
  * `rail` to replace that entirely, which is what About does to put its
  * illustration there instead. Either way the rail is a single grid cell
  * under `items-start`, so whatever leads it sits level with whatever leads
@@ -33,7 +33,7 @@ export default function Spread({
   id,
   ariaLabel,
 }: {
-  /** Mono label at the top of the default rail, e.g. "( branding )" */
+  /** Label at the top of the default rail, e.g. "( branding )" */
   eyebrow?: string;
   /** Optional line(s) under the default rail's hairline; \n is honoured */
   note?: string;
@@ -62,7 +62,7 @@ export default function Spread({
       <div className="grid grid-cols-[0.3fr_1fr] items-start gap-x-[6vw] max-b860:grid-cols-1 max-b860:gap-y-12">
         <div
           data-reveal=""
-          className="flex flex-col items-start gap-5 font-mono-ui text-meta/[1.6] text-muted-2"
+          className="flex flex-col items-start gap-5 font-manrope text-meta/[1.6] text-muted-2"
         >
           {rail ?? (
             <>
