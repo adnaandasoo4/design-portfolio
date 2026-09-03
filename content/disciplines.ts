@@ -1,10 +1,11 @@
 /*
  * Disciplines rows (§A6 #5) — copy verbatim from the reference `roles[]`.
  *
- * Rows 01 and 02 got new supporting work (user, 2026-09-03). The files are
- * named for the rows they belong to now — the old disc-brand-strategy-2 /
- * disc-digital-design-2 were named for headings these rows have not carried
- * for a while. Row 03's image is unchanged, so its filename is too.
+ * All three rows got new supporting work (user, 2026-09-03). Every file is
+ * named for the row it belongs to now — the ones they replace
+ * (disc-brand-strategy-2, disc-digital-design-2, disc-development-3) were
+ * named for headings these rows have not carried for a while, and carried
+ * version suffixes from a round of swaps nobody can reconstruct.
  */
 export type Discipline = {
   numeral: string;
@@ -64,7 +65,7 @@ export const disciplines: Discipline[] = [
     description:
       "Production-grade builds in React and TypeScript — fast, accessible front-ends where the craft survives contact with real users.",
     tags: ["react", "next.js", "typescript", "gsap", "supabase", "ci / cd"],
-    image: "/assets/disc-development-3.png",
+    image: "/assets/disc-development.png",
     line: true,
   },
 ];
