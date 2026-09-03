@@ -203,7 +203,7 @@ function BigLinkInner({ label }: { label: string }) {
  * choreography (user-removed); SR announcement retained. The underline is a
  * border-bottom (currentColor) so it spans the enter arrow too. */
 const EMAIL_FLOOD =
-  "pointer-events-none absolute -left-2.5 -right-5 -inset-y-2 bg-ink-1 opacity-0 " +
+  "pointer-events-none absolute -left-3 -right-6 -inset-y-2.5 bg-ink-1 opacity-0 " +
   "transition-opacity duration-(--dur-copy-2) ease-(--ease-std) " +
   "group-hover:opacity-100 group-hover:duration-0 " +
   "group-focus-visible:opacity-100 group-focus-visible:duration-0";
@@ -413,17 +413,72 @@ export default function Footer() {
             </nav>
           </div>
 
-          {/* RIGHT — details / socials / ask-AI columns. Mobile (MONOLOG
+          {/* RIGHT — details / socials / ask-AI across the top, email pinned
+              to the BOTTOM. The navigation list opposite runs six rows deep,
+              which left this side stopping well short of it and the corner
+              reading as unfinished; `mt-auto` on the email drops it to the
+              same depth so the two columns close together. Mobile (MONOLOG
               ref): details + socials sit side by side, ask-AI spans below. */}
-          <div className="grid grid-cols-[1.3fr_1fr_1fr] content-start gap-x-10 gap-y-10 max-b700:grid-cols-[1.25fr_1fr] max-b700:gap-x-6 max-b700:gap-y-14">
-            {/* (details) */}
-            <div>
-              <Eyebrow>{footer.detailsEyebrow}</Eyebrow>
+          <div className="flex flex-col">
+            <div className="grid grid-cols-[1.3fr_1fr_1fr] content-start gap-x-10 gap-y-10 max-b700:grid-cols-[1.25fr_1fr] max-b700:gap-x-6 max-b700:gap-y-14">
+              {/* (details) — location only; the email moved to the foot of
+                this column, below */}
+              <div>
+                <Eyebrow>{footer.detailsEyebrow}</Eyebrow>
+                <p className="mt-5 text-[16px]/[1.55] whitespace-pre-line text-muted-1 max-b700:text-[13px]/[1.55]">
+                  {footer.basedIn}
+                </p>
+              </div>
+
+              {/* (socials) — mobile: hugs the right edge like back-to-top */}
+              <div className="max-b700:justify-self-end max-b700:text-right">
+                <Eyebrow>{footer.socialsEyebrow}</Eyebrow>
+                <ul className="mt-5 flex flex-col items-start gap-1 max-b700:items-end">
+                  {footer.socials.map((s) => (
+                    <li key={s.label}>
+                      <a
+                        href={s.href}
+                        className="group relative inline-block text-[19px]/[1.2] text-ink max-b700:text-[21px]/[1.5]"
+                      >
+                        <span aria-hidden="true" className={SOCIAL_FLOOD} />
+                        <span className={SOCIAL_LABEL}>{s.label}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* (ask ai about me) — mobile: spans under both columns */}
+              <div className="max-b700:col-span-2">
+                <Eyebrow>{footer.askAiEyebrow}</Eyebrow>
+                <ul className="mt-5 flex flex-wrap items-center gap-4">
+                  {footer.askAi.map((ai) => (
+                    <li key={ai.label}>
+                      <a
+                        href={ai.base + encodeURIComponent(askAiPrompt)}
+                        target="_blank"
+                        rel="noopener"
+                        aria-label={ai.aria}
+                        className="block text-muted-3 transition-colors duration-(--dur-hover) ease-(--ease-std) hover:text-ink focus-visible:text-ink"
+                      >
+                        <AskAiIcon label={ai.label} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* (email) — the foot of this column. Set larger than it was in
+              the details cell: at the bottom of an otherwise empty stretch
+              it has to carry the corner, not just sit in it. */}
+            <div className="mt-auto pt-16 max-b860:mt-0 max-b860:pt-12">
+              <Eyebrow>{footer.emailEyebrow}</Eyebrow>
               <button
                 type="button"
                 data-foot-copy
                 onClick={onCopyClick}
-                className="group relative mt-5 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[18px]/[1.4] max-b700:text-[15px]/[1.4]"
+                className="group relative mt-5 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[clamp(20px,2.1vw,30px)]/[1.3] max-b700:text-[17px]/[1.4]"
               >
                 <span aria-hidden="true" className={EMAIL_FLOOD} />
                 {/* SR users need to know activation copies (not mails) — §A10 */}
@@ -437,47 +492,6 @@ export default function Footer() {
               <span aria-live="polite" className="sr-only">
                 {copied ? "email copied" : ""}
               </span>
-              <p className="mt-4 text-[16px]/[1.55] whitespace-pre-line text-muted-1 max-b700:text-[13px]/[1.55]">
-                {footer.basedIn}
-              </p>
-            </div>
-
-            {/* (socials) — mobile: hugs the right edge like back-to-top */}
-            <div className="max-b700:justify-self-end max-b700:text-right">
-              <Eyebrow>{footer.socialsEyebrow}</Eyebrow>
-              <ul className="mt-5 flex flex-col items-start gap-1 max-b700:items-end">
-                {footer.socials.map((s) => (
-                  <li key={s.label}>
-                    <a
-                      href={s.href}
-                      className="group relative inline-block text-[19px]/[1.2] text-ink max-b700:text-[21px]/[1.5]"
-                    >
-                      <span aria-hidden="true" className={SOCIAL_FLOOD} />
-                      <span className={SOCIAL_LABEL}>{s.label}</span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* (ask ai about me) — mobile: spans under both columns */}
-            <div className="max-b700:col-span-2">
-              <Eyebrow>{footer.askAiEyebrow}</Eyebrow>
-              <ul className="mt-5 flex flex-wrap items-center gap-4">
-                {footer.askAi.map((ai) => (
-                  <li key={ai.label}>
-                    <a
-                      href={ai.base + encodeURIComponent(askAiPrompt)}
-                      target="_blank"
-                      rel="noopener"
-                      aria-label={ai.aria}
-                      className="block text-muted-3 transition-colors duration-(--dur-hover) ease-(--ease-std) hover:text-ink focus-visible:text-ink"
-                    >
-                      <AskAiIcon label={ai.label} />
-                    </a>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </div>

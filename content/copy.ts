@@ -97,6 +97,9 @@ export const footer = {
      `nav.links` below, so the footer and the top menu can never disagree
      about what the site's navigation is (user, 2026-09-02). */
   detailsEyebrow: "( my details )",
+  /** Heads the email, which sits at the FOOT of the right column so that
+   *  side reaches the same depth as the navigation list (user, 2026-09-02). */
+  emailEyebrow: "( email )",
   basedIn: "Based in Baltimore, MD.\nWorking worldwide.",
   socialsEyebrow: "( my socials )",
   socials: [

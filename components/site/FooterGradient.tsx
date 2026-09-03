@@ -19,23 +19,16 @@
  * Interaction (their params): holding the pointer lerps amplitude ×2 and
  * clock speed ×1.5 with lerp factor 0.03/frame — flow accelerates and
  * distorts while held, relaxes on release. While hovering, a small
- * CURSOR (redesigned 2026-09-02, user request — look, colour, icon and
- * lerp all replaced). The old light-grey "hold" pill with a
- * press-and-hold glyph, trailing on a single heavy 0.055 lerp, is gone.
- * In its place, two brand-vermilion marks on TWO different speeds: a
- * hairline ring that lags (0.12) and a small filled dot that tracks almost
- * exactly (0.34). The split is the whole idea — one mark reads as the
- * cursor, the other as weight behind it, and the gap between them widens
- * with speed and closes at rest, so the pair breathes instead of merely
- * sliding. Pressing collapses it: the ring contracts and floods solid, the
- * dot is swallowed, and the word "hold" surfaces in white inside the disc
- * — the label now confirms the state rather than instructing from the
- * sidelines.
+ * CURSOR (2026-09-02, third pass — user asked for simple and in-theme).
+ * The vermilion ring-and-dot pair that preceded it was neither: two marks,
+ * two lerps and a brand colour that fought the gradient underneath. What
+ * is here now is the site's OWN hover recipe, borrowed wholesale from the
+ * nav rows and footer socials — a small uppercase mono label that trails
+ * the pointer, and on press a light flood snaps in behind it and the text
+ * flips dark. Same gesture the visitor has already met everywhere else,
+ * one mark, one lerp, no new colour. It sits beside the pointer rather
+ * than under it, since the band keeps the native arrow.
  *
- * Each mark is a POSITIONER whose transform the rAF loop owns, wrapping a
- * VISUAL that owns its own CSS-transitioned transform. Splitting them is
- * what lets the press animate at all: one element cannot be driven per
- * frame by script and transitioned by CSS on the same property.
  * DOM elements, transform/opacity only, lerped inside the same rAF loop,
  * hover+fine-pointer devices only, pointer-events: none.
  *
@@ -105,9 +98,8 @@ const TIME_SPEED = 0.008; // uTime increment per 60fps frame
 const HOLD_AMP_MULT = 2;
 const HOLD_SPEED_MULT = 1.5;
 const LERP_SPEED = 0.03; // per-frame lerp toward hold/rest targets
-/* Cursor follow — deliberately two speeds (see CURSOR above) */
-const RING_LERP = 0.12; // the lagging outline
-const DOT_LERP = 0.34; // the near-instant dot
+/* Cursor follow — one speed, trailing enough to feel weighted */
+const CURSOR_LERP = 0.16;
 /* Palette presets — color1 is always the site off-black (#111214). The
  * ember/flame hues still emerge from mix() extrapolation, so each preset
  * only names three real colors. Two options per user direction 2026-07-20:
@@ -152,8 +144,7 @@ export default function FooterGradient({
   cursor?: boolean;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const dotRef = useRef<HTMLDivElement>(null);
+  const cursorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -223,14 +214,10 @@ export default function FooterGradient({
     const finePointer = window.matchMedia(
       "(hover: hover) and (pointer: fine)",
     ).matches;
-    const ring = ringRef.current;
-    const dot = dotRef.current;
-    const ringVisual = ring?.firstElementChild as HTMLElement | null;
-    const dotVisual = dot?.firstElementChild as HTMLElement | null;
-    const ringFill =
-      ring?.querySelector<HTMLElement>("[data-cursor-fill]") ?? null;
-    const ringLabel =
-      ring?.querySelector<HTMLElement>("[data-cursor-label]") ?? null;
+    const cursor = cursorRef.current;
+    const cursorVisual = cursor?.firstElementChild as HTMLElement | null;
+    const cursorFill =
+      cursor?.querySelector<HTMLElement>("[data-cursor-fill]") ?? null;
 
     // Sim state — time/amplitude/speed accumulate in JS so the hold lerp
     // matches the reference exactly (per-frame factor, frame-rate corrected).
@@ -246,13 +233,10 @@ export default function FooterGradient({
     let lastFrame = performance.now();
     let raf = 0;
     let running = false;
-    // Cursor follow state (canvas-local px; lerped in the rAF loop).
-    // rx/ry is the lagging ring, dx/dy the near-instant dot.
+    // Cursor follow state (canvas-local px; lerped in the rAF loop)
     let cursorOn = false;
-    let rx = 0;
-    let ry = 0;
-    let dx = 0;
-    let dy = 0;
+    let cx = 0;
+    let cy = 0;
     let tx = 0;
     let ty = 0;
 
@@ -276,35 +260,31 @@ export default function FooterGradient({
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
-    /* Both marks are CENTRED on their point — the −50% offsets live on the
-       visuals as the `translate` property, leaving `transform` free here. */
+    /* The label is offset beside the pointer — the band keeps the native
+       arrow, so sitting on top of it would just collide. The offset itself
+       lives in the markup as the `translate` property, leaving `transform`
+       free for the follow. */
     const placeCursor = () => {
-      if (ring) ring.style.transform = `translate3d(${rx}px, ${ry}px, 0)`;
-      if (dot) dot.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
+      if (cursor) cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0)`;
     };
 
-    /** Frame-rate-corrected, so the gap between ring and dot is the same at
-     *  any refresh rate rather than twice as tight at 120Hz. */
+    /** Frame-rate-corrected, so the trail is the same weight at 120Hz as
+     *  at 60 rather than half as heavy. */
     const moveCursor = (frames: number) => {
       if (!cursorOn) return;
-      const kr = 1 - Math.pow(1 - RING_LERP, frames);
-      const kd = 1 - Math.pow(1 - DOT_LERP, frames);
-      rx += (tx - rx) * kr;
-      ry += (ty - ry) * kr;
-      dx += (tx - dx) * kd;
-      dy += (ty - dy) * kd;
+      const k = 1 - Math.pow(1 - CURSOR_LERP, frames);
+      cx += (tx - cx) * k;
+      cy += (ty - cy) * k;
       placeCursor();
     };
 
-    /** The press: ring contracts and floods, dot is swallowed, label shows.
-     *  Written as inline styles because the CLASSES declare the transitions
-     *  — script sets the target, CSS does the interpolation. */
+    /** The press, in the site's own hover language: flood snaps in, text
+     *  flips dark against it. Script sets the target, the CLASSES declare
+     *  the transitions. */
     const setHold = (on: boolean) => {
-      if (ringVisual)
-        ringVisual.style.transform = on ? "scale(0.8)" : "scale(1)";
-      if (dotVisual) dotVisual.style.transform = on ? "scale(0)" : "scale(1)";
-      if (ringFill) ringFill.style.opacity = on ? "1" : "0";
-      if (ringLabel) ringLabel.style.opacity = on ? "1" : "0";
+      if (cursorFill) cursorFill.style.opacity = on ? "1" : "0";
+      if (cursorVisual)
+        cursorVisual.style.color = on ? "var(--color-on-art-ink)" : "";
     };
 
     const loop = () => {
@@ -366,22 +346,19 @@ export default function FooterGradient({
       holding = false;
       setHold(false);
       cursorOn = false;
-      if (ring) ring.style.opacity = "0";
-      if (dot) dot.style.opacity = "0";
+      if (cursor) cursor.style.opacity = "0";
     };
     const onMove = (e: PointerEvent) => {
       const r = canvas.getBoundingClientRect();
       tx = e.clientX - r.left;
       ty = e.clientY - r.top;
       if (!cursorOn) {
-        // Snap BOTH marks onto the pointer on entry, or they would fly in
-        // from 0,0 and the ring would arrive a beat late every time.
-        rx = dx = tx;
-        ry = dy = ty;
+        // Snap onto the pointer on entry, or it flies in from 0,0
+        cx = tx;
+        cy = ty;
         cursorOn = true;
         placeCursor();
-        if (ring) ring.style.opacity = "1";
-        if (dot) dot.style.opacity = "1";
+        if (cursor) cursor.style.opacity = "1";
       }
     };
     if (!reduced) {
@@ -428,38 +405,22 @@ export default function FooterGradient({
       {/* Canvas host — the canvas itself is created fresh per mount (see
           effect) so a lost WebGL context can never be inherited */}
       <div ref={hostRef} aria-hidden="true" className="absolute inset-0" />
-      {/* CURSOR — two brand marks on two speeds (see CURSOR at the top).
-          Each is a POSITIONER, whose transform the rAF loop writes, wrapping
-          a VISUAL that owns its own CSS-transitioned transform for the
-          press. The −50% centring is the `translate` property, so it never
-          collides with either transform. */}
+      {/* CURSOR — the site's own flood-and-invert hover, following the
+          pointer. The positioner's transform is written per frame by the
+          rAF loop; the offset beside the arrow is the `translate` property
+          on the visual, so the two never collide. */}
       <div
-        ref={ringRef}
+        ref={cursorRef}
         aria-hidden="true"
         className="pointer-events-none absolute top-0 left-0 opacity-0 transition-opacity duration-(--dur-hover) ease-(--ease-std)"
       >
-        <div className="relative size-[54px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-brand [transform:scale(1)] transition-[transform] duration-(--dur-copy) ease-(--ease-out-quart)">
-          {/* Flood — fades in under the label on press */}
+        <span className="relative inline-block translate-x-5 -translate-y-1/2 px-2 py-1.5 font-mono-ui text-[11px] leading-none tracking-[0.16em] text-on-art uppercase transition-colors duration-(--dur-copy) ease-(--ease-std)">
           <span
             data-cursor-fill=""
-            className="absolute inset-0 rounded-full bg-brand opacity-0 transition-opacity duration-(--dur-copy) ease-(--ease-std)"
+            className="absolute inset-0 bg-on-art opacity-0 transition-opacity duration-(--dur-copy) ease-(--ease-std)"
           />
-          {/* Label — white on the vermilion flood, so it only ever reads
-              against a colour it is guaranteed to clear */}
-          <span
-            data-cursor-label=""
-            className="absolute inset-0 grid place-items-center text-[10px] leading-none font-medium tracking-[0.16em] text-brand-ink uppercase opacity-0 transition-opacity duration-(--dur-copy) ease-(--ease-std)"
-          >
-            {footer.holdLabel}
-          </span>
-        </div>
-      </div>
-      <div
-        ref={dotRef}
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-0 opacity-0 transition-opacity duration-(--dur-hover) ease-(--ease-std)"
-      >
-        <div className="size-[6px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand [transform:scale(1)] transition-[transform] duration-(--dur-copy) ease-(--ease-out-quart)" />
+          <span className="relative">{footer.holdLabel}</span>
+        </span>
       </div>
     </>
   );
