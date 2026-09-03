@@ -24,10 +24,30 @@ export const EMAIL = "adnaandasoo@gmail.com";
  * arrives.
  */
 export const hero = {
-  /** Eyebrow — one array item per display line */
+  /** Eyebrow — one array item per display line on desktop. On the phone the
+   *  lines run together and wrap to the measure instead (user, 2026-09-03):
+   *  breaks authored for a desktop column just wrap a second time there. */
   eyebrow: ["For B2B tech teams that have", "outgrown their website"],
-  /** Masthead headline — one array item per display line */
-  headline: ["BRANDING & WEBSITES", "THAT MOVE B2B TECH", "TEAMS FORWARD"],
+  /* Masthead headline. NOT one item per line: the desktop and phone line
+     breaks fall in different places, so the copy is stored as the segments
+     between EVERY break either layout needs, and each says where it ends a
+     line. Hero toggles the <br> elements with a CSS variant, which keeps the
+     headline a single run of text — one copy for screen readers, and one
+     element for SplitText to split.
+
+       desktop (3)   BRANDING & WEBSITES / THAT MOVE B2B TECH / TEAMS FORWARD
+       phone   (4)   BRANDING & / WEBSITES THAT / MOVE B2B TECH / TEAMS FORWARD
+
+     Four on the phone, at the user's direction (2026-09-03), and authored
+     rather than left to wrap: at 9.4vw the three desktop lines each broke
+     again, which is five or six ragged rows. */
+  headline: [
+    { text: "BRANDING &", breakAfter: "mobile" },
+    { text: "WEBSITES", breakAfter: "desktop" },
+    { text: "THAT", breakAfter: "mobile" },
+    { text: "MOVE B2B TECH", breakAfter: "all" },
+    { text: "TEAMS FORWARD" },
+  ] satisfies { text: string; breakAfter?: "all" | "desktop" | "mobile" }[],
   /** Right-hand paragraph, bottom-aligned to the headline */
   paragraph:
     "We partner with ambitious B2B teams, scale-ups and brands to unlock their true potential and growth through strategy, design and technology.",

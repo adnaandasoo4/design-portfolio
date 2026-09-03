@@ -48,6 +48,17 @@
  * site rather than its loudest. The line-height on the secondary tier eases
  * to 1.5 with the size, as it does everywhere else here.
  *
+ * At that size the headline's three authored lines each broke again, so the
+ * phone gets four authored lines of its own — see content/copy, where the
+ * headline is stored as the segments between every break either layout
+ * needs. The <br> elements are all in the DOM; a CSS variant decides which
+ * ones display. That keeps the headline ONE run of text: one copy for
+ * screen readers, and one element for SplitText, which is what a second
+ * hidden variant would have cost.
+ *
+ * The eyebrow goes the other way — its authored breaks are dropped below
+ * 700px and it simply wraps to the measure.
+ *
  * INTRO (rebuilt 2026-09-03, twice). ONE gesture, in ONE direction, on ONE
  * ease. Three moves, overlapping so heavily they read as a single event:
  *
@@ -87,7 +98,7 @@
  * markup renders visible and complete.
  */
 
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { gsap, useGSAP, SplitText } from "@/lib/gsap/register";
 import { DUR, EASE, MQ } from "@/lib/gsap/motion";
 import { onPreloaderDone } from "@/lib/preloader";
@@ -106,6 +117,15 @@ const REEL_OVERSCAN = 1.22;
 /** The settle outlasts the wipe, so the reel is still arriving after its
  *  edge has stopped — the part that reads as weight. */
 const SETTLE_STRETCH = 1.3;
+
+/** Which widths each authored break applies at. The <br> is always in the
+ *  DOM; only its `display` changes, so the headline stays one run of text
+ *  for SplitText and for screen readers. */
+const BREAK_AT = {
+  all: "",
+  desktop: "max-b700:hidden",
+  mobile: "hidden max-b700:inline",
+} as const;
 
 /* Timeline positions, in seconds. Every move starts before the one above it
    has finished; played end to end this is a queue, not an opening. */
@@ -218,9 +238,14 @@ export default function Hero() {
           data-hero-line=""
           className="font-manrope text-meta-lg/[1.6] tracking-[0.02em] text-muted-2 max-b700:text-[17px]/[1.5]"
         >
+          {/* Block on desktop, so the authored breaks hold; inline below
+              700px, so the two lines run together and wrap to the phone's
+              measure rather than breaking twice (user, 2026-09-03). The
+              trailing space only separates words once they are inline — it
+              collapses under `block`. */}
           {hero.eyebrow.map((line) => (
-            <span key={line} className="block">
-              {line}
+            <span key={line} className="block max-b700:inline">
+              {line}{" "}
             </span>
           ))}
         </p>
@@ -230,10 +255,20 @@ export default function Hero() {
             data-hero-line=""
             className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-bold tracking-[-0.02em] text-ink uppercase max-b700:text-[9.4vw]"
           >
-            {hero.headline.map((line) => (
-              <span key={line} className="block">
-                {line}
-              </span>
+            {hero.headline.map((segment, i) => (
+              <Fragment key={segment.text}>
+                {/* The separating space sits BEFORE each segment, so on the
+                    width where the preceding break is showing it lands at
+                    the start of a line and collapses. */}
+                {i > 0 ? " " : null}
+                {segment.text}
+                {segment.breakAfter ? (
+                  <br
+                    aria-hidden="true"
+                    className={BREAK_AT[segment.breakAfter]}
+                  />
+                ) : null}
+              </Fragment>
             ))}
           </h1>
 

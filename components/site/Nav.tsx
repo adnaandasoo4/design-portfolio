@@ -70,6 +70,12 @@ const ROW_LINK =
   "group relative flex w-full items-center py-[7px] pr-4 pl-5 text-[15px]/[1.3] " +
   "font-medium text-ink";
 
+/* Same recipe at full-screen scale: bigger type, taller target, and the
+   flood spanning the gutters rather than a dropdown's width. */
+const SHEET_LINK =
+  "group relative flex w-full items-center py-[14px] " +
+  "text-[clamp(30px,9vw,44px)]/[1.15] font-medium text-ink";
+
 const FLOOD =
   "pointer-events-none absolute inset-0 bg-ink-1 opacity-0 " +
   "transition-opacity duration-(--dur-copy-2) ease-(--ease-std) " +
@@ -85,6 +91,48 @@ const LABEL =
 
 /* Extra travel past the viewport's top edge, so nothing sits flush to it */
 const OUT_PAD_PX = 12;
+
+/** The link rows, rendered identically into the desktop dropdown and the
+ *  phone's full-screen panel. Only `rowClass` differs — same targets, same
+ *  handlers, so the two menus cannot drift apart in behaviour. */
+function MenuRows({
+  rowClass,
+  goRoute,
+  goScroll,
+}: {
+  rowClass: string;
+  goRoute: (target: string) => (e: MouseEvent<HTMLAnchorElement>) => void;
+  goScroll: (target: string) => (e: MouseEvent<HTMLAnchorElement>) => void;
+}) {
+  return (
+    <>
+      {navCopy.links.map((link, i) => (
+        <li key={link.label}>
+          {link.type === "route" ? (
+            <Link
+              data-navlink=""
+              href={link.target}
+              onClick={goRoute(link.target)}
+              className={rowClass}
+            >
+              <RowInner label={link.label} index={i} />
+            </Link>
+          ) : (
+            <Link
+              data-navlink=""
+              data-scrollto={link.target}
+              href={`/${link.target}`}
+              onClick={goScroll(link.target)}
+              className={rowClass}
+            >
+              <RowInner label={link.label} index={i} />
+            </Link>
+          )}
+        </li>
+      ))}
+    </>
+  );
+}
 
 function RowInner({ label, index }: { label: string; index: number }) {
   return (
@@ -107,6 +155,7 @@ function RowInner({ label, index }: { label: string; index: number }) {
 export default function Nav() {
   const scope = useRef<HTMLElement>(null);
   const menuWrap = useRef<HTMLDivElement>(null);
+  const sheet = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -145,7 +194,16 @@ export default function Nav() {
       menuWrap.current?.querySelector("button")?.focus();
     };
     const onDown = (e: PointerEvent) => {
-      if (!menuWrap.current?.contains(e.target as Node)) setOpen(false);
+      // The phone sheet lives outside menuWrap (it has to — see its note in
+      // the markup), so it needs counting as "inside" too. Without this, a
+      // pointerdown on one of its links closed the menu before the click
+      // that follows could navigate.
+      const node = e.target as Node;
+      if (
+        !menuWrap.current?.contains(node) &&
+        !sheet.current?.contains(node)
+      )
+        setOpen(false);
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onDown);
@@ -245,6 +303,40 @@ export default function Nav() {
       aria-label="Primary"
       className="pointer-events-none fixed inset-x-0 top-0 z-(--z-nav) px-5 py-5 max-b700:px-4 max-b700:py-4"
     >
+      {/* ---- Phone: the menu is a full screen (user, 2026-09-03) ----
+
+          It is a child of the NAV, not of the bar, and that is structural,
+          not stylistic: the bar carries a GSAP transform for its swipe, and
+          a transformed element becomes the containing block for any `fixed`
+          descendant — a `fixed inset-0` panel inside it would size to the
+          44px bar instead of the viewport. The nav root is untransformed, so
+          here it resolves against the viewport.
+
+          It also sits BEFORE the bar in source order, so the bar paints over
+          it and the Menu button — now an × — and the theme toggle stay live
+          on top of the open sheet. `invisible` when closed takes the whole
+          subtree out of the tab order; the clip-path handles the pointer,
+          since a clipped-away region is untargetable. */}
+      <div
+        ref={sheet}
+        id="nav-menu-sheet"
+        className={`pointer-events-auto fixed inset-0 hidden bg-bg [transition:clip-path_var(--dur-copy)_var(--ease-out-quart),visibility_0s_linear_var(--vis-delay)] motion-reduce:transition-none max-b700:block ${
+          open
+            ? "visible [--vis-delay:0s] [clip-path:inset(0_0_0_0)]"
+            : "invisible [--vis-delay:var(--dur-copy)] [clip-path:inset(0_0_100%_0)]"
+        }`}
+      >
+        {/* pt clears the bar: the nav's 16px phone gutter plus the 44px
+            button. justify-center puts the rows in the space that leaves. */}
+        <ul className="flex h-full flex-col justify-center px-4 pt-[60px] pb-[12vh]">
+          <MenuRows
+            rowClass={SHEET_LINK}
+            goRoute={goRoute}
+            goScroll={goScroll}
+          />
+        </ul>
+      </div>
+
       {/* The bar is the moving part — see SCROLL BEHAVIOUR above */}
       <div
         data-chrome-bar=""
@@ -279,7 +371,7 @@ export default function Nav() {
             <button
               type="button"
               aria-expanded={open}
-              aria-controls="nav-menu-panel"
+              aria-controls="nav-menu-panel nav-menu-sheet"
               onClick={() => setOpen((o) => !o)}
               className={`flex h-11 w-[clamp(160px,14vw,196px)] cursor-pointer items-center justify-between rounded-t-btn bg-raise-2 pr-4 pl-5 text-[15px] leading-none font-medium text-ink max-b700:w-[124px] max-b700:pr-3 max-b700:pl-4 ${
                 open ? "" : "rounded-b-btn"
@@ -329,7 +421,7 @@ export default function Nav() {
               }`}
             >
               <div
-                className={`overflow-hidden rounded-b-btn bg-raise-2 [transition:clip-path_var(--dur-copy)_var(--ease-out-quart)] motion-reduce:transition-none ${
+                className={`overflow-hidden rounded-b-btn bg-raise-2 max-b700:hidden [transition:clip-path_var(--dur-copy)_var(--ease-out-quart)] motion-reduce:transition-none ${
                   open
                     ? "[clip-path:inset(0_0_0_0)]"
                     : "[clip-path:inset(0_0_100%_0)]"
@@ -342,30 +434,11 @@ export default function Nav() {
                       : "[transform:translateY(-100%)]"
                   }`}
                 >
-                  {navCopy.links.map((link, i) => (
-                    <li key={link.label}>
-                      {link.type === "route" ? (
-                        <Link
-                          data-navlink=""
-                          href={link.target}
-                          onClick={goRoute(link.target)}
-                          className={ROW_LINK}
-                        >
-                          <RowInner label={link.label} index={i} />
-                        </Link>
-                      ) : (
-                        <Link
-                          data-navlink=""
-                          data-scrollto={link.target}
-                          href={`/${link.target}`}
-                          onClick={goScroll(link.target)}
-                          className={ROW_LINK}
-                        >
-                          <RowInner label={link.label} index={i} />
-                        </Link>
-                      )}
-                    </li>
-                  ))}
+                  <MenuRows
+                    rowClass={ROW_LINK}
+                    goRoute={goRoute}
+                    goScroll={goScroll}
+                  />
                 </ul>
               </div>
             </div>

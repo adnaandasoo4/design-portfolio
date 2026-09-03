@@ -8,6 +8,7 @@
  * 30svh. Top block: "(navigation)" big-link list (left) + details /
  * socials / ask-AI columns (right); meta row (live Baltimore clock ·
  * back-to-top · copyright) spans toward the right, pinned above the band.
+ * Back-to-top is dropped below 700px (user, 2026-09-03).
  * Big-link type is clamped by BOTH width and height (min(3.2vw, 6svh))
  * so five rows + meta always clear 70svh at desktop heights ~700–1100px
  * (row padding is py-1.5 — the fifth row ate the py-2 slack at ~700px).
@@ -629,11 +630,14 @@ export default function Footer() {
         <div className="mt-auto flex flex-wrap items-end justify-between gap-x-6 gap-y-6 pt-6 text-[19px]/[1.5]">
           <LocalClock />
           <div className="flex flex-col items-end gap-2 text-right">
+            {/* Dropped below 700px (user, 2026-09-03) — a phone's own
+                gestures already do this, and the footer's last row is
+                tighter for losing it. */}
             <button
               type="button"
               data-back-top
               onClick={() => scrollToTop()}
-              className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[19px]/[1.5] text-ink transition-transform duration-(--dur-copy-2) ease-(--ease-out-expo) motion-safe:hover:-translate-y-0.5 motion-safe:focus-visible:-translate-y-0.5 max-b700:text-[15px]/[1.5]"
+              className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[19px]/[1.5] text-ink transition-transform duration-(--dur-copy-2) ease-(--ease-out-expo) motion-safe:hover:-translate-y-0.5 motion-safe:focus-visible:-translate-y-0.5 max-b700:hidden"
             >
               {footer.backToTop}
               <svg
