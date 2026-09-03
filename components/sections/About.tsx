@@ -21,11 +21,16 @@
  * full narrative, not copies, so the two cannot drift.
  *
  * The teaser runs the full width of its column, matching the heading above
- * it (user, 2026-09-03). It is the larger --text-meta-lg tier in full `ink`
- * rather than small and grey (user, 2026-09-03): the section has no other
- * body copy for it to be the quiet part OF, so it is the section's second
- * voice, not its footnote. Line-height eases to 1.75 to carry the extra
- * size across a long measure.
+ * it. It sets at --text-lead — the SAME size as the "Read more" beneath it
+ * (user, 2026-09-03), so the copy and the link it belongs to are one voice
+ * rather than a paragraph with a footnote. It went ink for a few hours the
+ * same day and is grey again at the user's direction: at this size the copy
+ * no longer needs the contrast to hold the section, and grey keeps the h2
+ * as the only full-strength ink in it.
+ *
+ * Line-height tightens to 1.45 and the paragraph gap to 0.9em, both because
+ * the size went up: leading and gaps that read as generous at 15px read as
+ * gappy at 26.
  *
  * The layout itself lives in components/site/Spread, shared with the
  * Branding page, so the two cannot drift apart.
@@ -149,7 +154,7 @@ export default function About() {
         >
           {aboutSection.statement}
         </h2>
-        <div className="mt-[clamp(28px,4vh,56px)] flex flex-col gap-[1.1em] font-manrope text-meta-lg/[1.75] text-ink">
+        <div className="mt-[clamp(28px,4vh,56px)] flex flex-col gap-[0.9em] font-manrope text-lead/[1.45] text-muted-2">
           {aboutSection.paragraphs.map((paragraph) => (
             <p key={paragraph.slice(0, 24)} data-reveal="">
               {paragraph}

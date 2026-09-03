@@ -29,14 +29,20 @@
 
 /* The two paragraphs the home About section shows. Declared above `about`
    so the page and the home section point at one string each, never a copy.
-   THE EYE is the personal beat; THE OFFER is what the two halves add up to
+   THE_EYE is the personal beat; THE_OFFER is what the two halves add up to
    in practice, and it closes the page's narrative as well as the home
-   section (user, 2026-09-03). */
+   section (user, 2026-09-03).
+
+   Both were cut down later the same day (user): they now set at --text-lead,
+   which is roughly a third larger than the tier they were written for, and
+   copy that reads as measured at 15px reads as a speech at 26. THE_EYE also
+   lost its "proportion, weight, feels settled" clause — the user did not
+   want the work described in those terms. */
 const THE_EYE =
-  "I have always been pulled toward how things look. Not decoration — proportion, weight, the reason one version of a thing feels settled and the next one doesn’t. Long before I had a word for it, I was moving things a few pixels at a time until they sat right.";
+  "Design came first. I cared how things looked long before I could explain why, and I have never been able to leave something alone until it was right.";
 
 const THE_OFFER =
-  "Holding both halves is the point. Design taste on its own draws things that cannot be built the way they were drawn; engineering on its own builds things that are correct and forgettable. Together they let me take a brand the whole way — visual direction, identity and the system that carries it, through to the site itself — with no handoff in the middle for the intent to leak out of. That is worth most to brands who have outgrown their digital presence: the ones whose product has moved on and whose website has not.";
+  "Engineering came later, and the two turned out to be one job. I take a brand the whole way — visual direction, identity, and the site that carries it — so nothing is lost in a handoff. That matters most to brands whose product has moved on and whose website has not.";
 
 export const about = {
   eyebrow: { latin: "( about )", ja: "概要" },

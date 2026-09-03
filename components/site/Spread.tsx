@@ -8,6 +8,11 @@
  * the site has, not a thing one section does — and two hand-kept copies of
  * a grid drift the first time anyone adjusts one of them.
  *
+ * The content column carries a right inset equal to the column gap, so the
+ * copy is inset from the page edge by the same 6vw that separates it from
+ * the rail. Shared, which means the Branding page's four sections take the
+ * measure change too — that is the format doing its job, not a side effect.
+ *
  * The rail defaults to a small label, a hairline and an optional note. Pass
  * `rail` to replace that entirely, which is what About does to put its
  * illustration there instead. Either way the rail is a single grid cell
@@ -58,7 +63,15 @@ export default function Spread({
       } ${className}`}
     >
       {/* items-start keeps each column's first element on the row's top edge
-          — that alignment is the grid's job, not a margin's. */}
+          — that alignment is the grid's job, not a margin's.
+
+          The 6vw gutter is used TWICE: once as the column gap, and again as
+          the content column's right inset, so the copy ends as far from the
+          page edge as it begins from the rail (user, 2026-09-03). The two
+          numbers must stay equal — that is the whole point of the rule — so
+          treat them as one value in two places. Below 860px the columns
+          stack and the inset goes, since there is no rail beside the copy to
+          balance against. */}
       <div className="grid grid-cols-[0.3fr_1fr] items-start gap-x-[6vw] max-b860:grid-cols-1 max-b860:gap-y-12">
         <div
           data-reveal=""
@@ -76,7 +89,7 @@ export default function Spread({
           )}
         </div>
 
-        <div>{children}</div>
+        <div className="pr-[6vw] max-b860:pr-0">{children}</div>
       </div>
     </section>
   );

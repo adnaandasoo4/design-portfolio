@@ -2,9 +2,14 @@
 
 /*
  * ArrowLink — the arrow-tailed text-link idiom (§A6 #4 work-list "See All",
- * the home About section's "Read more"): Manrope 500 clamp(20px,1.8vw,26px)
- * `text-ink` label + 26×26 stroked arrow. Focus ring comes from the global
+ * the home About section's "Read more"): Manrope 500 at --text-lead in
+ * `text-ink`, plus a 26×26 stroked arrow. Focus ring comes from the global
  * :focus-visible rule (§A10).
+ *
+ * That size token is SHARED with the About section's body copy (user,
+ * 2026-09-03): the paragraphs and the link that follows them are one voice,
+ * and a link set smaller than the copy it belongs to reads as a footnote to
+ * it. Change the token, not this class.
  *
  * HOVER (2026-09-03) — the site's shared text-link motion, the same recipe
  * the footer's big links and the nav's menu rows use: label and arrow glide
@@ -52,7 +57,7 @@ export default function ArrowLink({
     <Link
       href={href}
       onClick={goRoute(href)}
-      className={`group inline-flex items-center gap-3.5 font-medium leading-none text-ink text-[clamp(20px,1.8vw,26px)] ${className}`}
+      className={`group inline-flex items-center gap-3.5 font-medium leading-none text-ink text-lead ${className}`}
     >
       <span className={LABEL}>{children}</span>
       <svg
