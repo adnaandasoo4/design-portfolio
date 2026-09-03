@@ -46,9 +46,10 @@ export const hero = {
     alt: "Branding showreel",
     /** Caption under the card — label left, action right. Set in the mono
      *  face at --text-meta so it reads as one tier with the hero's eyebrow
-     *  and paragraph. The parentheses match the footer's eyebrows. */
-    label: "( projects showreel )",
-    note: "watch",
+     *  and paragraph. Title case and unbracketed (user, 2026-09-03); it no
+     *  longer borrows the footer eyebrows' parenthesised lowercase. */
+    label: "Projects Showreel",
+    note: "Watch",
   },
 };
 
