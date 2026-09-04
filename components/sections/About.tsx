@@ -12,12 +12,18 @@
  * spacing, ragged right. Every gap that opens is a per-word `x` transform,
  * and that is the whole trick.
  *
- * Each line is measured for SLACK: the room between where its last word
- * naturally ends and the right edge of the measure. That slack is what the
- * line has to give away. As it is handed out, the line's last word walks to
- * the right edge and the paragraph arrives justified — without ever having
- * been justified, and without a single re-wrap, because the browser fixed
- * the line breaks once before any transform was applied.
+ * Each line is measured for ROOM: everything it is not using at its natural
+ * setting. That room is what the line has to give away, and it is spent from
+ * the MIDDLE — the line carries an offset of half whatever it has not spent
+ * yet, so it sits centred in the measure at rest and flush once it is fully
+ * open. The paragraph therefore arrives justified without ever having been
+ * justified, and without a single re-wrap, because the browser fixed the
+ * line breaks once before any transform was applied.
+ *
+ * Centring from the middle rather than anchoring at the left matters more
+ * than it sounds (user, 2026-09-04): left-anchored, every line was short on
+ * the right by however much it had still to open, and a block with perfectly
+ * even margins read as shoved to the left.
  *
  * ── ONE WAY, NOT BACK AND FORTH (user, 2026-09-04) ───────────────────────
  * The previous version oscillated: every gap ran a sine, so words drifted
@@ -94,12 +100,15 @@ function ease(t: number) {
 }
 
 type Line = {
-  /** One setter per word; index 0 never moves, it anchors the line. */
   setters: ((value: number) => void)[];
   /** Per-GAP — each array is setters.length - 1 long. */
   share: number[];
   from: number[];
   to: number[];
+  /** Everything the line is not using at its natural setting. Half of what
+   *  is still unspent is the line's centring offset. */
+  room: number;
+  /** How much of `room` the gaps are allowed to take. */
   slack: number;
 };
 
@@ -130,6 +139,9 @@ export default function About() {
           });
 
           let lines: Line[] = [];
+          // Reused every frame — this runs on every scroll event, so the
+          // per-frame work allocates nothing.
+          const offsets: number[] = [];
 
           /** Read the slack straight out of the browser's own layout. Re-run
            *  on every refresh, since a resize re-wraps every line and every
@@ -146,10 +158,8 @@ export default function About() {
                 const last = words[words.length - 1];
                 const natural =
                   last.offsetLeft + last.offsetWidth - first.offsetLeft;
-                const slack = Math.max(
-                  0,
-                  Math.min(column - natural, natural * MAX_SPREAD),
-                );
+                const room = Math.max(0, column - natural);
+                const slack = Math.min(room, natural * MAX_SPREAD);
 
                 const gaps = words.length - 1;
                 // Seeded off the line's length as well as the gap index, so
@@ -186,6 +196,7 @@ export default function About() {
                   share,
                   from,
                   to,
+                  room,
                   slack,
                 } as Line;
               })
@@ -195,19 +206,36 @@ export default function About() {
           /**
            * @param p 0..1 across the section's transit
            *
-           * Each gap contributes `share · slack` once its own window has
-           * run. Because every share is a fraction of one, a fully-open line
-           * has given away exactly its slack and not a pixel more — the
-           * right edge lands where it was measured to land.
+           * Each gap contributes `share · slack` once its own window has run.
+           * Every share is a fraction of one, so a fully-open line has given
+           * away exactly its slack and not a pixel more.
+           *
+           * CENTRED, not left-anchored (user, 2026-09-04). The line is offset
+           * by half of whatever room it has NOT yet spent, so at rest it sits
+           * centred in the measure and at full spread — when nothing is left
+           * unspent — it sits flush. Anchoring at the left instead left every
+           * line short on the right by however much it had still to open,
+           * which is what made a symmetrically centred block read as pushed
+           * to the left.
+           *
+           * Each word still travels one way only: the first walks left as the
+           * line opens, the rest walk right, and none of them turns around.
            */
           const apply = (p: number) => {
             for (const line of lines) {
               const gaps = line.from.length;
-              let run = 0;
-              line.setters[0](0);
+
+              let opened = 0;
               for (let g = 0; g < gaps; g++) {
                 const t = (p - line.from[g]) / (line.to[g] - line.from[g]);
-                run += line.share[g] * line.slack * ease(t);
+                offsets[g] = line.share[g] * line.slack * ease(t);
+                opened += offsets[g];
+              }
+
+              let run = (line.room - opened) / 2;
+              line.setters[0](run);
+              for (let g = 0; g < gaps; g++) {
+                run += offsets[g];
                 line.setters[g + 1](run);
               }
             }
