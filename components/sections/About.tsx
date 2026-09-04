@@ -166,19 +166,18 @@ export default function About() {
       aria-label="About"
       className="relative z-(--z-section) bg-bg px-5 py-[clamp(160px,24vh,300px)] max-b700:px-4 max-b700:py-24"
     >
-      {/* Spans the page, centred, on a tighter inner margin than the site
-          gutter — the paragraph is the only thing in the section. */}
-      <div className="mx-auto w-full max-w-[1600px] px-[clamp(0px,4vw,96px)]">
-        <div data-glare-stack="" className="relative">
-          <Statement />
-          {/* The lit copy: same text, same box, clipped to the circle. */}
-          <Statement
-            lit
-            data-glare=""
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0"
-          />
-        </div>
+      {/* Edge to edge on the site's own gutters (user, 2026-09-04) — no inner
+          inset and no max-width, so the measure is the page's, the same one
+          the nav and every other section sit on. */}
+      <div data-glare-stack="" className="relative">
+        <Statement />
+        {/* The lit copy: same text, same box, clipped to the circle. */}
+        <Statement
+          lit
+          data-glare=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+        />
       </div>
     </section>
   );
