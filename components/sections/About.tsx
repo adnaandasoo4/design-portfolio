@@ -1,59 +1,90 @@
 "use client";
 
 /*
- * About (§A6 #2) — rebuilt 2026-09-04 as a scroll set piece.
+ * About (§A6 #2) — the home page's scroll set piece (user, 2026-09-04).
  *
- * The section used to be a teaser: a statement, two paragraphs borrowed from
- * /about, and a "read more". All of that is on /about now, in full. What is
- * left is ONE statement and ONE picture, and the section earns its place on
- * the home page through motion rather than through more words.
+ * One statement, one picture, and two moves tied to the same scroll.
  *
- * TWO SCRUBBED MOVES, both tied to the same scroll, both transform-only
- * (§A7). Neither is decoration on a layout that would look finished without
- * it — the whole section is built around them:
+ * ── THE WORDS ────────────────────────────────────────────────────────────
+ * The paragraph is set NORMALLY in the markup: left-aligned, ordinary word
+ * spacing, ragged right. Every gap you see opening is a per-word `x`
+ * transform, and that is the whole trick.
  *
- *   WORDS. The statement is set JUSTIFIED, so the browser opens real gaps
- *   between words to fill each line. Every word then starts pulled LEFT by
- *   an amount proportional to how far into its line it sits, and scrubs back
- *   to zero as the section rises. Words near a line's start barely move;
- *   words at its end travel furthest. The line therefore arrives compressed
- *   and unpacks itself left to right, the gaps opening as you scroll.
+ * Each line is measured for SLACK — the room between where its last word
+ * naturally ends and the right edge of the column — and that slack is handed
+ * out across the line's gaps as scroll progress rises. At full spread the
+ * line's last word lands exactly on the right edge, so the paragraph reads
+ * as justified without ever having been justified. At zero it is back to its
+ * natural setting. Nothing re-wraps at any point in between, because the
+ * line breaks were fixed by the browser once, before a single transform was
+ * applied.
  *
- *   Pulling left rather than pushing right is deliberate: the offsets are
- *   negative, so words only ever move INTO the measure. Spreading them the
- *   other way would push the last word of every line past the column and
- *   need clipping to hide it.
+ * The gaps are UNEVEN by design: each one takes a different share of the
+ * slack, from a hash of the word's index, so the spacing looks set by hand
+ * rather than by an algorithm — which is what the reference actually looks
+ * like. The share is deterministic, so it never changes between loads.
  *
- *   IMAGE. The illustration starts at the top of its column and falls to the
- *   bottom across the section's whole transit of the viewport. The distance
- *   is MEASURED — the track's height less the picture's — and re-measured on
- *   refresh, so the fall always ends exactly at the floor of the column
- *   whatever the text wraps to at that width.
+ * APART AND TOGETHER: progress drives `sin(p·π)`, so the words are at their
+ * natural spacing as the section enters, spread to full justification as it
+ * crosses the middle of the viewport, and close again as it leaves. Scroll
+ * up and it runs backwards. It is a position, not a playback — the paragraph
+ * only ever moves as fast as you scroll it.
  *
- * Both are `ease: none` and scrubbed: the section does not play an animation
- * at you, it is driven entirely by how fast you scroll, which is the whole
- * point of the effect.
+ * Doing it with transforms rather than by animating `word-spacing` is what
+ * keeps this affordable: word-spacing is a layout property, so animating it
+ * would re-wrap and re-lay-out the paragraph on every frame of every scroll.
+ * The visible result is the same; only the cost differs.
  *
- * SplitText runs only after document.fonts.ready (§A7): split against the
- * fallback face and the words are measured at the wrong widths, so every
- * offset is computed from a layout that no longer exists once the real face
- * lands.
+ * ── THE PICTURE ──────────────────────────────────────────────────────────
+ * It starts level with the first line of the statement, rides up with the
+ * page until it clears the fixed nav, then PINS — the words keep scrolling
+ * past on the left while it holds still. It is released after exactly the
+ * column's slack (track height less its own), which is the scroll distance
+ * that puts its bottom edge on the bottom of the text. From there it scrolls
+ * away with everything else.
  *
- * Reduced motion: the branch is intentionally empty — the statement sets
- * justified and static, the picture sits at the top of its column, and the
- * section reads as an ordinary two-column spread.
+ * ── MOBILE AND REDUCED MOTION ────────────────────────────────────────────
+ * Neither move exists below 700px (user, 2026-09-04): no split, no pin, and
+ * the statement is exactly what the markup says — an ordinary paragraph. A
+ * justified-by-transform paragraph at phone measure is three or four words a
+ * line with canyons between them, and a pinned picture on a screen that
+ * short is a picture that never appears to move. Reduced motion opts out of
+ * both for the same reason it opts out of everything else.
  */
 import { useRef } from "react";
 import Image from "next/image";
-import { gsap, useGSAP, SplitText } from "@/lib/gsap/register";
+import { gsap, useGSAP, ScrollTrigger, SplitText } from "@/lib/gsap/register";
 import { MQ } from "@/lib/gsap/motion";
 import ArrowLink from "@/components/site/ArrowLink";
 import { aboutSection } from "@/content/copy";
 
-/** How far each word is pulled left, per pixel of its offset into the line.
- *  0.16 puts a word 800px along a line 128px out of place at the start —
- *  enough to read as compressed, short of illegible. */
-const WORD_COMPRESS = 0.16;
+/** Desktop, and only when motion is welcome. */
+const MQ_SET_PIECE = `${MQ.desktop} and ${MQ.motionOk}`;
+
+/** Distance from the viewport's top the picture holds at while pinned —
+ *  clear of the nav bar (44px on a 20px gutter) with air to spare. */
+const PIN_TOP = 116;
+
+/** A line never gives up more than this share of its own width to gaps. The
+ *  cap exists for the LAST line, which is short and therefore nearly all
+ *  slack: without it, three words would be flung across the full column. */
+const MAX_SPREAD = 0.32;
+
+/** Deterministic 0..1 from an integer — the per-gap share of the slack. Not
+ *  Math.random: the spacing has to be identical on every load, or the
+ *  paragraph would re-space itself on a refresh. */
+function hash01(n: number) {
+  const x = Math.sin(n * 12.9898 + 78.233) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+type Line = {
+  /** One setter per word; index 0 never moves, it anchors the line. */
+  setters: ((value: number) => void)[];
+  /** Cumulative share of the slack at each word, 0..1. */
+  shares: number[];
+  slack: number;
+};
 
 export default function About() {
   const scope = useRef<HTMLElement>(null);
@@ -64,77 +95,132 @@ export default function About() {
       if (!section) return;
       const mm = gsap.matchMedia();
 
-      mm.add(MQ.motionOk, () => {
+      mm.add(MQ_SET_PIECE, () => {
         const statement =
           section.querySelector<HTMLElement>("[data-about-statement]");
         const track = section.querySelector<HTMLElement>("[data-about-track]");
         const media = section.querySelector<HTMLElement>("[data-about-media]");
 
-        /* ---- The picture falls the height of its column ---- */
+        /* ---- The picture pins while the words scroll past ---- */
+        let pin: ScrollTrigger | null = null;
         if (track && media) {
-          gsap.fromTo(
-            media,
-            { y: 0 },
-            {
-              // Function-based, so ScrollTrigger re-measures on refresh and
-              // the fall still lands on the floor after a resize re-wraps
-              // the text and changes the track's height.
-              y: () => Math.max(0, track.clientHeight - media.offsetHeight),
-              ease: "none",
-              scrollTrigger: {
-                trigger: section,
-                start: "top bottom",
-                end: "bottom top",
-                scrub: true,
-                invalidateOnRefresh: true,
-              },
-            },
-          );
+          pin = ScrollTrigger.create({
+            trigger: media,
+            start: `top ${PIN_TOP}px`,
+            // Exactly the column's slack: hold until the picture's bottom
+            // meets the bottom of the text, then let go. Function-based, so
+            // a resize that re-wraps the statement re-measures the hold.
+            end: () =>
+              "+=" + Math.max(0, track.clientHeight - media.offsetHeight),
+            pin: media,
+            pinSpacing: false,
+            invalidateOnRefresh: true,
+          });
         }
 
-        /* ---- The words unpack out of compression ---- */
+        /* ---- The words open and close their own gaps ---- */
         let split: SplitText | null = null;
-        let tween: gsap.core.Tween | null = null;
+        let spread: ScrollTrigger | null = null;
         let cancelled = false;
 
         document.fonts.ready.then(() => {
           if (cancelled || !statement) return;
-          split = new SplitText(statement, { type: "words" });
-          tween = gsap.fromTo(
-            split.words,
-            {
-              // offsetLeft is measured against the statement itself, which is
-              // `relative` for exactly this reason, so the value is the
-              // word's distance into its own line and resets every line.
-              x: (_i: number, el: HTMLElement) =>
-                -el.offsetLeft * WORD_COMPRESS,
+
+          split = new SplitText(statement, {
+            type: "lines,words",
+            linesClass: "ad-line",
+            wordsClass: "ad-word",
+          });
+
+          const column = statement.clientWidth;
+          let lines: Line[] = [];
+
+          /** Re-measure everything from the browser's own layout. Called on
+           *  build and on every refresh, since a resize re-wraps the lines
+           *  and every slack figure with them. */
+          const measure = () => {
+            lines = gsap.utils
+              .toArray<HTMLElement>(".ad-line", statement)
+              .map((line) => {
+                const words = gsap.utils.toArray<HTMLElement>(
+                  ".ad-word",
+                  line,
+                );
+                if (words.length < 2) return null;
+
+                const first = words[0];
+                const last = words[words.length - 1];
+                const natural =
+                  last.offsetLeft + last.offsetWidth - first.offsetLeft;
+                const slack = Math.max(
+                  0,
+                  Math.min(column - natural, natural * MAX_SPREAD),
+                );
+
+                // One weight per GAP, normalised, then accumulated so each
+                // word knows how much of the slack sits to its left.
+                const gaps = words.length - 1;
+                const weights = Array.from(
+                  { length: gaps },
+                  (_, g) => 0.45 + hash01(g + words.length * 7),
+                );
+                const total = weights.reduce((a, b) => a + b, 0);
+                const shares = [0];
+                let run = 0;
+                for (const w of weights) {
+                  run += w / total;
+                  shares.push(run);
+                }
+
+                return {
+                  setters: words.map((w) => gsap.quickSetter(w, "x", "px")),
+                  shares,
+                  slack,
+                } as Line;
+              })
+              .filter((l): l is Line => l !== null);
+          };
+
+          const apply = (p: number) => {
+            for (const line of lines) {
+              const open = line.slack * p;
+              for (let i = 0; i < line.setters.length; i++) {
+                line.setters[i](line.shares[i] * open);
+              }
+            }
+          };
+
+          measure();
+
+          spread = ScrollTrigger.create({
+            trigger: section,
+            start: "top bottom",
+            end: "bottom top",
+            invalidateOnRefresh: true,
+            onRefresh: () => {
+              // Zero the transforms before re-measuring, or the offsets we
+              // read back would include the spread we are about to recompute.
+              apply(0);
+              measure();
             },
-            {
-              x: 0,
-              ease: "none",
-              scrollTrigger: {
-                trigger: section,
-                start: "top 85%",
-                end: "top 25%",
-                scrub: true,
-                invalidateOnRefresh: true,
-              },
-            },
-          );
+            // sin(p·pi): closed at both ends of the transit, fully open as
+            // the section crosses the middle. Scroll up and it reverses.
+            onUpdate: (self) => apply(Math.sin(self.progress * Math.PI)),
+          });
         });
 
         return () => {
-          // The split resolves after this callback returns, so its tween and
-          // its trigger are outside useGSAP's automatic cleanup and are
-          // killed by hand.
+          // Both of these are built after this callback returns, so they sit
+          // outside useGSAP's automatic cleanup and are killed by hand.
           cancelled = true;
-          tween?.scrollTrigger?.kill();
-          tween?.kill();
+          spread?.kill();
           split?.revert();
+          pin?.kill();
         };
       });
 
-      // Reduced motion: intentionally empty — the markup renders complete.
+      // Every other case — phones, and anyone who asked for less motion —
+      // renders the markup exactly as written.
 
       return () => mm.revert();
     },
@@ -152,17 +238,14 @@ export default function About() {
         {aboutSection.eyebrow}
       </p>
 
-      {/* items-stretch, so the picture's column is exactly as tall as the
-          statement beside it — that height IS the distance the picture
-          falls, which is why it is the grid's job and not a fixed value. */}
-      <div className="mt-[clamp(30px,5vh,72px)] grid grid-cols-[1fr_minmax(0,27%)] items-stretch gap-x-[clamp(32px,6vw,110px)] max-b860:grid-cols-1 max-b860:gap-y-14">
+      {/* items-start so the picture's top edge begins level with the first
+          line of the statement; the track below it carries the height that
+          decides how long the pin holds. */}
+      <div className="mt-[clamp(30px,5vh,72px)] grid grid-cols-[1fr_minmax(0,34%)] items-start gap-x-[clamp(32px,5vw,90px)] max-b860:grid-cols-1 max-b860:gap-y-14">
         <div>
-          {/* `relative` is load-bearing: it makes this element the words'
-              offsetParent, so each word's offsetLeft is its distance into
-              its own line rather than into the page. */}
           <p
             data-about-statement=""
-            className="relative text-justify font-hkgw text-[clamp(26px,4.2vw,68px)]/[1.08] font-semibold tracking-[-0.02em] text-ink hyphens-none"
+            className="font-hkgw text-[clamp(26px,4.4vw,72px)]/[1.09] font-semibold tracking-[-0.02em] text-ink"
           >
             {aboutSection.statement}
           </p>
@@ -174,22 +257,19 @@ export default function About() {
           </div>
         </div>
 
-        {/* The track is the full column; the picture is shorter than it, and
-            the difference is the fall. */}
-        <div
-          data-about-track=""
-          className="relative h-full min-h-[clamp(300px,44vh,560px)] max-b860:min-h-0"
-        >
+        {/* The track is the column the picture travels; its height less the
+            picture's own is exactly how far the pin holds. */}
+        <div data-about-track="" className="relative h-full">
           <div
             data-about-media=""
-            className="relative h-[clamp(220px,30vh,380px)] w-full overflow-hidden rounded-media bg-slot max-b860:h-[clamp(260px,42vh,420px)]"
+            className="relative aspect-4/3 w-full overflow-hidden rounded-media bg-slot"
           >
             <Image
               src={aboutSection.image}
               alt={aboutSection.imageAlt}
               fill
-              sizes="(max-width: 860px) 100vw, 27vw"
-              className="object-cover object-top"
+              sizes="(max-width: 860px) 100vw, 34vw"
+              className="object-cover"
             />
           </div>
         </div>

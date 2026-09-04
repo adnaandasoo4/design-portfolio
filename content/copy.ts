@@ -105,8 +105,10 @@ export const hero = {
  * height of the column, both scrubbed to the scroll.
  *
  * The statement is written to that job: one paragraph, long enough to set as
- * five or six justified lines — the word gaps ARE the effect, so a two-line
- * statement would have nothing to animate.
+ * ten or so lines. The length is doing two things, not one — the word gaps
+ * ARE the effect, so a short statement has nothing to animate; and the
+ * paragraph's height is what the picture beside it pins against, so a short
+ * one leaves the pin nothing to hold for either.
  *
  * It is also written NOT to be /about's. A first draft restated that page's
  * closing paragraph almost word for word, which is the trap a teaser sitting
@@ -116,13 +118,15 @@ export const hero = {
 export const aboutSection = {
   /** Rail index, over the illustration. */
   eyebrow: "Myself",
-  /** Left column. The file is 736x1308 (9:16); shown at 3:4 and top-anchored,
-   *  so the crop comes off the BOTTOM — desk, window and moon survive. */
-  image: "/assets/about-desk-night.png",
+  /** Right column. Landscape (1199x674), shown in a tall-ish frame with
+   *  object-cover, so the crop comes off the sides — the desk, the screens
+   *  and the window stay centred. The night-desk illustration stays on
+   *  /about; the two pages no longer share a picture either (2026-09-04). */
+  image: "/assets/about-desk-coding.png",
   imageAlt:
-    "Illustration of a figure working at a desk late at night, lit by a monitor and a full moon through the window.",
+    "Illustration of a figure at a two-screen desk setup in headphones, coding, with a bright sky through the window beside them.",
   statement:
-    "I close the gap between how a brand looks and how it is built. One person on both sides of that line means the details that survive the drawing survive the build too.",
+    "I close the gap between how a brand looks and how it is built. One person on both sides of that line means the details that survive the drawing survive the build too — the motion, the states, and the small things you feel long before you notice them.",
   /** Sends you to the rest of the piece. */
   readMoreText: "Read more",
   readMoreHref: "/about",
