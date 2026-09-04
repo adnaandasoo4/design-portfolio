@@ -3,71 +3,55 @@
 /*
  * About (§A6 #2) — the home page's scroll set piece.
  *
- * One paragraph, centred and spanning the page, and nothing else: the
- * picture and the "Myself" index are both gone (user, 2026-09-04). The
- * section is the sentence and the way it moves.
+ * One paragraph, centred and spanning the page, and nothing else. The section
+ * is the sentence and the way it moves.
  *
- * ── HOW IT WORKS ─────────────────────────────────────────────────────────
+ * ── WHAT IT DOES ─────────────────────────────────────────────────────────
  * The paragraph is set NORMALLY in the markup — left-aligned, ordinary word
- * spacing, ragged right. Every gap you see is a per-word `x` transform.
+ * spacing, ragged right. Every position you see is a per-word `x` transform.
+ * The browser fixes the line breaks once, before any transform is applied,
+ * so nothing ever re-wraps however far the words travel.
  *
- * Each line is measured for its GAP BUDGET: every natural word gap on it
- * plus whatever room the line was not using. The line is then laid out from
- * scratch — first word on the left edge, each next word after a gap of its
- * own share of that budget — and because the shares always total 1, the gaps
- * always total the budget and the last word lands on the right edge. The
- * paragraph is edge to edge from the moment it appears (user, 2026-09-04);
- * it never arrives tight and opens up.
+ * It is ALWAYS displaced. There is no tidy state it starts from or settles
+ * into — at every scroll position the spacing is uneven, and scrolling moves
+ * it to a different uneven arrangement. Three things move at once, each on
+ * its own cycle:
  *
- * Redistributing the WHOLE budget, rather than only the leftover room, is
- * what lets a line that already fills the measure still come apart — a gap
- * can shrink below its natural width so another opens far past it. An
- * earlier version divided only the leftover, which left the lines that
- * happened to wrap near-flush with one to three pixels of movement, i.e.
- * none.
+ *   GAPS   every gap holds a share of the line's gap budget, and each share
+ *          rides its own sine as you scroll, so gaps trade width back and
+ *          forth continuously. Shares are normalised every frame, so a gap
+ *          can only widen by another narrowing.
+ *   WIDTH  the budget itself breathes between BUDGET_MIN of the measure and
+ *          all of it, so the line is sometimes flush edge to edge and
+ *          sometimes drawn in short of it.
+ *   SLIDE  whatever the line is not using, it slides across — so when it is
+ *          short of the measure it is also off-centre, and by a changing
+ *          amount.
  *
- * ── WHAT SCROLLING CHANGES ───────────────────────────────────────────────
- * Not how MUCH room is given away — that is always all of it — but WHERE it
- * goes. Every gap holds a share of the room, and each share migrates from
- * one uneven value to a different uneven value across the section's transit.
- * Room moves between gaps: one can only widen by another narrowing. So the
- * line stays pinned to both edges while its interior rearranges, which is
- * what makes the words look displaced all over rather than justified.
+ * WIDTH and SLIDE are why the first and last words move. An earlier version
+ * pinned every line to both edges, which held the whole budget constant and
+ * left the outermost words nailed in place while only the middle churned —
+ * the user's words were that the edge words looked stuck. They are the two
+ * most visible words on a line; if they do not move, nothing reads as moving.
  *
- * The end shares are the start shares ROTATED along the line: each gap ends
- * up with the width of one some distance away from it, so room travels
- * bodily across the measure as you scroll. Two alternatives were tried and
- * rejected — a second independent hash normalises to nearly the same numbers
- * and moved each gap a pixel or two, and the head's exact complement moves
- * plenty but passes THROUGH even spacing at the halfway point, arriving just
- * as the section crosses the middle of the screen. A rotation blends two
- * different uneven states, so the line is irregular at every point of the
- * scroll and never flattens out.
+ * BACK AND FORTH, deliberately (user, 2026-09-04). A previous pass ran each
+ * gap one way only, from one arrangement to another. That was a correction to
+ * the pass before it, which started from normal spacing and opened up — but
+ * the objection there was the tidy STARTING POINT, not the fact that it kept
+ * moving. Sines restore the movement and keep the displacement.
  *
- * MORE, THE FURTHER YOU GO: progress is eased IN (t·t), so the shares barely
- * move as the section enters and move fastest as it crosses and leaves. The
- * paragraph gets visibly more restless the further you scroll it.
+ * Every phase and frequency comes from a hash of an index, so the paragraph
+ * moves identically on every load rather than reshuffling on refresh. And it
+ * is a position, not a playback: scroll up and every word retraces exactly.
  *
- * ── ONE WAY, NOT BACK AND FORTH (user, 2026-09-04) ───────────────────────
- * Each share travels from its start value to its end value and stops. It is
- * an interpolation between two fixed numbers, so no gap can reverse, and no
- * word can drift back the way it came. Scroll up and the whole thing rewinds
- * — it is a position, not a playback.
- *
- * Interpolating between two sets of weights that each sum to 1 is also what
- * makes this safe: any blend of them also sums to 1, and every weight stays
- * positive, so a gap can never collapse to nothing or overrun the measure.
- *
- * Doing this with transforms rather than by animating `word-spacing` is what
- * keeps it affordable: word-spacing is a layout property, so animating it
- * would re-wrap and re-lay-out the paragraph on every frame of every scroll.
- * Same result on screen, different cost entirely.
+ * Transforms rather than animating `word-spacing`, which is a layout property
+ * and would re-wrap and re-lay-out the paragraph on every frame of every
+ * scroll. Same result on screen, different cost entirely.
  *
  * ── MOBILE AND REDUCED MOTION ────────────────────────────────────────────
- * Neither exists below 700px: no split, and the statement is exactly what
- * the markup says — an ordinary paragraph. Justified-by-transform at phone
- * measure is three words a line with canyons between them. Reduced motion
- * opts out the same way.
+ * Neither exists below 700px: no split, and the statement is exactly what the
+ * markup says — an ordinary paragraph. This at phone measure is three words a
+ * line with canyons between them. Reduced motion opts out the same way.
  */
 import { useRef } from "react";
 import { gsap, useGSAP, ScrollTrigger, SplitText } from "@/lib/gsap/register";
@@ -77,52 +61,57 @@ import { aboutSection } from "@/content/copy";
 /** Desktop, and only when motion is welcome. */
 const MQ_SET_PIECE = `${MQ.desktop} and ${MQ.motionOk}`;
 
-/** How irregular the spacing is. Each gap's weight is 1 + up to this much
- *  extra, so at 2.2 the widest gap on a line can be roughly 3.2x the
- *  narrowest. Raise it for a more scattered setting, lower it toward 0 for
- *  something close to ordinary justification. */
-const IRREGULARITY = 2.2;
+/** How uneven the gaps get. A gap's weight is 1 + up to this much, so at 3
+ *  the widest gap on a line can be around 4x the narrowest. */
+const IRREGULARITY = 3;
 
-/** Every gap is guaranteed this much before any share is divided out, so the
- *  narrowest gap on a line can never pull two words into each other. */
+/** The narrowest a line ever draws itself, as a share of the room it has to
+ *  fill. At 0.62 a line pulls in to roughly two thirds of the measure at the
+ *  bottom of its cycle and runs flush at the top — that swing is what gets
+ *  the first and last words moving. */
+const BUDGET_MIN = 0.62;
+
+/** Every gap keeps this much before any share is divided out, so the
+ *  narrowest never runs two words together — but never more than
+ *  FLOOR_MAX_SHARE of what the line has to spend per gap, or a line that is
+ *  nearly full spends everything on floors and comes out perfectly regular. */
 const MIN_GAP = 14;
-
-/** ...but the floor never takes more than this much of a line's per-gap
- *  budget, so there is always most of it left for the shares to divide
- *  unevenly. Without the cap, a line that already fills the measure spent
- *  everything on floors and came out perfectly regular. */
 const FLOOR_MAX_SHARE = 0.4;
 
-/** Deterministic 0..1 from an integer. Not Math.random: the spacing has to
- *  be identical on every load, or the paragraph would re-space itself on a
- *  refresh. */
+/** Cycles across one pass of the section. Kept low, and spread, so the parts
+ *  drift out of step with each other rather than pulsing together. */
+const CYCLE_MIN = 1.2;
+const CYCLE_MAX = 3.1;
+
+const TAU = Math.PI * 2;
+
+/** Deterministic 0..1 from an integer. Not Math.random: the paragraph has to
+ *  move identically on every load rather than reshuffling on refresh. */
 function hash01(n: number) {
   const x = Math.sin(n * 12.9898 + 78.233) * 43758.5453;
   return x - Math.floor(x);
 }
 
-/** Eased IN, deliberately: barely moving as the section enters, moving
- *  fastest as it crosses and leaves. That is what makes the paragraph read
- *  as getting more restless the further it is scrolled, rather than
- *  rearranging at a constant rate throughout. */
-function ease(t: number) {
-  const c = t < 0 ? 0 : t > 1 ? 1 : t;
-  return c * c;
+/** A 0..1 wave for `progress`, on its own phase and rate. */
+function wave(progress: number, seed: number) {
+  const rate = CYCLE_MIN + hash01(seed) * (CYCLE_MAX - CYCLE_MIN);
+  return 0.5 + 0.5 * Math.sin(progress * TAU * rate + hash01(seed + 97) * TAU);
 }
 
 type Line = {
   setters: ((value: number) => void)[];
-  /** Per-GAP share of the gap budget at each end of the transit. Both sum to
-   *  1, which is what keeps every blend of them safe. */
-  head: number[];
-  tail: number[];
-  /** Where each word sits at its natural setting, relative to the line's
-   *  start — what the transforms are measured against. */
-  natural: number[];
   widths: number[];
-  /** Total width of every gap once the line fills the measure. Fixed, so
-   *  however the gaps divide it the line still runs edge to edge. */
-  budget: number;
+  /** Where each word sits untouched, relative to the line's start — what the
+   *  transforms are measured against. */
+  natural: number[];
+  /** Total gap width when the line runs flush across the whole measure. */
+  fullBudget: number;
+  /** Room the line has to move in once it is at its narrowest. */
+  measure: number;
+  /** Per-gap seeds for the share waves, plus two for the line itself. */
+  gapSeed: number[];
+  widthSeed: number;
+  slideSeed: number;
 };
 
 export default function About() {
@@ -152,84 +141,48 @@ export default function About() {
           });
 
           let lines: Line[] = [];
-          /** Read each line's room straight out of the browser's own layout.
-           *  Re-run on every refresh, since a resize re-wraps every line and
-           *  changes every room figure with it. */
+          // Reused every frame — this runs on every scroll event, so the
+          // per-frame work allocates nothing.
+          const shares: number[] = [];
+
+          /** Read the untouched layout straight out of the browser. Re-run on
+           *  every refresh, since a resize re-wraps every line. */
           const measure = () => {
-            const column = statement.clientWidth;
+            const measureW = statement.clientWidth;
             lines = gsap.utils
               .toArray<HTMLElement>(".ad-line", statement)
               .map((line) => {
                 const words = gsap.utils.toArray<HTMLElement>(".ad-word", line);
                 if (words.length < 2) return null;
 
-                const first = words[0];
-                const last = words[words.length - 1];
-                // Where every word sits, and how wide every natural gap is,
-                // measured from the line's own start.
-                const origin = first.offsetLeft;
+                const origin = words[0].offsetLeft;
                 const natural = words.map((w) => w.offsetLeft - origin);
-                const naturalGaps: number[] = [];
-                for (let g = 0; g < words.length - 1; g++) {
-                  naturalGaps.push(
-                    natural[g + 1] - (natural[g] + words[g].offsetWidth),
-                  );
-                }
-
+                const widths = words.map((w) => w.offsetWidth);
+                const last = words[words.length - 1];
                 const used = last.offsetLeft + last.offsetWidth - origin;
-                const room = Math.max(0, column - used);
-                // The budget is EVERY gap on the line plus the room left
-                // over. Redistributing the whole budget rather than only the
-                // leftover is what lets a line that already fills the measure
-                // still come apart: a gap can shrink below its natural width
-                // so another can open far past it. Distributing only the
-                // leftover left such lines with 1-3px of movement — nothing.
-                const gapTotal = naturalGaps.reduce((a, b) => a + b, 0);
-                const budget = gapTotal + room;
+
+                // Every natural gap on the line, plus the room it was not
+                // using. Redistributing the WHOLE of that rather than only the
+                // leftover is what lets a line which already fills the measure
+                // still come apart — a gap can shrink below its natural width
+                // so another opens far past it.
+                const textWidth = widths.reduce((a, b) => a + b, 0);
+                const fullBudget = Math.max(0, measureW - textWidth);
 
                 const gaps = words.length - 1;
-                // Seeded off the line's length as well as the gap index, so
-                // two lines with the same word count rearrange differently.
+                // Seeded off the line's length as well as the index, so two
+                // lines with the same word count move differently.
                 const seed = words.length * 31;
-
-                /** Normalised so the shares sum to exactly 1 — that is the
-                 *  invariant the whole thing rests on. */
-                const normalise = (raw: number[]) => {
-                  const total = raw.reduce((a, b) => a + b, 0);
-                  return raw.map((r) => r / total);
-                };
-
-                const rawHead = Array.from(
-                  { length: gaps },
-                  (_, g) => 1 + hash01(g + seed) * IRREGULARITY,
-                );
-                // The tail is the head ROTATED — every gap inherits the width
-                // of one some distance along the line. Two things this beats:
-                //
-                //   a second independent hash, which normalises to almost the
-                //   same numbers and moved each gap a pixel or two;
-                //
-                //   the head's complement (widest becomes narrowest), which
-                //   moves plenty but interpolates THROUGH uniform spacing at
-                //   the halfway point — the one setting that looks like
-                //   nothing is happening, arriving exactly as the section
-                //   crosses the middle of the screen.
-                //
-                // A rotation keeps every intermediate state a blend of two
-                // DIFFERENT uneven values, so the line is irregular at every
-                // point of the scroll and never passes through even.
-                const shift = 1 + Math.floor(gaps / 2);
-                const rawTail = rawHead.map(
-                  (_, g) => rawHead[(g + shift) % gaps],
-                );
 
                 return {
                   setters: words.map((w) => gsap.quickSetter(w, "x", "px")),
-                  head: normalise(rawHead),
-                  tail: normalise(rawTail),
+                  widths,
                   natural,
-                  widths: words.map((w) => w.offsetWidth),
-                  budget,
+                  fullBudget: fullBudget > 0 ? fullBudget : used,
+                  measure: measureW,
+                  gapSeed: Array.from({ length: gaps }, (_, g) => g + seed),
+                  widthSeed: seed + 3301,
+                  slideSeed: seed + 7717,
                 } as Line;
               })
               .filter((l): l is Line => l !== null);
@@ -238,41 +191,39 @@ export default function About() {
           /**
            * @param p 0..1 across the section's transit
            *
-           * Lays the line out from scratch: first word on the left edge, then
-           * each following word placed after a gap of its own share of the
-           * budget. Since the shares always sum to 1 the gaps always total the
-           * budget exactly, so the last word lands on the right edge at every
-           * scroll position — the line is edge to edge throughout, and what p
-           * changes is only how the budget divides between the gaps.
+           * Lays every line out from scratch: pick this frame's budget, slide
+           * the line by whatever of the measure it is not using, then place
+           * each word after a gap of its own share.
            *
-           * Every gap keeps a floor first and divides only what is left
-           * over, so a gap at the bottom of its share can never close to the
-           * point of running two words together. The floor is MIN_GAP or the
-           * line's fair share of its budget, whichever is smaller.
+           * Shares are normalised, so however they move the gaps still total
+           * the budget exactly — the line's width is decided by the budget
+           * wave alone and never drifts.
            */
           const apply = (p: number) => {
-            const t = ease(p);
             for (const line of lines) {
-              const gaps = line.head.length;
-              // The floor is MIN_GAP, but never more than FLOOR_MAX_SHARE of
-              // what the line has to spend per gap. Two failures this avoids,
-              // both seen: applied flat, a line whose budget is under
-              // gaps x MIN_GAP had every gap widened to the floor and overran
-              // the right edge; clamped to the full average, the floor ate the
-              // entire budget and left nothing to divide, so every gap on a
-              // near-full line came out identical. Leaving most of the budget
-              // to the shares is what keeps even a tight line irregular.
-              const floor = Math.min(
-                MIN_GAP,
-                (FLOOR_MAX_SHARE * line.budget) / gaps,
-              );
-              const spare = line.budget - floor * gaps;
+              const gaps = line.gapSeed.length;
 
-              let cursor = 0;
-              line.setters[0](0);
+              // How wide the line draws itself this frame, and where it sits
+              // in the room that leaves.
+              const budget =
+                line.fullBudget *
+                (BUDGET_MIN + (1 - BUDGET_MIN) * wave(p, line.widthSeed));
+              const slide =
+                (line.fullBudget - budget) * wave(p, line.slideSeed);
+
+              let total = 0;
               for (let g = 0; g < gaps; g++) {
-                const share = line.head[g] + (line.tail[g] - line.head[g]) * t;
-                cursor += line.widths[g] + floor + share * spare;
+                shares[g] = 1 + IRREGULARITY * wave(p, line.gapSeed[g]);
+                total += shares[g];
+              }
+
+              const floor = Math.min(MIN_GAP, (FLOOR_MAX_SHARE * budget) / gaps);
+              const spare = budget - floor * gaps;
+
+              let cursor = slide;
+              line.setters[0](cursor);
+              for (let g = 0; g < gaps; g++) {
+                cursor += line.widths[g] + floor + (shares[g] / total) * spare;
                 line.setters[g + 1](cursor - line.natural[g + 1]);
               }
             }
@@ -286,14 +237,14 @@ export default function About() {
             end: "bottom top",
             invalidateOnRefresh: true,
             onRefresh: (self) => {
-              // Zero before measuring, or the offsets read back would
-              // include the spread about to be recomputed...
-              apply(0);
+              // Zero before measuring, or the offsets read back would include
+              // the displacement about to be recomputed...
+              for (const line of lines) line.setters.forEach((s) => s(0));
               measure();
-              // ...and put it straight back. A refresh fires on resize and
-              // on the font swap, neither of which involves scrolling, so
-              // without this the paragraph would sit at its natural spacing
-              // until a scroll event that may never come.
+              // ...and put it straight back. A refresh fires on resize and on
+              // the font swap, neither of which involves scrolling, so without
+              // this the paragraph would sit at its untouched spacing until a
+              // scroll event that may never come.
               apply(self.progress);
             },
             onUpdate: (self) => apply(self.progress),
