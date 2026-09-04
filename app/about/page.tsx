@@ -1,44 +1,41 @@
 import type { Metadata } from "next";
 import RevealGroup from "@/components/site/RevealGroup";
-import AboutOpening from "@/components/about/AboutOpening";
-import AboutLead from "@/components/about/AboutLead";
-import AboutPortrait from "@/components/about/AboutPortrait";
+import AboutMain from "@/components/about/AboutMain";
 import AboutFacts from "@/components/about/AboutFacts";
 import AboutClosing from "@/components/about/AboutClosing";
 import Footer from "@/components/site/Footer";
 import { about } from "@/content/about";
 
 /*
- * About (§A9) — rebuilt 2026-09-03, twice. The first attempt ran every
- * section through the shared Spread; consistent, and dead. Four identical
- * two-column blocks with the same rail in each read as a template rather
- * than a page, and the illustration — the only real image in the project —
- * was a thumbnail in a 0.3fr column.
+ * About (§A9) — rebuilt 2026-09-04.
  *
- * This version is built on CONTRAST instead of consistency, because the
- * shared grid is the home page's job and an about page has a different one:
+ * The page is now the HOME page's About section, moved here whole, followed
+ * by what already lived below it:
  *
- *   Opening    a full viewport, mostly empty, headline pinned to the floor
- *   Lead       one line, indented deep into the measure, alone on a screen
- *   Portrait   asymmetric — a 9:16 image at 38vw with the narrative
- *              bottom-aligned beside it
- *   Facts      a wide, even, three-across row, the page's only regular grid
- *   Closing    display scale, tight measure, the most air on the page
+ *   Main     the site's shared Spread — illustration in the left rail, the
+ *            statement, the opening line and the narrative in full
+ *   Facts    a wide, even, three-across row
+ *   Closing  display scale, tight measure, the most air on the page
  *
- * No two of those are the same shape, and the vertical padding is
- * deliberately uneven — generous, generous, tight, medium, widest — so the
- * page has a pulse rather than a constant. Gutters stay at the site's 20px
- * throughout, which is what keeps it recognisably the same site while
- * nothing else repeats.
+ * Three sections went to make room, and none of them is missed: Opening
+ * spent a full viewport on one headline, Lead spent another on one line, and
+ * Portrait showed the same illustration a second time at 9:16. The page led
+ * with its picture twice and got to the argument third. The previous version
+ * was built on CONTRAST — five deliberately different shapes — which read as
+ * a page trying not to repeat itself rather than one making a case.
  *
- * Motion: ONE set piece — the opening headline splits into lines and rises
- * through a mask on load — plus a scrub parallax on the portrait. Every
- * other element uses RevealGroup's ordinary rise. Reduced motion renders
- * everything static.
+ * Adopting the home format is the point, not a shortcut: it is the layout
+ * the rest of the site already speaks, so arriving here reads as the same
+ * site rather than a separate document, and the shared Spread means the
+ * grid cannot drift from the Branding page's.
  *
- * The experience timeline is still NOT here: its data is "20XX / role —
- * tbd" (Open Q5), and three placeholder rows would read as broken. The copy
- * waits in content/about.ts.
+ * Motion: AboutMain splits its statement into lines and rises them through
+ * masks on scroll; everything else uses RevealGroup's ordinary rise.
+ * Reduced motion renders everything static.
+ *
+ * The experience timeline is still NOT here: its data is "20XX / role — tbd"
+ * (Open Q5), and three placeholder rows would read as broken. The copy waits
+ * in content/about.ts.
  */
 
 export const metadata: Metadata = {
@@ -63,9 +60,7 @@ export default function AboutPage() {
         className="relative overflow-x-clip bg-bg outline-none"
       >
         <RevealGroup className="relative z-(--z-flow)">
-          <AboutOpening />
-          <AboutLead />
-          <AboutPortrait />
+          <AboutMain />
           <AboutFacts />
           <AboutClosing />
         </RevealGroup>

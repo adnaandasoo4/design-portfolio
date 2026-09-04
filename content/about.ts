@@ -22,9 +22,15 @@
  * edited.
  *
  * Third pass, same day: THE_OFFER joins the narrative as its closing
- * argument and the home teaser as its second paragraph. The piece read as
- * biography and stopped — it said how the two halves came to be held
- * together but never what holding them together is FOR.
+ * argument. The piece read as biography and stopped — it said how the two
+ * halves came to be held together but never what holding them together is
+ * FOR.
+ *
+ * Fourth pass: the home page no longer borrows from here. The About section
+ * that used to run a two-paragraph teaser off `homeTeaser` moved to THIS
+ * page in full, and home took a scroll-driven statement of its own
+ * (content/copy → aboutSection.statement). One page, one voice, and no
+ * string rendered in two places any more.
  */
 
 /* The two paragraphs the home About section shows. Declared above `about`
@@ -64,11 +70,6 @@ export const about = {
     "I work end-to-end — visual direction, interaction, and the front-end build — and I don’t hand something off until the details feel inevitable. Motion with purpose, interfaces that respond, the small stuff you feel more than notice.",
     THE_OFFER,
   ],
-  /** Rendered TWICE, deliberately: each appears once here in sequence and
-   *  once on the home page, which shows these two and nothing else. They are
-   *  the beats that work standing alone — the eye, then what it is for —
-   *  which is what a teaser has to do. */
-  homeTeaser: [THE_EYE, THE_OFFER],
   /** Shared with the home About section — the only real image in the project */
   image: {
     src: "/assets/about-desk-night.png",

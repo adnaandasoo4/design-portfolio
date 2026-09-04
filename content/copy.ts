@@ -1,7 +1,6 @@
 /*
  * Site-level copy (§A6) — all strings verbatim from the reference design.
  */
-import { about } from "@/content/about";
 
 export const EMAIL = "adnaandasoo@gmail.com";
 
@@ -97,34 +96,33 @@ export const hero = {
  * different things under one name in one folder is an import waiting to go
  * to the wrong file.
  *
- * CUT BACK to a teaser (user, 2026-09-03). It ran three long paragraphs —
- * the whole personal piece — on a page whose job is to move you along. The
- * section is now the statement, two paragraphs and a link: the personal
- * beat, then what holding design and engineering together actually buys a
- * brand (added later the same day). Neither is duplicated here — they are
- * `about.homeTeaser`, imported, so the two pages cannot drift.
+ * REBUILT as a scroll set piece (user, 2026-09-04). The section used to be a
+ * teaser — statement, two borrowed paragraphs, a "read more" — and all of
+ * that moved to /about, which now runs the personal piece in full. What is
+ * left here is one statement and one picture, and the section earns its
+ * place on the home page through MOTION rather than through more copy: the
+ * words settle out of a compressed state and the illustration falls the
+ * height of the column, both scrubbed to the scroll.
  *
- * No eyebrow and no note: the section index and the location line were both
- * removed (user, 2026-09-03), leaving the illustration alone in the left
- * column. A "Myself" index was tried over the image later the same day and
- * removed again.
+ * The statement is written to that job: one paragraph, long enough to set as
+ * five or six justified lines — the word gaps ARE the effect, so a two-line
+ * statement would have nothing to animate.
  *
- * `statement` is the §A6 blurb's opening sentence, kept verbatim, and takes
- * the section's h2.
+ * It is also written NOT to be /about's. A first draft restated that page's
+ * closing paragraph almost word for word, which is the trap a teaser sitting
+ * one link away from the full piece falls into. This says the thesis; the
+ * page says the argument. Neither sentence appears twice on the site.
  */
 export const aboutSection = {
-  /** Left column of the section. The file is 736x1308 (9:16); it is
-   *  displayed at 4:5 and top-anchored, so the crop comes off the BOTTOM —
-   *  the desk, window and moon survive, the bed and floor do not. */
+  /** Rail index, over the illustration. */
+  eyebrow: "Myself",
+  /** Left column. The file is 736x1308 (9:16); shown at 3:4 and top-anchored,
+   *  so the crop comes off the BOTTOM — desk, window and moon survive. */
   image: "/assets/about-desk-night.png",
   imageAlt:
     "Illustration of a figure working at a desk late at night, lit by a monitor and a full moon through the window.",
   statement:
-    "The goal has always been to close the gap between design and engineering.",
-  /** The two paragraphs the section keeps — the eye, then what it is for.
-   *  The same strings /about renders inside its full narrative, never
-   *  copies of them. */
-  paragraphs: about.homeTeaser,
+    "I close the gap between how a brand looks and how it is built. One person on both sides of that line means the details that survive the drawing survive the build too.",
   /** Sends you to the rest of the piece. */
   readMoreText: "Read more",
   readMoreHref: "/about",
