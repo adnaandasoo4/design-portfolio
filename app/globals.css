@@ -402,6 +402,40 @@ html[data-pageleave] [data-veil] {
   }
 }
 
+/* ---- About statement glare (user, 2026-09-04) ----
+   Two copies of the paragraph sit exactly on top of each other: a grey one
+   you always read, and a full-ink one clipped to a soft circle that follows
+   the pointer. Moving the mask rather than drawing anything means the bright
+   copy is only ever revealed, never re-rendered — no per-frame layout, and
+   the two copies cannot fall out of register because they are the same text
+   in the same box.
+
+   The circle's centre and the whole layer's opacity are custom properties,
+   written from a lerped ticker in components/sections/About. Nothing here
+   transitions: the smoothing is the lerp, and a CSS transition on top of it
+   would only add a second, competing lag.
+
+   Two stops at full black before the fade begins gives the glare a readable
+   core rather than a soft blur with no centre. */
+[data-glare] {
+  --glare-x: -9999px;
+  --glare-y: -9999px;
+  --glare-r: clamp(150px, 17vw, 300px);
+  opacity: var(--glare-on, 0);
+  -webkit-mask-image: radial-gradient(
+    circle var(--glare-r) at var(--glare-x) var(--glare-y),
+    #000 0%,
+    #000 32%,
+    transparent 72%
+  );
+  mask-image: radial-gradient(
+    circle var(--glare-r) at var(--glare-x) var(--glare-y),
+    #000 0%,
+    #000 32%,
+    transparent 72%
+  );
+}
+
 /* ---- Work-row marquee loop (§A5 Marquee) — CSS keyframes, GSAP-free path ---- */
 @keyframes wlist-marq {
   to {
