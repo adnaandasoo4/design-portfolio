@@ -19,16 +19,29 @@
  * line breaks were fixed by the browser once, before a single transform was
  * applied.
  *
- * The gaps are UNEVEN by design: each one takes a different share of the
- * slack, from a hash of the word's index, so the spacing looks set by hand
- * rather than by an algorithm — which is what the reference actually looks
- * like. The share is deterministic, so it never changes between loads.
+ * SPORADIC, not synchronised (user, 2026-09-04). A first pass handed every
+ * gap a fixed share of the slack and opened them all together, which read as
+ * one block breathing — legible, and dull. Now each gap carries its OWN
+ * phase and its own frequency, so at any scroll position some are wide open
+ * while their neighbours are shut, and which ones those are keeps changing
+ * as you scroll. The words appear to shuffle against each other rather than
+ * inflate as a unit.
  *
- * APART AND TOGETHER: progress drives `sin(p·π)`, so the words are at their
- * natural spacing as the section enters, spread to full justification as it
- * crosses the middle of the viewport, and close again as it leaves. Scroll
- * up and it runs backwards. It is a position, not a playback — the paragraph
- * only ever moves as fast as you scroll it.
+ * What keeps that from tearing the line apart is that the shares are
+ * NORMALISED every frame: the per-gap values are weights, scaled so their
+ * total is always the line's slack budget and never a pixel more. Gaps
+ * therefore trade room with each other — one can only open by another
+ * closing — so the line's right edge stays put however chaotic the middle
+ * gets.
+ *
+ * An ENVELOPE rides over the top: `0.35 + 0.65·sin(p·π)`, so the paragraph is
+ * never fully closed (the reference always shows gaps) but is at its most
+ * open crossing the middle of the viewport. Scroll up and all of it runs
+ * backwards. It is a position, not a playback — the paragraph only ever
+ * moves as fast as you scroll it.
+ *
+ * Every phase and frequency comes from a hash of the gap's index, so the
+ * churn is identical on every load rather than random per refresh.
  *
  * Doing it with transforms rather than by animating `word-spacing` is what
  * keeps this affordable: word-spacing is a layout property, so animating it
@@ -55,7 +68,6 @@ import { useRef } from "react";
 import Image from "next/image";
 import { gsap, useGSAP, ScrollTrigger, SplitText } from "@/lib/gsap/register";
 import { MQ } from "@/lib/gsap/motion";
-import ArrowLink from "@/components/site/ArrowLink";
 import { aboutSection } from "@/content/copy";
 
 /** Desktop, and only when motion is welcome. */
@@ -70,6 +82,16 @@ const PIN_TOP = 116;
  *  slack: without it, three words would be flung across the full column. */
 const MAX_SPREAD = 0.32;
 
+/** The floor of the envelope — how open the paragraph stays at the ends of
+ *  the transit. Never 0: the reference always shows gaps. */
+const OPEN_FLOOR = 0.35;
+
+/** How many times a gap cycles across one pass of the section. Kept low and
+ *  irrational-ish so neighbours drift out of step instead of pulsing
+ *  together. */
+const CHURN_MIN = 1.3;
+const CHURN_MAX = 3.4;
+
 /** Deterministic 0..1 from an integer — the per-gap share of the slack. Not
  *  Math.random: the spacing has to be identical on every load, or the
  *  paragraph would re-space itself on a refresh. */
@@ -81,8 +103,9 @@ function hash01(n: number) {
 type Line = {
   /** One setter per word; index 0 never moves, it anchors the line. */
   setters: ((value: number) => void)[];
-  /** Cumulative share of the slack at each word, 0..1. */
-  shares: number[];
+  /** Per-GAP phase and frequency — length is setters.length - 1. */
+  phase: number[];
+  freq: number[];
   slack: number;
 };
 
@@ -134,6 +157,9 @@ export default function About() {
 
           const column = statement.clientWidth;
           let lines: Line[] = [];
+          // Reused across frames — this runs on every scroll event, so the
+          // per-frame work allocates nothing.
+          const weights: number[] = [];
 
           /** Re-measure everything from the browser's own layout. Called on
            *  build and on every refresh, since a resize re-wraps the lines
@@ -157,38 +183,76 @@ export default function About() {
                   Math.min(column - natural, natural * MAX_SPREAD),
                 );
 
-                // One weight per GAP, normalised, then accumulated so each
-                // word knows how much of the slack sits to its left.
+                // One phase and one frequency per GAP. Seeded off the
+                // line's own length as well as the gap index, so two lines
+                // with the same word count still churn differently.
                 const gaps = words.length - 1;
-                const weights = Array.from(
+                const seed = words.length * 31;
+                const phase = Array.from(
                   { length: gaps },
-                  (_, g) => 0.45 + hash01(g + words.length * 7),
+                  (_, g) => hash01(g + seed) * Math.PI * 2,
                 );
-                const total = weights.reduce((a, b) => a + b, 0);
-                const shares = [0];
-                let run = 0;
-                for (const w of weights) {
-                  run += w / total;
-                  shares.push(run);
-                }
+                const freq = Array.from(
+                  { length: gaps },
+                  (_, g) =>
+                    CHURN_MIN +
+                    hash01(g + seed + 977) * (CHURN_MAX - CHURN_MIN),
+                );
 
                 return {
                   setters: words.map((w) => gsap.quickSetter(w, "x", "px")),
-                  shares,
+                  phase,
+                  freq,
                   slack,
                 } as Line;
               })
               .filter((l): l is Line => l !== null);
           };
 
-          const apply = (p: number) => {
+          /**
+           * @param progress 0..1 across the section's transit
+           * @param envelope how much of each line's slack is in play
+           *
+           * The per-gap values are WEIGHTS, not widths. They are normalised
+           * to sum to 1 before being scaled by the line's budget, which is
+           * what stops the line growing past its slack no matter how the
+           * individual gaps happen to fall — a gap can only open by taking
+           * room from another.
+           */
+          const apply = (progress: number, envelope: number) => {
             for (const line of lines) {
-              const open = line.slack * p;
-              for (let i = 0; i < line.setters.length; i++) {
-                line.setters[i](line.shares[i] * open);
+              const gaps = line.phase.length;
+              if (!gaps) continue;
+
+              let total = 0;
+              for (let g = 0; g < gaps; g++) {
+                // 0.15 floor so a gap at the bottom of its cycle still holds
+                // a sliver of room rather than snapping its words together.
+                weights[g] =
+                  0.15 +
+                  0.85 *
+                    (0.5 +
+                      0.5 *
+                        Math.sin(
+                          progress * Math.PI * 2 * line.freq[g] +
+                            line.phase[g],
+                        ));
+                total += weights[g];
+              }
+
+              const budget = line.slack * envelope;
+              let run = 0;
+              line.setters[0](0);
+              for (let g = 0; g < gaps; g++) {
+                run += (weights[g] / total) * budget;
+                line.setters[g + 1](run);
               }
             }
           };
+
+          /** How much of each line's slack is in play at this progress. */
+          const envelope = (progress: number) =>
+            OPEN_FLOOR + (1 - OPEN_FLOOR) * Math.sin(progress * Math.PI);
 
           measure();
 
@@ -197,15 +261,19 @@ export default function About() {
             start: "top bottom",
             end: "bottom top",
             invalidateOnRefresh: true,
-            onRefresh: () => {
+            onRefresh: (self) => {
               // Zero the transforms before re-measuring, or the offsets we
               // read back would include the spread we are about to recompute.
-              apply(0);
+              apply(0, 0);
               measure();
+              // ...and put it straight back. A refresh fires on resize, on
+              // the font swap and when the picture finishes loading, none of
+              // which involve scrolling — so without this the paragraph sits
+              // at its natural spacing until the next scroll event happens
+              // to arrive, which on a section already in view is never.
+              apply(self.progress, envelope(self.progress));
             },
-            // sin(p·pi): closed at both ends of the transit, fully open as
-            // the section crosses the middle. Scroll up and it reverses.
-            onUpdate: (self) => apply(Math.sin(self.progress * Math.PI)),
+            onUpdate: (self) => apply(self.progress, envelope(self.progress)),
           });
         });
 
@@ -245,16 +313,10 @@ export default function About() {
         <div>
           <p
             data-about-statement=""
-            className="font-hkgw text-[clamp(26px,4.4vw,72px)]/[1.09] font-semibold tracking-[-0.02em] text-ink"
+            className="font-manrope text-[clamp(28px,4.6vw,74px)]/[1.02] font-bold tracking-[-0.03em] text-ink"
           >
             {aboutSection.statement}
           </p>
-
-          <div className="mt-[clamp(32px,5vh,64px)]">
-            <ArrowLink href={aboutSection.readMoreHref}>
-              {aboutSection.readMoreText}
-            </ArrowLink>
-          </div>
         </div>
 
         {/* The track is the column the picture travels; its height less the

@@ -104,16 +104,18 @@ export const hero = {
  * words settle out of a compressed state and the illustration falls the
  * height of the column, both scrubbed to the scroll.
  *
- * The statement is written to that job: one paragraph, long enough to set as
- * ten or so lines. The length is doing two things, not one — the word gaps
- * ARE the effect, so a short statement has nothing to animate; and the
- * paragraph's height is what the picture beside it pins against, so a short
- * one leaves the pin nothing to hold for either.
+ * !! PLACEHOLDER COPY (user request, 2026-09-04) !!
+ * `statement` is the REFERENCE SITE's own paragraph, lifted verbatim so the
+ * setting, the measure and the motion can be judged against the thing they
+ * are being matched to. It is another designer's positioning, not Adnaan's,
+ * and it MUST be replaced before this goes anywhere public — the same
+ * standing condition the hero copy above is under. The user has said the
+ * personal rewrite comes next.
  *
- * It is also written NOT to be /about's. A first draft restated that page's
- * closing paragraph almost word for word, which is the trap a teaser sitting
- * one link away from the full piece falls into. This says the thesis; the
- * page says the argument. Neither sentence appears twice on the site.
+ * Whatever replaces it has to stay about this long. Both moves depend on it:
+ * the gaps need lines to open between, and the pinned picture needs the
+ * paragraph's height to hold against. A six-line statement gave the pin
+ * roughly 150px of travel, which reads as nothing at all.
  */
 export const aboutSection = {
   /** Rail index, over the illustration. */
@@ -126,10 +128,7 @@ export const aboutSection = {
   imageAlt:
     "Illustration of a figure at a two-screen desk setup in headphones, coding, with a bright sky through the window beside them.",
   statement:
-    "I close the gap between how a brand looks and how it is built. One person on both sides of that line means the details that survive the drawing survive the build too — the motion, the states, and the small things you feel long before you notice them.",
-  /** Sends you to the rest of the piece. */
-  readMoreText: "Read more",
-  readMoreHref: "/about",
+    "Passionate about merging design and engineering, I craft smooth, interactive experiences with purpose. With a focus on motion, performance, and detail, I help bring digital products to life for forward-thinking brands around the world.",
 };
 
 /** §A6 #2 blurb — retained verbatim as the handoff record. Only its first
