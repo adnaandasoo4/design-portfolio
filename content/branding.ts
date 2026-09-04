@@ -45,7 +45,7 @@ export const branding = {
      this file was not updated with them; the Branding page rendered three
      empty slots until an audit of /public found the dangling references.
      Anything that changes a disc-*.png path has to change it here too. */
-  bandImage: "/assets/disc-visual-identity-melts.png",
+  bandImage: "/assets/disc-visual-identity-sinua.png",
   bandCaption: "( identity work )",
 
   processEyebrow: "( how it runs )",

@@ -46,7 +46,7 @@ export const disciplines: Discipline[] = [
       "naming",
       "brand systems",
     ],
-    image: "/assets/disc-visual-identity-melts.png",
+    image: "/assets/disc-visual-identity-sinua.png",
     line: false,
   },
   {
