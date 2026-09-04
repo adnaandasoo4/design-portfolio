@@ -264,7 +264,7 @@ export default function About() {
       <div className="mx-auto w-full max-w-[1600px] px-[clamp(0px,4vw,96px)]">
         <p
           data-about-statement=""
-          className="font-manrope text-[clamp(28px,4.6vw,74px)]/[1.02] font-normal tracking-[-0.03em] text-ink"
+          className="font-manrope text-[clamp(26px,4vw,64px)]/[1.06] font-semibold tracking-[-0.03em] text-ink"
         >
           {aboutSection.statement}
         </p>
