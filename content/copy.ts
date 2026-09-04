@@ -57,9 +57,21 @@ export const hero = {
   paragraph:
     "We partner with ambitious B2B teams, scale-ups and brands to unlock their true potential and growth through strategy, design and technology.",
   /** Showreel — the branding reel, plus the captions on its bottom edge.
-   *  brand-reel.mp4 is 1920×1080 (exactly the card's 16:9) and 6.5s, so it
-   *  loops without a letterbox. (showreel-2.mp4 was a byte-identical copy of
-   *  it and is deleted, 2026-09-03.)
+   *  1920×1080 (exactly the card's 16:9) and 6.5s, so it loops without a
+   *  letterbox. (showreel-2.mp4 was a byte-identical copy and is deleted,
+   *  2026-09-03.)
+   *
+   *  FASTSTART, and the filename says so on purpose. The original had its
+   *  `moov` atom — the index a decoder needs before it can draw anything —
+   *  at byte 2,087,838 of a 2,091,411-byte file, i.e. last. A browser
+   *  therefore had to fetch essentially the WHOLE 2MB before it could show
+   *  one frame, and on the home page that request queues behind the
+   *  preloader's six stills, the fonts and the JS. The card sat empty long
+   *  after the hero had finished animating in. Remuxed so moov leads: same
+   *  bytes, reordered, decodable within a few KB.
+   *
+   *  If this is ever re-exported, export it faststart (ffmpeg -movflags
+   *  +faststart) or the card goes blank again.
    *
    *  No poster, and no poster FILE: assets/reel-poster.png was itself a
    *  placeholder graphic — it literally read "brand showreel — poster
@@ -67,7 +79,7 @@ export const hero = {
    *  it would have flashed placeholder artwork before the reel starts. It is
    *  deleted too. The card's own fill is the loading state. */
   reel: {
-    src: "/assets/brand-reel.mp4",
+    src: "/assets/brand-reel-faststart.mp4",
     /** Accessible name for the video */
     alt: "Branding showreel",
     /** Caption under the card — label left, action right. Set at
