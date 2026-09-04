@@ -1,71 +1,58 @@
 "use client";
 
 /*
- * About (§A6 #2) — the home page's scroll set piece (user, 2026-09-04).
+ * About (§A6 #2) — the home page's scroll set piece.
  *
- * One statement, one picture, and two moves tied to the same scroll.
+ * One paragraph, centred and spanning the page, and nothing else: the
+ * picture and the "Myself" index are both gone (user, 2026-09-04). The
+ * section is the sentence and the way it moves.
  *
- * ── THE WORDS ────────────────────────────────────────────────────────────
- * The paragraph is set NORMALLY in the markup: left-aligned, ordinary word
- * spacing, ragged right. Every gap you see opening is a per-word `x`
- * transform, and that is the whole trick.
+ * ── HOW IT WORKS ─────────────────────────────────────────────────────────
+ * The paragraph is set NORMALLY in the markup — left-aligned, ordinary word
+ * spacing, ragged right. Every gap that opens is a per-word `x` transform,
+ * and that is the whole trick.
  *
- * Each line is measured for SLACK — the room between where its last word
- * naturally ends and the right edge of the column — and that slack is handed
- * out across the line's gaps as scroll progress rises. At full spread the
- * line's last word lands exactly on the right edge, so the paragraph reads
- * as justified without ever having been justified. At zero it is back to its
- * natural setting. Nothing re-wraps at any point in between, because the
- * line breaks were fixed by the browser once, before a single transform was
- * applied.
+ * Each line is measured for SLACK: the room between where its last word
+ * naturally ends and the right edge of the measure. That slack is what the
+ * line has to give away. As it is handed out, the line's last word walks to
+ * the right edge and the paragraph arrives justified — without ever having
+ * been justified, and without a single re-wrap, because the browser fixed
+ * the line breaks once before any transform was applied.
  *
- * SPORADIC, not synchronised (user, 2026-09-04). A first pass handed every
- * gap a fixed share of the slack and opened them all together, which read as
- * one block breathing — legible, and dull. Now each gap carries its OWN
- * phase and its own frequency, so at any scroll position some are wide open
- * while their neighbours are shut, and which ones those are keeps changing
- * as you scroll. The words appear to shuffle against each other rather than
- * inflate as a unit.
+ * ── ONE WAY, NOT BACK AND FORTH (user, 2026-09-04) ───────────────────────
+ * The previous version oscillated: every gap ran a sine, so words drifted
+ * open and shut and open again for as long as you scrolled. That reads as
+ * fidgeting. Now each gap has a WINDOW — a start and an end in scroll
+ * progress — and inside it eases from shut to its final share exactly once.
+ * Past its window it holds. Scroll on and nothing moves back; scroll up and
+ * it rewinds, because it is a position rather than a playback.
  *
- * What keeps that from tearing the line apart is that the shares are
- * NORMALISED every frame: the per-gap values are weights, scaled so their
- * total is always the line's slack budget and never a pixel more. Gaps
- * therefore trade room with each other — one can only open by another
- * closing — so the line's right edge stays put however chaotic the middle
- * gets.
+ * ── STILL SPORADIC ───────────────────────────────────────────────────────
+ * The windows are what keeps it from being one block inflating. Every gap
+ * opens at a different point and takes a different length of scroll to do
+ * it, so at any moment some are already wide, some are mid-move and some
+ * have not started — the paragraph comes apart in pieces rather than all at
+ * once. Its final share of the slack is uneven too, so the settled spacing
+ * looks set by hand.
  *
- * An ENVELOPE rides over the top: `0.35 + 0.65·sin(p·π)`, so the paragraph is
- * never fully closed (the reference always shows gaps) but is at its most
- * open crossing the middle of the viewport. Scroll up and all of it runs
- * backwards. It is a position, not a playback — the paragraph only ever
- * moves as fast as you scroll it.
+ * Windows live inside SPREAD_FROM..SPREAD_TO rather than the full transit,
+ * so the paragraph finishes opening while it is still comfortably on screen
+ * and then simply holds as it leaves. Every start, length and share comes
+ * from a hash of the gap's index — deterministic, so the paragraph never
+ * re-spaces itself between loads.
  *
- * Every phase and frequency comes from a hash of the gap's index, so the
- * churn is identical on every load rather than random per refresh.
- *
- * Doing it with transforms rather than by animating `word-spacing` is what
- * keeps this affordable: word-spacing is a layout property, so animating it
+ * Doing this with transforms rather than by animating `word-spacing` is what
+ * keeps it affordable: word-spacing is a layout property, so animating it
  * would re-wrap and re-lay-out the paragraph on every frame of every scroll.
- * The visible result is the same; only the cost differs.
- *
- * ── THE PICTURE ──────────────────────────────────────────────────────────
- * It starts level with the first line of the statement, rides up with the
- * page until it clears the fixed nav, then PINS — the words keep scrolling
- * past on the left while it holds still. It is released after exactly the
- * column's slack (track height less its own), which is the scroll distance
- * that puts its bottom edge on the bottom of the text. From there it scrolls
- * away with everything else.
+ * Same result on screen, different cost entirely.
  *
  * ── MOBILE AND REDUCED MOTION ────────────────────────────────────────────
- * Neither move exists below 700px (user, 2026-09-04): no split, no pin, and
- * the statement is exactly what the markup says — an ordinary paragraph. A
- * justified-by-transform paragraph at phone measure is three or four words a
- * line with canyons between them, and a pinned picture on a screen that
- * short is a picture that never appears to move. Reduced motion opts out of
- * both for the same reason it opts out of everything else.
+ * Neither exists below 700px: no split, and the statement is exactly what
+ * the markup says — an ordinary paragraph. Justified-by-transform at phone
+ * measure is three words a line with canyons between them. Reduced motion
+ * opts out the same way.
  */
 import { useRef } from "react";
-import Image from "next/image";
 import { gsap, useGSAP, ScrollTrigger, SplitText } from "@/lib/gsap/register";
 import { MQ } from "@/lib/gsap/motion";
 import { aboutSection } from "@/content/copy";
@@ -73,39 +60,46 @@ import { aboutSection } from "@/content/copy";
 /** Desktop, and only when motion is welcome. */
 const MQ_SET_PIECE = `${MQ.desktop} and ${MQ.motionOk}`;
 
-/** Distance from the viewport's top the picture holds at while pinned —
- *  clear of the nav bar (44px on a 20px gutter) with air to spare. */
-const PIN_TOP = 116;
+/** A line never gives up more than this share of its own width to gaps.
+ *  Raised from 0.32 when the picture went and the measure widened — there is
+ *  far more room to travel now, and the user asked for the move to be more
+ *  drastic with it. The cap still matters for the LAST line, which is short
+ *  and therefore nearly all slack. */
+const MAX_SPREAD = 0.5;
 
-/** A line never gives up more than this share of its own width to gaps. The
- *  cap exists for the LAST line, which is short and therefore nearly all
- *  slack: without it, three words would be flung across the full column. */
-const MAX_SPREAD = 0.32;
+/** Where the opening happens inside the section's transit. Bounded well
+ *  short of 1 so the paragraph finishes while it is still on screen and
+ *  holds, rather than completing on its way out of frame. */
+const SPREAD_FROM = 0.08;
+const SPREAD_TO = 0.78;
 
-/** The floor of the envelope — how open the paragraph stays at the ends of
- *  the transit. Never 0: the reference always shows gaps. */
-const OPEN_FLOOR = 0.35;
+/** How long a single gap takes, as a share of the whole transit. The spread
+ *  between the two is what staggers the paragraph apart. */
+const WINDOW_MIN = 0.16;
+const WINDOW_MAX = 0.42;
 
-/** How many times a gap cycles across one pass of the section. Kept low and
- *  irrational-ish so neighbours drift out of step instead of pulsing
- *  together. */
-const CHURN_MIN = 1.3;
-const CHURN_MAX = 3.4;
-
-/** Deterministic 0..1 from an integer — the per-gap share of the slack. Not
- *  Math.random: the spacing has to be identical on every load, or the
- *  paragraph would re-space itself on a refresh. */
+/** Deterministic 0..1 from an integer. Not Math.random: the spacing has to
+ *  be identical on every load, or the paragraph would re-space itself on a
+ *  refresh. */
 function hash01(n: number) {
   const x = Math.sin(n * 12.9898 + 78.233) * 43758.5453;
   return x - Math.floor(x);
 }
 
+/** Smootherstep — flat at both ends, so a gap neither starts nor stops
+ *  abruptly as it enters and leaves its window. */
+function ease(t: number) {
+  const c = t < 0 ? 0 : t > 1 ? 1 : t;
+  return c * c * c * (c * (c * 6 - 15) + 10);
+}
+
 type Line = {
   /** One setter per word; index 0 never moves, it anchors the line. */
   setters: ((value: number) => void)[];
-  /** Per-GAP phase and frequency — length is setters.length - 1. */
-  phase: number[];
-  freq: number[];
+  /** Per-GAP — each array is setters.length - 1 long. */
+  share: number[];
+  from: number[];
+  to: number[];
   slack: number;
 };
 
@@ -121,27 +115,7 @@ export default function About() {
       mm.add(MQ_SET_PIECE, () => {
         const statement =
           section.querySelector<HTMLElement>("[data-about-statement]");
-        const track = section.querySelector<HTMLElement>("[data-about-track]");
-        const media = section.querySelector<HTMLElement>("[data-about-media]");
 
-        /* ---- The picture pins while the words scroll past ---- */
-        let pin: ScrollTrigger | null = null;
-        if (track && media) {
-          pin = ScrollTrigger.create({
-            trigger: media,
-            start: `top ${PIN_TOP}px`,
-            // Exactly the column's slack: hold until the picture's bottom
-            // meets the bottom of the text, then let go. Function-based, so
-            // a resize that re-wraps the statement re-measures the hold.
-            end: () =>
-              "+=" + Math.max(0, track.clientHeight - media.offsetHeight),
-            pin: media,
-            pinSpacing: false,
-            invalidateOnRefresh: true,
-          });
-        }
-
-        /* ---- The words open and close their own gaps ---- */
         let split: SplitText | null = null;
         let spread: ScrollTrigger | null = null;
         let cancelled = false;
@@ -155,23 +129,17 @@ export default function About() {
             wordsClass: "ad-word",
           });
 
-          const column = statement.clientWidth;
           let lines: Line[] = [];
-          // Reused across frames — this runs on every scroll event, so the
-          // per-frame work allocates nothing.
-          const weights: number[] = [];
 
-          /** Re-measure everything from the browser's own layout. Called on
-           *  build and on every refresh, since a resize re-wraps the lines
-           *  and every slack figure with them. */
+          /** Read the slack straight out of the browser's own layout. Re-run
+           *  on every refresh, since a resize re-wraps every line and every
+           *  slack figure with it. */
           const measure = () => {
+            const column = statement.clientWidth;
             lines = gsap.utils
               .toArray<HTMLElement>(".ad-line", statement)
               .map((line) => {
-                const words = gsap.utils.toArray<HTMLElement>(
-                  ".ad-word",
-                  line,
-                );
+                const words = gsap.utils.toArray<HTMLElement>(".ad-word", line);
                 if (words.length < 2) return null;
 
                 const first = words[0];
@@ -183,26 +151,41 @@ export default function About() {
                   Math.min(column - natural, natural * MAX_SPREAD),
                 );
 
-                // One phase and one frequency per GAP. Seeded off the
-                // line's own length as well as the gap index, so two lines
-                // with the same word count still churn differently.
                 const gaps = words.length - 1;
+                // Seeded off the line's length as well as the gap index, so
+                // two lines with the same word count still come apart in a
+                // different order.
                 const seed = words.length * 31;
-                const phase = Array.from(
+
+                const raw = Array.from(
                   { length: gaps },
-                  (_, g) => hash01(g + seed) * Math.PI * 2,
+                  (_, g) => 0.4 + hash01(g + seed),
                 );
-                const freq = Array.from(
-                  { length: gaps },
-                  (_, g) =>
-                    CHURN_MIN +
-                    hash01(g + seed + 977) * (CHURN_MAX - CHURN_MIN),
-                );
+                const total = raw.reduce((a, b) => a + b, 0);
+                const share = raw.map((r) => r / total);
+
+                const from: number[] = [];
+                const to: number[] = [];
+                for (let g = 0; g < gaps; g++) {
+                  const len =
+                    WINDOW_MIN +
+                    hash01(g + seed + 613) * (WINDOW_MAX - WINDOW_MIN);
+                  // Start anywhere that still leaves room for the whole
+                  // window inside the spread band, so every gap is finished
+                  // by SPREAD_TO and none is left half-open.
+                  const latest = SPREAD_TO - len;
+                  const start =
+                    SPREAD_FROM +
+                    hash01(g + seed + 191) * Math.max(0, latest - SPREAD_FROM);
+                  from.push(start);
+                  to.push(start + len);
+                }
 
                 return {
                   setters: words.map((w) => gsap.quickSetter(w, "x", "px")),
-                  phase,
-                  freq,
+                  share,
+                  from,
+                  to,
                   slack,
                 } as Line;
               })
@@ -210,49 +193,25 @@ export default function About() {
           };
 
           /**
-           * @param progress 0..1 across the section's transit
-           * @param envelope how much of each line's slack is in play
+           * @param p 0..1 across the section's transit
            *
-           * The per-gap values are WEIGHTS, not widths. They are normalised
-           * to sum to 1 before being scaled by the line's budget, which is
-           * what stops the line growing past its slack no matter how the
-           * individual gaps happen to fall — a gap can only open by taking
-           * room from another.
+           * Each gap contributes `share · slack` once its own window has
+           * run. Because every share is a fraction of one, a fully-open line
+           * has given away exactly its slack and not a pixel more — the
+           * right edge lands where it was measured to land.
            */
-          const apply = (progress: number, envelope: number) => {
+          const apply = (p: number) => {
             for (const line of lines) {
-              const gaps = line.phase.length;
-              if (!gaps) continue;
-
-              let total = 0;
-              for (let g = 0; g < gaps; g++) {
-                // 0.15 floor so a gap at the bottom of its cycle still holds
-                // a sliver of room rather than snapping its words together.
-                weights[g] =
-                  0.15 +
-                  0.85 *
-                    (0.5 +
-                      0.5 *
-                        Math.sin(
-                          progress * Math.PI * 2 * line.freq[g] +
-                            line.phase[g],
-                        ));
-                total += weights[g];
-              }
-
-              const budget = line.slack * envelope;
+              const gaps = line.from.length;
               let run = 0;
               line.setters[0](0);
               for (let g = 0; g < gaps; g++) {
-                run += (weights[g] / total) * budget;
+                const t = (p - line.from[g]) / (line.to[g] - line.from[g]);
+                run += line.share[g] * line.slack * ease(t);
                 line.setters[g + 1](run);
               }
             }
           };
-
-          /** How much of each line's slack is in play at this progress. */
-          const envelope = (progress: number) =>
-            OPEN_FLOOR + (1 - OPEN_FLOOR) * Math.sin(progress * Math.PI);
 
           measure();
 
@@ -262,33 +221,30 @@ export default function About() {
             end: "bottom top",
             invalidateOnRefresh: true,
             onRefresh: (self) => {
-              // Zero the transforms before re-measuring, or the offsets we
-              // read back would include the spread we are about to recompute.
-              apply(0, 0);
+              // Zero before measuring, or the offsets read back would
+              // include the spread about to be recomputed...
+              apply(0);
               measure();
-              // ...and put it straight back. A refresh fires on resize, on
-              // the font swap and when the picture finishes loading, none of
-              // which involve scrolling — so without this the paragraph sits
-              // at its natural spacing until the next scroll event happens
-              // to arrive, which on a section already in view is never.
-              apply(self.progress, envelope(self.progress));
+              // ...and put it straight back. A refresh fires on resize and
+              // on the font swap, neither of which involves scrolling, so
+              // without this the paragraph would sit at its natural spacing
+              // until a scroll event that may never come.
+              apply(self.progress);
             },
-            onUpdate: (self) => apply(self.progress, envelope(self.progress)),
+            onUpdate: (self) => apply(self.progress),
           });
         });
 
         return () => {
-          // Both of these are built after this callback returns, so they sit
-          // outside useGSAP's automatic cleanup and are killed by hand.
+          // Built after this callback returns, so both sit outside useGSAP's
+          // automatic cleanup and are killed by hand.
           cancelled = true;
           spread?.kill();
           split?.revert();
-          pin?.kill();
         };
       });
 
-      // Every other case — phones, and anyone who asked for less motion —
-      // renders the markup exactly as written.
+      // Phones and reduced-motion render the markup exactly as written.
 
       return () => mm.revert();
     },
@@ -300,41 +256,18 @@ export default function About() {
       id="about"
       ref={scope}
       aria-label="About"
-      className="relative z-(--z-section) bg-bg px-5 py-[clamp(140px,20vh,260px)] max-b700:px-4 max-b700:py-24"
+      className="relative z-(--z-section) bg-bg px-5 py-[clamp(160px,24vh,300px)] max-b700:px-4 max-b700:py-24"
     >
-      <p className="font-manrope text-meta leading-none tracking-[0.08em] text-muted-2 uppercase">
-        {aboutSection.eyebrow}
-      </p>
-
-      {/* items-start so the picture's top edge begins level with the first
-          line of the statement; the track below it carries the height that
-          decides how long the pin holds. */}
-      <div className="mt-[clamp(30px,5vh,72px)] grid grid-cols-[1fr_minmax(0,34%)] items-start gap-x-[clamp(32px,5vw,90px)] max-b860:grid-cols-1 max-b860:gap-y-14">
-        <div>
-          <p
-            data-about-statement=""
-            className="font-manrope text-[clamp(28px,4.6vw,74px)]/[1.02] font-bold tracking-[-0.03em] text-ink"
-          >
-            {aboutSection.statement}
-          </p>
-        </div>
-
-        {/* The track is the column the picture travels; its height less the
-            picture's own is exactly how far the pin holds. */}
-        <div data-about-track="" className="relative h-full">
-          <div
-            data-about-media=""
-            className="relative aspect-4/3 w-full overflow-hidden rounded-media bg-slot"
-          >
-            <Image
-              src={aboutSection.image}
-              alt={aboutSection.imageAlt}
-              fill
-              sizes="(max-width: 860px) 100vw, 34vw"
-              className="object-cover"
-            />
-          </div>
-        </div>
+      {/* Spans the page, centred, on a tighter inner margin than the site
+          gutter — the paragraph is the only thing in the section, so the
+          measure is set by the inset rather than by a column beside it. */}
+      <div className="mx-auto w-full max-w-[1600px] px-[clamp(0px,4vw,96px)]">
+        <p
+          data-about-statement=""
+          className="font-manrope text-[clamp(28px,4.6vw,74px)]/[1.02] font-bold tracking-[-0.03em] text-ink"
+        >
+          {aboutSection.statement}
+        </p>
       </div>
     </section>
   );

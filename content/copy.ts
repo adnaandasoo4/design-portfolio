@@ -98,11 +98,11 @@ export const hero = {
  *
  * REBUILT as a scroll set piece (user, 2026-09-04). The section used to be a
  * teaser — statement, two borrowed paragraphs, a "read more" — and all of
- * that moved to /about, which now runs the personal piece in full. What is
- * left here is one statement and one picture, and the section earns its
- * place on the home page through MOTION rather than through more copy: the
- * words settle out of a compressed state and the illustration falls the
- * height of the column, both scrubbed to the scroll.
+ * that moved to /about, which now runs the personal piece in full.
+ *
+ * What is left is ONE sentence. The index and the illustration went too, so
+ * the section is the paragraph and the way it moves: the word gaps come
+ * apart across the page as you scroll it. Nothing else competes.
  *
  * !! PLACEHOLDER COPY (user request, 2026-09-04) !!
  * `statement` is the REFERENCE SITE's own paragraph, lifted verbatim so the
@@ -118,15 +118,6 @@ export const hero = {
  * roughly 150px of travel, which reads as nothing at all.
  */
 export const aboutSection = {
-  /** Rail index, over the illustration. */
-  eyebrow: "Myself",
-  /** Right column. Landscape (1199x674), shown in a tall-ish frame with
-   *  object-cover, so the crop comes off the sides — the desk, the screens
-   *  and the window stay centred. The night-desk illustration stays on
-   *  /about; the two pages no longer share a picture either (2026-09-04). */
-  image: "/assets/about-desk-coding.png",
-  imageAlt:
-    "Illustration of a figure at a two-screen desk setup in headphones, coding, with a bright sky through the window beside them.",
   statement:
     "Passionate about merging design and engineering, I craft smooth, interactive experiences with purpose. With a focus on motion, performance, and detail, I help bring digital products to life for forward-thinking brands around the world.",
 };
