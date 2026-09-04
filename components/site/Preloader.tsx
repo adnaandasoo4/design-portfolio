@@ -33,8 +33,12 @@ import { markPreloaderDone } from "@/lib/preloader";
  * load.
  */
 
-/** Image slides — preload-1…6 (preload-7, the 911 GT3 still, was cut by
- *  user direction 2026-07-21). The final slide is the solid off-black. */
+/** Image slides — preload-1…6. (preload-7, the 911 GT3 still, was cut by
+ *  user direction 2026-07-21; the file was deleted 2026-09-03.) The final
+ *  slide is the solid off-black.
+ *
+ *  NOTE for anyone auditing /public: these paths are BUILT, not written out,
+ *  so grepping the repo for "preload-3.jpg" finds nothing. They are in use. */
 const SLIDES = [1, 2, 3, 4, 5, 6].map((n) => `/assets/preload-${n}.jpg`);
 
 /* ---- Choreography timing (s) — reference v1 port, verbatim ---- */

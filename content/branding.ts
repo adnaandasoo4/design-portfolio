@@ -38,7 +38,14 @@ export const branding = {
     },
   ],
 
-  bandImage: "/assets/disc-brand-strategy-2.png",
+  /* Shares the Disciplines rows' artwork rather than carrying its own — the
+     page argues the same three things the home section lists, so a separate
+     set would be two libraries to keep in step. These paths broke once
+     (2026-09-03) when the discipline images were replaced and renamed and
+     this file was not updated with them; the Branding page rendered three
+     empty slots until an audit of /public found the dangling references.
+     Anything that changes a disc-*.png path has to change it here too. */
+  bandImage: "/assets/disc-visual-identity-melts.png",
   bandCaption: "( identity work )",
 
   processEyebrow: "( how it runs )",
@@ -68,11 +75,11 @@ export const branding = {
   galleryEyebrow: "( in practice )",
   gallery: [
     {
-      image: "/assets/disc-digital-design-2.png",
+      image: "/assets/disc-digital-brand-diconf.png",
       caption: "Identity applied across a digital product surface.",
     },
     {
-      image: "/assets/disc-development-3.png",
+      image: "/assets/disc-development-laptop.png",
       caption: "The same system, specified for the people building it.",
     },
   ],

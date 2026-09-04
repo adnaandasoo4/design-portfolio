@@ -58,14 +58,14 @@ export const hero = {
     "We partner with ambitious B2B teams, scale-ups and brands to unlock their true potential and growth through strategy, design and technology.",
   /** Showreel — the branding reel, plus the captions on its bottom edge.
    *  brand-reel.mp4 is 1920×1080 (exactly the card's 16:9) and 6.5s, so it
-   *  loops without a letterbox. showreel-2.mp4 in the same folder is a
-   *  byte-identical duplicate.
+   *  loops without a letterbox. (showreel-2.mp4 was a byte-identical copy of
+   *  it and is deleted, 2026-09-03.)
    *
-   *  No poster: assets/reel-poster.png is itself a placeholder graphic (it
-   *  literally reads "brand showreel — poster (16:10)", and at 16:10 it is
-   *  the wrong shape for this card anyway), so it would flash placeholder
-   *  artwork before the reel starts. The card's vermilion fill is the
-   *  loading state instead. */
+   *  No poster, and no poster FILE: assets/reel-poster.png was itself a
+   *  placeholder graphic — it literally read "brand showreel — poster
+   *  (16:10)", and at 16:10 it was the wrong shape for this card anyway — so
+   *  it would have flashed placeholder artwork before the reel starts. It is
+   *  deleted too. The card's own fill is the loading state. */
   reel: {
     src: "/assets/brand-reel.mp4",
     /** Accessible name for the video */
