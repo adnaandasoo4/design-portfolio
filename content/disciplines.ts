@@ -2,10 +2,16 @@
  * Disciplines rows (§A6 #5) — copy verbatim from the reference `roles[]`.
  *
  * All three rows got new supporting work (user, 2026-09-03). Every file is
- * named for the row it belongs to now — the ones they replace
+ * named for the row it belongs to — the ones they replace
  * (disc-brand-strategy-2, disc-digital-design-2, disc-development-3) were
  * named for headings these rows have not carried for a while, and carried
  * version suffixes from a round of swaps nobody can reconstruct.
+ *
+ * Later the same day the D!CONF stage shot moved from row 03 to row 02,
+ * dropping the Otters billboard, and row 03 took the lit-screen laptop.
+ * The paths did not change: the files are named for the ROW, so a picture
+ * moving between rows is a change of file contents, not of filename. That
+ * is the naming rule earning its keep.
  */
 export type Discipline = {
   numeral: string;
