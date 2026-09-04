@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { gsap, useGSAP } from "@/lib/gsap/register";
 import { EASE } from "@/lib/gsap/motion";
@@ -22,6 +22,11 @@ import { markPreloaderDone } from "@/lib/preloader";
  * At expand-complete (+900ms): scroll unlocks, markPreloaderDone fires the
  * reveals — nav, hero PANEL fade-in, hero intro elements — and the stage
  * fades out .55s (display:none at +600ms, per the reference).
+ *
+ * Signalling: markPreloaderDone() fires at expand-complete, and ALSO
+ * immediately when this component decides not to play at all. Nothing may be
+ * left waiting on a preloader that is never coming — see lib/preloader, which
+ * also puts a hard deadline on every subscription.
  *
  * Gating: cascade starts only after all stills decode() (hard 1200ms
  * fallback). Scroll locked + page inert for the duration; released on
@@ -89,6 +94,17 @@ export default function Preloader() {
   // lazy initializer captures the landing route; client-side returns to "/"
   // don't replay).
   const [play] = useState(() => pathname === "/" && !hasPlayed);
+
+  /* Say so when there is no preloader to wait for — this route did not enter
+     on "/", or it already played. Everything gated on the signal (the nav's
+     arrival, the hero's whole opening) is HIDDEN until it arrives, so the
+     absence of a preloader has to be announced rather than left for
+     subscribers to infer from whether a [data-preloader] node happens to be
+     in the DOM when they look. That inference is what left the hero blank
+     when this component decided not to render. */
+  useEffect(() => {
+    if (!play) markPreloaderDone();
+  }, [play]);
 
   useGSAP(
     () => {
