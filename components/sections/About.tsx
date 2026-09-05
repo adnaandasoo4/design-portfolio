@@ -63,8 +63,8 @@ const FADE = 0.16;
 /* The setting is shared, not duplicated: both copies have to wrap to exactly
    the same lines or the lit one would sit a pixel off the grey one. */
 const SETTING =
-  "font-manrope text-[clamp(26px,4vw,64px)]/[1.06] font-semibold " +
-  "tracking-[-0.03em] indent-[clamp(56px,20%,380px)]";
+  "font-manrope text-[clamp(1.625rem,4vw,4rem)]/[1.06] font-semibold " +
+  "tracking-[-0.03em] indent-[clamp(3.5rem,20%,23.75rem)]";
 
 /** The paragraph, twice: once grey and read, once lit and clipped. */
 function Statement({
@@ -164,7 +164,7 @@ export default function About() {
       id="about"
       ref={scope}
       aria-label="About"
-      className="relative z-(--z-section) bg-bg px-5 py-[clamp(160px,24vh,300px)] max-b700:px-4 max-b700:py-24"
+      className="relative z-(--z-section) bg-bg px-5 py-[clamp(10rem,24vh,18.75rem)] max-b700:px-4 max-b700:py-24"
     >
       {/* Edge to edge on the site's own gutters (user, 2026-09-04) — no inner
           inset and no max-width, so the measure is the page's, the same one

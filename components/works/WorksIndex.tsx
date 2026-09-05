@@ -65,7 +65,7 @@ export default function WorksIndex() {
       {/* Full-bleed hairline under the header (§A1 — hairlines, not margins) */}
       <div aria-hidden="true" className="h-px bg-line-09" />
 
-      <ul className="grid grid-cols-3 gap-x-9 gap-y-[clamp(48px,7vh,84px)] px-9 pt-[clamp(44px,7vh,84px)] pb-[clamp(90px,13vh,170px)] max-b1024:grid-cols-2 max-b860:grid-cols-1 max-b700:px-5.5">
+      <ul className="grid grid-cols-3 gap-x-9 gap-y-[clamp(3rem,7vh,5.25rem)] px-9 pt-[clamp(2.75rem,7vh,5.25rem)] pb-[clamp(5.625rem,13vh,10.625rem)] max-b1024:grid-cols-2 max-b860:grid-cols-1 max-b700:px-5.5">
         {works.cards.map((card, i) => (
           <li key={card.title}>
             {/* Case studies deferred (§A9) — anchor is a placeholder */}
@@ -84,18 +84,18 @@ export default function WorksIndex() {
 
               {/* Meta line — title + JP left · index + mono meta right */}
               <span className="mt-4 flex items-baseline justify-between gap-4">
-                <span className="flex min-w-0 flex-col gap-[7px]">
-                  <span className="truncate text-[clamp(17px,1.35vw,21px)]/[1] font-medium tracking-[-0.01em] text-ink transition-colors duration-(--dur-hover) ease-(--ease-std) group-hover:text-accent group-focus-visible:text-accent">
+                <span className="flex min-w-0 flex-col gap-[0.4375rem]">
+                  <span className="truncate text-[clamp(1.0625rem,1.35vw,1.3125rem)]/[1] font-medium tracking-[-0.01em] text-ink transition-colors duration-(--dur-hover) ease-(--ease-std) group-hover:text-accent group-focus-visible:text-accent">
                     {card.title}
                   </span>
                   <span
                     lang="ja"
-                    className="truncate font-ja text-[12px]/[1] font-normal tracking-[0.14em] text-text-38"
+                    className="truncate font-ja text-[0.75rem]/[1] font-normal tracking-[0.14em] text-text-38"
                   >
                     {card.ja}
                   </span>
                 </span>
-                <span className="shrink-0 font-manrope text-[12px]/[1] font-medium tracking-[0.04em] text-muted-3">
+                <span className="shrink-0 font-manrope text-[0.75rem]/[1] font-medium tracking-[0.04em] text-muted-3">
                   <span className="text-muted-2">
                     {String(i + 1).padStart(2, "0")}
                   </span>

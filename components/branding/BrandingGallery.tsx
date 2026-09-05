@@ -13,7 +13,7 @@ import { branding } from "@/content/branding";
 export default function BrandingGallery() {
   return (
     <Spread eyebrow={branding.galleryEyebrow} tight>
-      <div className="grid grid-cols-2 gap-[clamp(16px,2.4vw,40px)] max-b700:grid-cols-1">
+      <div className="grid grid-cols-2 gap-[clamp(1rem,2.4vw,2.5rem)] max-b700:grid-cols-1">
         {branding.gallery.map((item) => (
           <figure key={item.image} data-reveal="" className="m-0">
             <div className="relative aspect-4/3 w-full overflow-hidden rounded-media bg-slot">

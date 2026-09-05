@@ -15,7 +15,7 @@ export default function AboutFacts() {
   return (
     <section
       aria-label="In three"
-      className="relative bg-bg px-5 py-[clamp(100px,16vh,220px)] max-b700:px-4 max-b700:py-20"
+      className="relative bg-bg px-5 py-[clamp(6.25rem,16vh,13.75rem)] max-b700:px-4 max-b700:py-20"
     >
       <div
         data-reveal=""
@@ -28,7 +28,7 @@ export default function AboutFacts() {
       </div>
       <span aria-hidden="true" className="mt-5 block h-px w-full bg-line-09" />
 
-      <ul className="mt-[clamp(44px,7vh,96px)] grid grid-cols-3 gap-x-[clamp(24px,5vw,90px)] max-b860:grid-cols-1 max-b860:gap-y-12">
+      <ul className="mt-[clamp(2.75rem,7vh,6rem)] grid grid-cols-3 gap-x-[clamp(1.5rem,5vw,5.625rem)] max-b860:grid-cols-1 max-b860:gap-y-12">
         {about.meta.map((item) => (
           <li key={item.numeral} data-reveal="" className="flex flex-col">
             <span
@@ -37,7 +37,7 @@ export default function AboutFacts() {
             >
               {item.numeral}
             </span>
-            <span className="mt-[clamp(16px,2.4vh,32px)] text-[clamp(20px,2.2vw,38px)]/[1.15] font-semibold tracking-[-0.018em] text-ink">
+            <span className="mt-[clamp(1rem,2.4vh,2rem)] text-[clamp(1.25rem,2.2vw,2.375rem)]/[1.15] font-semibold tracking-[-0.018em] text-ink">
               {item.latin}
             </span>
             <span

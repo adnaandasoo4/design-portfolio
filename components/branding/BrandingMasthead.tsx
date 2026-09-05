@@ -16,13 +16,13 @@ export default function BrandingMasthead() {
     <Spread eyebrow={branding.eyebrow} note={branding.meta}>
       <h1
         data-reveal=""
-        className="font-hkgw text-[clamp(44px,7.4vw,132px)]/[0.9] font-bold tracking-[-0.025em] text-ink uppercase"
+        className="font-hkgw text-[clamp(2.75rem,7.4vw,8.25rem)]/[0.9] font-bold tracking-[-0.025em] text-ink uppercase"
       >
         {branding.title}
       </h1>
       <p
         data-reveal=""
-        className="mt-[clamp(28px,4vh,56px)] max-w-[54ch] font-manrope text-meta/[1.7] text-muted-2"
+        className="mt-[clamp(1.75rem,4vh,3.5rem)] max-w-[54ch] font-manrope text-meta/[1.7] text-muted-2"
       >
         {branding.intro}
       </p>

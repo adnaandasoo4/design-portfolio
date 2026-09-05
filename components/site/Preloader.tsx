@@ -245,7 +245,7 @@ export default function Preloader() {
           the frame rect at call time, so the math follows automatically. */}
       <div
         data-pre-frame=""
-        className="relative h-[384px] w-[300px] overflow-hidden max-b700:h-[307px] max-b700:w-[240px]"
+        className="relative h-[24rem] w-[18.75rem] overflow-hidden max-b700:h-[19.1875rem] max-b700:w-[15rem]"
       >
         {SLIDES.map((src, i) => (
           <div

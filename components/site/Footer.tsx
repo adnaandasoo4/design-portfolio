@@ -49,7 +49,7 @@ const PENDING_SCROLL_TTL_MS = 3000;
 /** Column eyebrow — lowercase Manrope, shared by all four headers */
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[14px]/[1] tracking-[0.04em] text-muted-2">{children}</p>
+    <p className="text-[0.875rem]/[1] tracking-[0.04em] text-muted-2">{children}</p>
   );
 }
 
@@ -138,7 +138,7 @@ function LocalClock() {
 
   return (
     // Sized to match the (my details) column type at both breakpoints
-    <div className="text-[18px]/[1.4] text-ink max-b700:text-[15px]/[1.4]">
+    <div className="text-[1.125rem]/[1.4] text-ink max-b700:text-[0.9375rem]/[1.4]">
       <p>
         {footer.clockCity} {time}
       </p>
@@ -160,7 +160,7 @@ const FLOOD =
   "group-focus-visible:opacity-100 group-focus-visible:duration-0";
 
 const LABEL =
-  "relative text-[clamp(28px,min(3.2vw,6svh),54px)]/[1.12] font-medium " +
+  "relative text-[clamp(1.75rem,min(3.2vw,6svh),3.375rem)]/[1.12] font-medium " +
   "tracking-[-0.01em] text-ink " +
   "[transition:color_var(--dur-copy-2)_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
   "group-hover:[transition:color_0s_ease,translate_var(--dur-track)_var(--ease-out-quart)] " +
@@ -181,7 +181,7 @@ const ARROW =
    dropped from 6svh to 5svh when the list went from five links to six
    (Branding), so the taller list still clears the meta row beneath it. */
 const FOOTER_DISPLAY =
-  "text-[clamp(28px,min(3.2vw,5svh),54px)]/[1.12] max-b700:text-[34px]";
+  "text-[clamp(1.75rem,min(3.2vw,5svh),3.375rem)]/[1.12] max-b700:text-[2.125rem]";
 
 const BIG_LINK =
   "group relative flex items-center justify-between gap-6 py-1.5 pr-4 " +
@@ -275,7 +275,7 @@ function SwapCell({
       </span>
       <span
         style={{ transitionDelay }}
-        className={`${SWAP_LAYER} absolute inset-0 [transform:translateY(100%)] motion-safe:group-hover:[transform:translateY(0px)] motion-safe:group-focus-visible:[transform:translateY(0px)]`}
+        className={`${SWAP_LAYER} absolute inset-0 [transform:translateY(100%)] motion-safe:group-hover:[transform:translateY(0rem)] motion-safe:group-focus-visible:[transform:translateY(0rem)]`}
       >
         {children}
       </span>
@@ -529,7 +529,7 @@ export default function Footer() {
                   type="button"
                   data-foot-copy
                   onClick={onCopyClick}
-                  className="group relative mt-5 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[18px]/[1.4] max-b700:text-[15px]/[1.4]"
+                  className="group relative mt-5 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-[1.125rem]/[1.4] max-b700:text-[0.9375rem]/[1.4]"
                 >
                   <span aria-hidden="true" className={EMAIL_FLOOD} />
                   {/* SR users need to know activation copies (not mails) — §A10 */}
@@ -543,7 +543,7 @@ export default function Footer() {
                 <span aria-live="polite" className="sr-only">
                   {copied ? "email copied" : ""}
                 </span>
-                <p className="mt-4 text-[16px]/[1.55] whitespace-pre-line text-muted-1 max-b700:text-[13px]/[1.55]">
+                <p className="mt-4 text-[1rem]/[1.55] whitespace-pre-line text-muted-1 max-b700:text-[0.8125rem]/[1.55]">
                   {footer.basedIn}
                 </p>
               </div>
@@ -556,7 +556,7 @@ export default function Footer() {
                     <li key={s.label}>
                       <a
                         href={s.href}
-                        className="group relative inline-block text-[19px]/[1.2] text-ink max-b700:text-[21px]/[1.5]"
+                        className="group relative inline-block text-[1.1875rem]/[1.2] text-ink max-b700:text-[1.3125rem]/[1.5]"
                       >
                         <span aria-hidden="true" className={SOCIAL_FLOOD} />
                         <span className={SOCIAL_LABEL}>{s.label}</span>
@@ -631,7 +631,7 @@ export default function Footer() {
 
         {/* ---- Meta row (right above the gradient): clock bottom-left;
              right side stacks back-to-top OVER the bilingual sign-off ---- */}
-        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-6 gap-y-6 pt-6 text-[19px]/[1.5]">
+        <div className="mt-auto flex flex-wrap items-end justify-between gap-x-6 gap-y-6 pt-6 text-[1.1875rem]/[1.5]">
           <LocalClock />
           <div className="flex flex-col items-end gap-2 text-right">
             {/* Dropped below 700px (user, 2026-09-03) — a phone's own
@@ -641,7 +641,7 @@ export default function Footer() {
               type="button"
               data-back-top
               onClick={() => scrollToTop()}
-              className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[19px]/[1.5] text-ink transition-transform duration-(--dur-copy-2) ease-(--ease-out-expo) motion-safe:hover:-translate-y-0.5 motion-safe:focus-visible:-translate-y-0.5 max-b700:hidden"
+              className="inline-flex cursor-pointer items-center gap-1.5 border-0 bg-transparent p-0 text-[1.1875rem]/[1.5] text-ink transition-transform duration-(--dur-copy-2) ease-(--ease-out-expo) motion-safe:hover:-translate-y-0.5 motion-safe:focus-visible:-translate-y-0.5 max-b700:hidden"
             >
               {footer.backToTop}
               <svg
@@ -661,12 +661,12 @@ export default function Footer() {
             </button>
             {/* Bilingual sign-off — JP sub-line keeps the dimmer treatment */}
             <div className="flex flex-col gap-1">
-              <p className="text-[19px]/[1.4] whitespace-nowrap text-ink max-b700:text-[15px]/[1.4]">
+              <p className="text-[1.1875rem]/[1.4] whitespace-nowrap text-ink max-b700:text-[0.9375rem]/[1.4]">
                 {footer.metaLatin}
               </p>
               <p
                 lang="ja"
-                className="font-ja text-[14px]/[1.4] tracking-[0.14em] whitespace-nowrap text-text-38 max-b700:text-[11px]/[1.4]"
+                className="font-ja text-[0.875rem]/[1.4] tracking-[0.14em] whitespace-nowrap text-text-38 max-b700:text-[0.6875rem]/[1.4]"
               >
                 {footer.metaJa}
               </p>

@@ -27,10 +27,10 @@ import { workList } from "@/content/copy";
  *  holds two identical groups so the −50% keyframe loops seamlessly. */
 function MarqueeGroup({ project }: { project: Project }) {
   return (
-    <span className="flex items-center gap-[clamp(30px,3vw,60px)] pr-[clamp(30px,3vw,60px)]">
+    <span className="flex items-center gap-[clamp(1.875rem,3vw,3.75rem)] pr-[clamp(1.875rem,3vw,3.75rem)]">
       {Array.from({ length: 5 }, (_, i) => (
         <Fragment key={i}>
-          <span className="relative block h-[clamp(74px,13vh,118px)] w-[clamp(184px,21vw,272px)] shrink-0 overflow-hidden rounded-pill">
+          <span className="relative block h-[clamp(4.625rem,13vh,7.375rem)] w-[clamp(11.5rem,21vw,17rem)] shrink-0 overflow-hidden rounded-pill">
             <Image
               src={project.image}
               alt=""
@@ -40,13 +40,13 @@ function MarqueeGroup({ project }: { project: Project }) {
               className="object-cover"
             />
           </span>
-          <span className="flex shrink-0 flex-col gap-[7px]">
-            <span className="font-semibold leading-none tracking-[-0.01em] text-bg text-[clamp(24px,2.1vw,36px)]">
+          <span className="flex shrink-0 flex-col gap-[0.4375rem]">
+            <span className="font-semibold leading-none tracking-[-0.01em] text-bg text-[clamp(1.5rem,2.1vw,2.25rem)]">
               {project.marqueeName}
             </span>
             <span
               lang="ja"
-              className="font-ja font-medium leading-none text-muted-ja text-[clamp(13px,1vw,17px)]"
+              className="font-ja font-medium leading-none text-muted-ja text-[clamp(0.8125rem,1vw,1.0625rem)]"
             >
               {project.jaName}
             </span>
@@ -95,14 +95,14 @@ export default function WorkList() {
       id="worklist"
       aria-label="Work list"
       ref={sectionRef}
-      className="relative z-(--z-section) bg-bg pt-[clamp(56px,8vh,110px)] pb-[clamp(56px,8vh,100px)]"
+      className="relative z-(--z-section) bg-bg pt-[clamp(3.5rem,8vh,6.875rem)] pb-[clamp(3.5rem,8vh,6.25rem)]"
     >
       {/* Header row — Industry / Timeline */}
       <div className="flex items-baseline justify-between px-9 pb-4 max-b700:px-5.5">
-        <span className="font-normal text-[13px] leading-none tracking-[0.04em] text-muted-3">
+        <span className="font-normal text-[0.8125rem] leading-none tracking-[0.04em] text-muted-3">
           {workList.headerLeft}
         </span>
-        <span className="font-normal text-[13px] leading-none tracking-[0.04em] text-muted-3">
+        <span className="font-normal text-[0.8125rem] leading-none tracking-[0.04em] text-muted-3">
           {workList.headerRight}
         </span>
       </div>
@@ -117,21 +117,21 @@ export default function WorkList() {
           href={p.href}
           onClick={goRoute(p.href)}
           data-wrow
-          className="group relative flex h-[clamp(128px,21vh,196px)] cursor-pointer items-center justify-center overflow-hidden border-t border-line-09 max-b700:h-27.5"
+          className="group relative flex h-[clamp(8rem,21vh,12.25rem)] cursor-pointer items-center justify-center overflow-hidden border-t border-line-09 max-b700:h-27.5"
         >
-          <span className="absolute left-9 top-1/2 -translate-y-1/2 text-[20px] leading-none text-ink-1 max-b700:left-5.5 max-b700:text-[11px]">
+          <span className="absolute left-9 top-1/2 -translate-y-1/2 text-[1.25rem] leading-none text-ink-1 max-b700:left-5.5 max-b700:text-[0.6875rem]">
             {p.industry}
           </span>
 
           <span
             data-wrow-name
-            className="font-medium leading-none tracking-[-0.02em] text-ink text-[clamp(52px,6.2vw,126px)] max-b700:text-[38px]"
+            className="font-medium leading-none tracking-[-0.02em] text-ink text-[clamp(3.25rem,6.2vw,7.875rem)] max-b700:text-[2.375rem]"
           >
             {p.name}
           </span>
 
-          <span className="absolute right-9 top-1/2 -translate-y-1/2 text-[20px] leading-none text-ink-1 max-b700:right-5.5 max-b700:text-[11px]">
-            <span className="mr-[3px] text-muted-2">’</span>
+          <span className="absolute right-9 top-1/2 -translate-y-1/2 text-[1.25rem] leading-none text-ink-1 max-b700:right-5.5 max-b700:text-[0.6875rem]">
+            <span className="mr-[0.1875rem] text-muted-2">’</span>
             {p.year}
           </span>
 
@@ -144,7 +144,7 @@ export default function WorkList() {
             {/* Track — 32s linear loop (#11) + 30px lift on reveal */}
             <span
               data-wrow-track
-              className="flex w-max items-center [animation:wlist-marq_32s_linear_infinite] [animation-play-state:paused] [translate:0_30px] transition-[translate] duration-[0.7s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:[animation-play-state:running] group-hover:[translate:0_0] group-focus-visible:[animation-play-state:running] group-focus-visible:[translate:0_0] motion-reduce:transition-none motion-reduce:[translate:none]"
+              className="flex w-max items-center [animation:wlist-marq_32s_linear_infinite] [animation-play-state:paused] [translate:0_1.875rem] transition-[translate] duration-[0.7s] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:[animation-play-state:running] group-hover:[translate:0_0] group-focus-visible:[animation-play-state:running] group-focus-visible:[translate:0_0] motion-reduce:transition-none motion-reduce:[translate:none]"
             >
               <MarqueeGroup project={p} />
               <MarqueeGroup project={p} />
@@ -154,7 +154,7 @@ export default function WorkList() {
       ))}
 
       {/* CTA — See All */}
-      <div className="flex justify-center pt-[clamp(64px,9vh,120px)]">
+      <div className="flex justify-center pt-[clamp(4rem,9vh,7.5rem)]">
         <ArrowLink href={workList.ctaHref}>{workList.ctaText}</ArrowLink>
       </div>
     </section>

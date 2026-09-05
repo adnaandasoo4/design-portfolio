@@ -113,7 +113,7 @@ export default function AboutMain() {
       >
         <h1
           data-about-statement=""
-          className="font-hkgw text-[clamp(26px,3.4vw,58px)]/[0.98] font-semibold tracking-[-0.018em] text-ink uppercase"
+          className="font-hkgw text-[clamp(1.625rem,3.4vw,3.625rem)]/[0.98] font-semibold tracking-[-0.018em] text-ink uppercase"
         >
           {about.headline}
         </h1>
@@ -123,12 +123,12 @@ export default function AboutMain() {
             argument narrowing rather than a wall starting. */}
         <p
           data-reveal=""
-          className="mt-[clamp(28px,4vh,56px)] font-manrope text-lead/[1.45] text-ink"
+          className="mt-[clamp(1.75rem,4vh,3.5rem)] font-manrope text-lead/[1.45] text-ink"
         >
           {about.opening}
         </p>
 
-        <div className="mt-[clamp(24px,3.4vh,44px)] flex flex-col gap-[1.1em] font-manrope text-meta-lg/[1.85] text-muted-2">
+        <div className="mt-[clamp(1.5rem,3.4vh,2.75rem)] flex flex-col gap-[1.1em] font-manrope text-meta-lg/[1.85] text-muted-2">
           {about.paragraphs.map((paragraph) => (
             <p key={paragraph.slice(0, 24)} data-reveal="">
               {paragraph}

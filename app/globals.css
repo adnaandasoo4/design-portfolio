@@ -18,6 +18,37 @@
   `bg-ink` + `text-bg`, so swapping ink↔bg inverts them for free.
 */
 
+/*
+  ---- One scale above the reference width (user, 2026-09-05) ----
+  The design is authored for a 1512px canvas. Below that it stays fluid,
+  exactly as it always was. At and above it the ROOT FONT SIZE tracks the
+  viewport, and because every measurement on the site is expressed in rem,
+  the whole design grows as one piece — type, spacing, gutters, radii, media.
+
+  This exists because a capped design does not merely look smaller on a big
+  monitor, it looks DISPROPORTIONATE: the clamps pin at their maxima while the
+  hardcoded values — gutters, small labels — never move at all, so a 2560px
+  screen showed near-identical type on a canvas 69% wider.
+
+  1rem = 16px at exactly 1512px, so a screen that size renders as it always
+  did. 1512 / 16 = 94.5, which is where the divisor comes from.
+
+  Kept in px on purpose: hairlines and borders, since a 1px rule is a hairline
+  at any scale rather than a measurement; --radius-pill's 999px "fully round"
+  sentinel; and every --breakpoint-*, because a media query must not move with
+  the scale it is deciding.
+
+  Browser ZOOM still behaves — zooming changes the CSS viewport, so 100vw
+  shrinks and the page scales down with it. What this does override above the
+  reference is a custom default font size, the root being viewport-derived
+  there rather than inherited.
+*/
+@media (min-width: 1512px) {
+  :root {
+    font-size: calc(100vw / 94.5);
+  }
+}
+
 /* ---- RAW palette: dark (default) ---- */
 :root {
   --c-bg: #111214; /* page background everywhere — never pure #000 */
@@ -203,17 +234,17 @@ html[data-theme="light"] {
      --text-meta stays the site-wide small tier: rails, captions, labels and
      body blocks on About, Branding and Works. Keeping them separate is what
      lets these few grow without dragging nineteen other elements along. */
-  --text-lead: clamp(20px, 1.8vw, 26px);
-  --text-meta-lg: clamp(15px, 1.2vw, 18px);
-  --text-meta: clamp(13px, 1vw, 15px);
+  --text-lead: clamp(1.25rem, 1.8vw, 1.625rem);
+  --text-meta-lg: clamp(0.9375rem, 1.2vw, 1.125rem);
+  --text-meta: clamp(0.8125rem, 1vw, 0.9375rem);
 
   /* ---- Radius ---- */
-  --radius-chip: 2px; /* say-hi arrow chip */
-  --radius-btn: 3px; /* nav buttons / say-hi pill */
-  --radius-tag: 6px; /* discipline tags */
-  --radius-media: 10px; /* discipline media */
-  --radius-panel: 14px; /* disciplines inner panel */
-  --radius-card: 18px; /* disciplines outer card */
+  --radius-chip: 0.125rem; /* say-hi arrow chip */
+  --radius-btn: 0.1875rem; /* nav buttons / say-hi pill */
+  --radius-tag: 0.375rem; /* discipline tags */
+  --radius-media: 0.625rem; /* discipline media */
+  --radius-panel: 0.875rem; /* disciplines inner panel */
+  --radius-card: 1.125rem; /* disciplines outer card */
   --radius-pill: 999px; /* marquee pill images */
 
   /* ---- Breakpoints (§A4) — use with max-* variants ---- */
@@ -420,7 +451,7 @@ html[data-pageleave] [data-veil] {
 [data-glare] {
   --glare-x: -9999px;
   --glare-y: -9999px;
-  --glare-r: clamp(150px, 17vw, 300px);
+  --glare-r: clamp(9.375rem, 17vw, 18.75rem);
   opacity: var(--glare-on, 0);
   -webkit-mask-image: radial-gradient(
     circle var(--glare-r) at var(--glare-x) var(--glare-y),

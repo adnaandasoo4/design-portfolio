@@ -147,7 +147,7 @@ export default function Showreel() {
             element. See components/sections/Hero. */}
         <div
           data-reel-clip=""
-          className="aspect-16/9 w-[clamp(260px,26vw,470px)] overflow-hidden rounded-[3px] max-b700:w-full"
+          className="aspect-16/9 w-[clamp(16.25rem,26vw,29.375rem)] overflow-hidden rounded-[0.1875rem] max-b700:w-full"
         >
           <video
             data-reel-media=""
@@ -172,7 +172,7 @@ export default function Showreel() {
             other line in the hero. SplitText cannot do this one — it would
             wrap the flex children in line divs and take the
             justify-between apart. */}
-        <figcaption className="mt-[clamp(12px,1.4vw,20px)] overflow-hidden max-b700:hidden">
+        <figcaption className="mt-[clamp(0.75rem,1.4vw,1.25rem)] overflow-hidden max-b700:hidden">
           <span
             data-reel-caption=""
             className="flex items-center justify-between gap-6 font-manrope text-meta-lg leading-none text-ink"

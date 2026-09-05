@@ -67,14 +67,14 @@ import ThemeToggle from "@/components/site/ThemeToggle";
 
 /* -------- Footer-socials hover recipe at menu scale -------- */
 const ROW_LINK =
-  "group relative flex w-full items-center py-[7px] pr-4 pl-5 text-[15px]/[1.3] " +
+  "group relative flex w-full items-center py-[0.4375rem] pr-4 pl-5 text-[0.9375rem]/[1.3] " +
   "font-medium text-ink";
 
 /* Same recipe at full-screen scale: bigger type, taller target, and the
    flood spanning the gutters rather than a dropdown's width. */
 const SHEET_LINK =
-  "group relative flex w-full items-center py-[14px] " +
-  "text-[clamp(30px,9vw,44px)]/[1.15] font-medium text-ink";
+  "group relative flex w-full items-center py-[0.875rem] " +
+  "text-[clamp(1.875rem,9vw,2.75rem)]/[1.15] font-medium text-ink";
 
 const FLOOD =
   "pointer-events-none absolute inset-0 bg-ink-1 opacity-0 " +
@@ -142,7 +142,7 @@ function RowInner({ label, index }: { label: string; index: number }) {
         {/* Row numeral — flips dark with the label on the flood */}
         <span
           aria-hidden="true"
-          className="mr-2.5 text-[11px] font-normal text-muted-2 tabular-nums group-hover:text-bg group-focus-visible:text-bg"
+          className="mr-2.5 text-[0.6875rem] font-normal text-muted-2 tabular-nums group-hover:text-bg group-focus-visible:text-bg"
         >
           {String(index + 1).padStart(2, "0")}
         </span>
@@ -328,7 +328,7 @@ export default function Nav() {
       >
         {/* pt clears the bar: the nav's 16px phone gutter plus the 44px
             button. justify-center puts the rows in the space that leaves. */}
-        <ul className="flex h-full flex-col justify-center px-4 pt-[60px] pb-[12vh]">
+        <ul className="flex h-full flex-col justify-center px-4 pt-[3.75rem] pb-[12vh]">
           <MenuRows
             rowClass={SHEET_LINK}
             goRoute={goRoute}
@@ -347,7 +347,7 @@ export default function Nav() {
           href="/"
           onClick={goHome}
           aria-label={`${navCopy.wordmark} — home`}
-          className="pointer-events-auto flex h-11 items-center font-hkgw text-[clamp(20px,2.1vw,30px)] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink uppercase transition-opacity duration-(--dur-hover) ease-(--ease-std) hover:opacity-70"
+          className="pointer-events-auto flex h-11 items-center font-hkgw text-[clamp(1.25rem,2.1vw,1.875rem)] leading-none font-bold tracking-[-0.02em] whitespace-nowrap text-ink uppercase transition-opacity duration-(--dur-hover) ease-(--ease-std) hover:opacity-70"
         >
           {navCopy.wordmark}
         </Link>
@@ -373,7 +373,7 @@ export default function Nav() {
               aria-expanded={open}
               aria-controls="nav-menu-panel nav-menu-sheet"
               onClick={() => setOpen((o) => !o)}
-              className={`flex h-11 w-[clamp(160px,14vw,196px)] cursor-pointer items-center justify-between rounded-t-btn bg-raise-2 pr-4 pl-5 text-[15px] leading-none font-medium text-ink max-b700:w-[124px] max-b700:pr-3 max-b700:pl-4 ${
+              className={`flex h-11 w-[clamp(10rem,14vw,12.25rem)] cursor-pointer items-center justify-between rounded-t-btn bg-raise-2 pr-4 pl-5 text-[0.9375rem] leading-none font-medium text-ink max-b700:w-[7.75rem] max-b700:pr-3 max-b700:pl-4 ${
                 open ? "" : "rounded-b-btn"
               }`}
             >
@@ -383,7 +383,7 @@ export default function Nav() {
               read as too much. */}
               <svg
                 viewBox="0 0 24 24"
-                className={`size-[15px] transition-transform duration-(--dur-copy) ease-(--ease-out-quart) motion-reduce:transition-none ${
+                className={`size-[0.9375rem] transition-transform duration-(--dur-copy) ease-(--ease-out-quart) motion-reduce:transition-none ${
                   open ? "rotate-[225deg]" : "rotate-0"
                 }`}
                 fill="none"
@@ -430,7 +430,7 @@ export default function Nav() {
                 <ul
                   className={`flex flex-col py-1.5 [transition:transform_var(--dur-copy)_var(--ease-out-quart)] motion-reduce:transition-none ${
                     open
-                      ? "[transform:translateY(0px)]"
+                      ? "[transform:translateY(0rem)]"
                       : "[transform:translateY(-100%)]"
                   }`}
                 >

@@ -31,7 +31,7 @@ function SunGlyph() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="size-[17px]"
+      className="size-[1.0625rem]"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.7"
@@ -48,7 +48,7 @@ function MoonGlyph() {
   return (
     <svg
       viewBox="0 0 24 24"
-      className="size-[17px]"
+      className="size-[1.0625rem]"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.7"
@@ -75,7 +75,7 @@ export default function ThemeToggle() {
           from below. */}
       <span
         aria-hidden="true"
-        className="relative block size-[17px] overflow-hidden"
+        className="relative block size-[1.0625rem] overflow-hidden"
       >
         <span
           className={`${ICON_LAYER} theme-light:[transform:translateY(-150%)]`}
@@ -83,7 +83,7 @@ export default function ThemeToggle() {
           <SunGlyph />
         </span>
         <span
-          className={`${ICON_LAYER} [transform:translateY(150%)] theme-light:[transform:translateY(0px)]`}
+          className={`${ICON_LAYER} [transform:translateY(150%)] theme-light:[transform:translateY(0rem)]`}
         >
           <MoonGlyph />
         </span>

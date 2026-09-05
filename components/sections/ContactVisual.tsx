@@ -89,7 +89,7 @@ export default function ContactVisual() {
         data-cv-content=""
         className="relative flex h-full flex-col items-center justify-center gap-6 px-9 text-center"
       >
-        <h2 className="font-hkgw text-[clamp(36px,5.5vw,96px)]/[1.04] font-semibold tracking-[-0.01em] text-on-art uppercase max-b700:text-[clamp(22px,7.2vw,36px)]/[1.06]">
+        <h2 className="font-hkgw text-[clamp(2.25rem,5.5vw,6rem)]/[1.04] font-semibold tracking-[-0.01em] text-on-art uppercase max-b700:text-[clamp(1.375rem,7.2vw,2.25rem)]/[1.06]">
           {contactVisual.lines.map((line) => (
             <span key={line} className="block">
               {line}

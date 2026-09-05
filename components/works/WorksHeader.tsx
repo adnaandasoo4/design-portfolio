@@ -82,7 +82,7 @@ export default function WorksHeader() {
   return (
     <header
       ref={rootRef}
-      className="px-9 pt-[clamp(130px,18vh,210px)] pb-[clamp(30px,5vh,58px)] max-b700:px-5.5"
+      className="px-9 pt-[clamp(8.125rem,18vh,13.125rem)] pb-[clamp(1.875rem,5vh,3.625rem)] max-b700:px-5.5"
     >
       {/* Eyebrow row — micro-label register (13px, wide tracking) */}
       <p
@@ -90,17 +90,17 @@ export default function WorksHeader() {
         className="flex items-baseline justify-between gap-4"
       >
         <span className="flex items-baseline gap-3.5">
-          <span className="text-[13px]/[1] font-normal tracking-[0.14em] text-muted-2">
+          <span className="text-[0.8125rem]/[1] font-normal tracking-[0.14em] text-muted-2">
             {works.headerEyebrow.latin}
           </span>
           <span
             lang="ja"
-            className="font-ja text-[13px]/[1] font-normal tracking-[0.14em] text-text-38"
+            className="font-ja text-[0.8125rem]/[1] font-normal tracking-[0.14em] text-text-38"
           >
             {works.headerEyebrow.ja}
           </span>
         </span>
-        <span className="shrink-0 font-manrope text-[13px]/[1] font-medium tracking-[0.08em] text-muted-2">
+        <span className="shrink-0 font-manrope text-[0.8125rem]/[1] font-medium tracking-[0.08em] text-muted-2">
           {works.count}
         </span>
       </p>
@@ -111,7 +111,7 @@ export default function WorksHeader() {
       <div className="overflow-clip">
         <h1
           data-wh-title
-          className="pt-[clamp(20px,4vh,44px)] font-medium text-ink text-[clamp(58px,12vw,200px)]/[0.95] tracking-[-0.02em]"
+          className="pt-[clamp(1.25rem,4vh,2.75rem)] font-medium text-ink text-[clamp(3.625rem,12vw,12.5rem)]/[0.95] tracking-[-0.02em]"
         >
           works
         </h1>

@@ -192,7 +192,7 @@ export default function Disciplines() {
         {/* Intro grid: empty numeral gutter · eyebrow + intro line */}
         <div
           data-xp-intro
-          className="grid grid-cols-[clamp(120px,15vw,300px)_1fr] gap-10 px-12 pt-24 pb-27 max-b700:grid-cols-1 max-b700:gap-5 max-b700:px-5.5 max-b700:pt-12 max-b700:pb-10"
+          className="grid grid-cols-[clamp(7.5rem,15vw,18.75rem)_1fr] gap-10 px-12 pt-24 pb-27 max-b700:grid-cols-1 max-b700:gap-5 max-b700:px-5.5 max-b700:pt-12 max-b700:pb-10"
         >
           {/* Empty numeral gutter — hidden when the grid stacks so its row
               gap doesn't offset the eyebrow (AboutBio idiom) */}
@@ -200,13 +200,13 @@ export default function Disciplines() {
           <div>
             <p
               data-xp-eyebrow
-              className="text-[14px] leading-none font-medium tracking-[0.1em] uppercase text-muted-2"
+              className="text-[0.875rem] leading-none font-medium tracking-[0.1em] uppercase text-muted-2"
             >
               {disciplinesEyebrow}
             </p>
             <h2
               data-xp-intro-line
-              className="mt-4.5 max-w-310 text-[min(50px,3.25vw)] leading-[1.26] font-medium tracking-[-0.015em] text-pretty text-ink max-b700:text-[22px]"
+              className="mt-4.5 max-w-310 text-[min(3.125rem,3.25vw)] leading-[1.26] font-medium tracking-[-0.015em] text-pretty text-ink max-b700:text-[1.375rem]"
             >
               {disciplinesIntro}
             </h2>
@@ -222,7 +222,7 @@ export default function Disciplines() {
             <div
               key={d.numeral}
               data-xp-row
-              className="relative grid grid-cols-[clamp(120px,15vw,300px)_1.32fr_1fr_1fr] gap-10 px-12 pt-14.5 pb-15.5 max-b700:grid-cols-1 max-b700:gap-4.5 max-b700:px-5.5 max-b700:pt-7 max-b700:pb-8"
+              className="relative grid grid-cols-[clamp(7.5rem,15vw,18.75rem)_1.32fr_1fr_1fr] gap-10 px-12 pt-14.5 pb-15.5 max-b700:grid-cols-1 max-b700:gap-4.5 max-b700:px-5.5 max-b700:pt-7 max-b700:pb-8"
             >
               {d.line && (
                 <span
@@ -234,19 +234,19 @@ export default function Disciplines() {
               {/* 1 — numeral */}
               <div
                 data-xp-numeral
-                className="pt-3 text-[18px] leading-none font-normal text-muted-2"
+                className="pt-3 text-[1.125rem] leading-none font-normal text-muted-2"
               >
                 {d.numeral}
               </div>
 
               {/* 2 — name + JP sub-label */}
               <div>
-                <h3 className="text-[min(46px,3vw)] leading-[1.08] font-medium tracking-[-0.02em] text-ink max-b700:text-[30px]">
+                <h3 className="text-[min(2.875rem,3vw)] leading-[1.08] font-medium tracking-[-0.02em] text-ink max-b700:text-[1.875rem]">
                   {d.name}
                 </h3>
                 <span
                   lang="ja"
-                  className="mt-2.5 block font-ja text-[15px] leading-none font-normal tracking-[0.12em] text-muted-2"
+                  className="mt-2.5 block font-ja text-[0.9375rem] leading-none font-normal tracking-[0.12em] text-muted-2"
                 >
                   {d.jaName}
                 </span>
@@ -256,7 +256,7 @@ export default function Disciplines() {
               <div>
                 <p
                   data-xp-desc
-                  className="text-[18px] leading-[1.7] font-normal text-muted-1"
+                  className="text-[1.125rem] leading-[1.7] font-normal text-muted-1"
                 >
                   {d.description}
                 </p>
@@ -268,7 +268,7 @@ export default function Disciplines() {
                   {d.tags.map((tag) => (
                     <li
                       key={tag}
-                      className="rounded-tag border border-line-13 bg-fill-035 px-[15px] py-2.5 text-[13px] leading-none font-normal tracking-[0.04em] text-ink-2"
+                      className="rounded-tag border border-line-13 bg-fill-035 px-[0.9375rem] py-2.5 text-[0.8125rem] leading-none font-normal tracking-[0.04em] text-ink-2"
                     >
                       {tag}
                     </li>

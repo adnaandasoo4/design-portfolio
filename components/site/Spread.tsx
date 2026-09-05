@@ -58,8 +58,8 @@ export default function Spread({
       aria-label={ariaLabel}
       className={`relative bg-bg px-5 max-b700:px-4 ${
         tight
-          ? "py-[clamp(72px,10vh,130px)] max-b700:py-14"
-          : "py-[clamp(140px,20vh,260px)] max-b700:py-24"
+          ? "py-[clamp(4.5rem,10vh,8.125rem)] max-b700:py-14"
+          : "py-[clamp(8.75rem,20vh,16.25rem)] max-b700:py-24"
       } ${className}`}
     >
       {/* items-start keeps each column's first element on the row's top edge

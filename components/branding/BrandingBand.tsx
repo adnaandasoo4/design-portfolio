@@ -60,7 +60,7 @@ export default function BrandingBand() {
       aria-label="Identity work"
       className="relative overflow-hidden bg-bg"
     >
-      <div className="relative h-[clamp(300px,58svh,620px)] w-full">
+      <div className="relative h-[clamp(18.75rem,58svh,38.75rem)] w-full">
         {/* Oversized so the drift never reveals an edge */}
         <div
           data-band-media=""

@@ -12,11 +12,11 @@ export default function AboutClosing() {
   return (
     <section
       aria-label="Closing"
-      className="relative bg-bg px-5 py-[clamp(140px,24vh,320px)] max-b700:px-4 max-b700:py-28"
+      className="relative bg-bg px-5 py-[clamp(8.75rem,24vh,20rem)] max-b700:px-4 max-b700:py-28"
     >
       <p
         data-reveal=""
-        className="max-w-[18ch] font-hkgw text-[clamp(30px,5.2vw,94px)]/[0.96] font-bold tracking-[-0.025em] text-ink uppercase max-b700:text-[8vw]"
+        className="max-w-[18ch] font-hkgw text-[clamp(1.875rem,5.2vw,5.875rem)]/[0.96] font-bold tracking-[-0.025em] text-ink uppercase max-b700:text-[8vw]"
       >
         {about.closing}
       </p>

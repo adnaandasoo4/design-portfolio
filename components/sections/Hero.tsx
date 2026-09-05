@@ -227,7 +227,7 @@ export default function Hero() {
       id="hero"
       ref={sectionRef}
       aria-label="Hero"
-      className="relative z-(--z-section) flex h-svh flex-col bg-bg px-5 pt-[92px] pb-5 max-b700:px-4 max-b700:pt-[76px] max-b700:pb-4"
+      className="relative z-(--z-section) flex h-svh flex-col bg-bg px-5 pt-[5.75rem] pb-5 max-b700:px-4 max-b700:pt-[4.75rem] max-b700:pb-4"
     >
       {/* Reel — centred in the space the statement block leaves over */}
       <div className="flex flex-1 items-center justify-center">
@@ -238,7 +238,7 @@ export default function Hero() {
       <div className="shrink-0">
         <p
           data-hero-line=""
-          className="font-manrope text-meta-lg/[1.6] tracking-[0.02em] text-muted-2 max-b700:text-[17px]/[1.5]"
+          className="font-manrope text-meta-lg/[1.6] tracking-[0.02em] text-muted-2 max-b700:text-[1.0625rem]/[1.5]"
         >
           {/* Block on desktop, so the authored breaks hold; inline below
               700px, so the two lines run together and wrap to the phone's
@@ -252,10 +252,10 @@ export default function Hero() {
           ))}
         </p>
 
-        <div className="mt-[clamp(16px,2.4vh,30px)] flex items-end justify-between gap-[clamp(24px,5vw,90px)] max-b860:flex-col max-b860:items-start max-b860:gap-7">
+        <div className="mt-[clamp(1rem,2.4vh,1.875rem)] flex items-end justify-between gap-[clamp(1.5rem,5vw,5.625rem)] max-b860:flex-col max-b860:items-start max-b860:gap-7">
           <h1
             data-hero-line=""
-            className="font-hkgw text-[clamp(34px,4.9vw,86px)]/[0.88] font-bold tracking-[-0.02em] text-ink uppercase max-b700:text-[9.4vw]"
+            className="font-hkgw text-[clamp(2.125rem,4.9vw,5.375rem)]/[0.88] font-bold tracking-[-0.02em] text-ink uppercase max-b700:text-[9.4vw]"
           >
             {hero.headline.map((parts, i) => (
               /* Every line is a block on desktop — the structure this has
@@ -289,7 +289,7 @@ export default function Hero() {
 
           <p
             data-hero-line=""
-            className="w-[clamp(250px,26vw,360px)] shrink-0 pb-[0.4em] font-manrope text-meta-lg/[1.6] text-muted-2 max-b860:w-full max-b860:max-w-[440px] max-b860:pb-0 max-b700:text-[17px]/[1.5]"
+            className="w-[clamp(15.625rem,26vw,22.5rem)] shrink-0 pb-[0.4em] font-manrope text-meta-lg/[1.6] text-muted-2 max-b860:w-full max-b860:max-w-[27.5rem] max-b860:pb-0 max-b700:text-[1.0625rem]/[1.5]"
           >
             {hero.paragraph}
           </p>

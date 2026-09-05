@@ -16,7 +16,7 @@ import { branding } from "@/content/branding";
 export default function BrandingServices() {
   return (
     <Spread eyebrow={branding.servicesEyebrow}>
-      <div className="relative grid grid-cols-2 gap-x-[clamp(28px,4vw,72px)] gap-y-[clamp(48px,7vh,96px)] max-b860:grid-cols-1">
+      <div className="relative grid grid-cols-2 gap-x-[clamp(1.75rem,4vw,4.5rem)] gap-y-[clamp(3rem,7vh,6rem)] max-b860:grid-cols-1">
         {/* The cross — one rule each way, centred on the gaps */}
         <span
           aria-hidden="true"
@@ -29,7 +29,7 @@ export default function BrandingServices() {
 
         {branding.services.map((service) => (
           <div key={service.title} data-reveal="">
-            <h2 className="text-[clamp(20px,1.7vw,28px)]/[1.2] font-semibold tracking-[-0.015em] text-ink">
+            <h2 className="text-[clamp(1.25rem,1.7vw,1.75rem)]/[1.2] font-semibold tracking-[-0.015em] text-ink">
               {service.title}
             </h2>
             <p className="mt-4 font-manrope text-meta/[1.7] text-muted-2">

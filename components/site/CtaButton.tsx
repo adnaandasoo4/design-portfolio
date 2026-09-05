@@ -74,19 +74,19 @@ const SIZES: Record<
     /* max-b700:* additions scale the bar down on phones (the md clamp floors
        overflow a 360px viewport inside px-9 gutters); desktop output is
        untouched — the base classes are verbatim. */
-    root: "h-[clamp(54px,6vw,76px)] gap-[clamp(18px,2.2vw,32px)] pl-[clamp(22px,2.6vw,38px)] pr-[clamp(12px,1.4vw,20px)] max-b700:h-[46px] max-b700:gap-[14px] max-b700:pl-[16px] max-b700:pr-[9px]",
-    window: "h-[clamp(34px,3.8vw,50px)] max-b700:h-[27px]",
+    root: "h-[clamp(3.375rem,6vw,4.75rem)] gap-[clamp(1.125rem,2.2vw,2rem)] pl-[clamp(1.375rem,2.6vw,2.375rem)] pr-[clamp(0.75rem,1.4vw,1.25rem)] max-b700:h-[2.875rem] max-b700:gap-[0.875rem] max-b700:pl-[1rem] max-b700:pr-[0.5625rem]",
+    window: "h-[clamp(2.125rem,3.8vw,3.125rem)] max-b700:h-[1.6875rem]",
     label:
-      "text-[clamp(26px,3vw,40px)] leading-[clamp(34px,3.8vw,50px)] max-b700:text-[20px] max-b700:leading-[27px]",
-    chip: "size-[clamp(36px,4vw,50px)] max-b700:size-[28px]",
-    arrow: "size-[clamp(18px,2.1vw,26px)] max-b700:size-[15px]",
+      "text-[clamp(1.625rem,3vw,2.5rem)] leading-[clamp(2.125rem,3.8vw,3.125rem)] max-b700:text-[1.25rem] max-b700:leading-[1.6875rem]",
+    chip: "size-[clamp(2.25rem,4vw,3.125rem)] max-b700:size-[1.75rem]",
+    arrow: "size-[clamp(1.125rem,2.1vw,1.625rem)] max-b700:size-[0.9375rem]",
   },
   sm: {
-    root: "h-[34px] gap-[10px] pl-[12px] pr-[6px]",
-    window: "h-[19px]",
-    label: "text-[13px] leading-[19px]",
-    chip: "size-[20px]",
-    arrow: "size-[10px]",
+    root: "h-[2.125rem] gap-[0.625rem] pl-[0.75rem] pr-[0.375rem]",
+    window: "h-[1.1875rem]",
+    label: "text-[0.8125rem] leading-[1.1875rem]",
+    chip: "size-[1.25rem]",
+    arrow: "size-[0.625rem]",
   },
 };
 
@@ -162,7 +162,7 @@ export default function CtaButton({
         </span>
         <span
           aria-hidden="true"
-          className={`${LABEL_BASE} ${t.label} ${s.label} [transform:translateY(105%)] motion-safe:group-hover:[transform:translateY(0px)] motion-safe:group-focus-visible:[transform:translateY(0px)]`}
+          className={`${LABEL_BASE} ${t.label} ${s.label} [transform:translateY(105%)] motion-safe:group-hover:[transform:translateY(0rem)] motion-safe:group-focus-visible:[transform:translateY(0rem)]`}
         >
           {label}
         </span>
@@ -181,7 +181,7 @@ export default function CtaButton({
         </span>
         {/* A2 — parked off the bottom-left, arrives center on hover */}
         <span
-          className={`${ARROW_LAYER} [transform:translate(-130%,130%)] motion-safe:group-hover:[transform:translate(0px,0px)] motion-safe:group-focus-visible:[transform:translate(0px,0px)]`}
+          className={`${ARROW_LAYER} [transform:translate(-130%,130%)] motion-safe:group-hover:[transform:translate(0rem,0rem)] motion-safe:group-focus-visible:[transform:translate(0rem,0rem)]`}
         >
           <ArrowGlyph className={`${s.arrow} ${t.arrow}`} />
         </span>

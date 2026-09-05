@@ -18,7 +18,7 @@ export default function BrandingProcess() {
           <li
             key={step.numeral}
             data-reveal=""
-            className={`grid grid-cols-[auto_1fr] gap-x-[clamp(20px,3vw,56px)] py-[clamp(24px,3.4vh,44px)] max-b700:grid-cols-1 max-b700:gap-y-3 ${
+            className={`grid grid-cols-[auto_1fr] gap-x-[clamp(1.25rem,3vw,3.5rem)] py-[clamp(1.5rem,3.4vh,2.75rem)] max-b700:grid-cols-1 max-b700:gap-y-3 ${
               i === 0 ? "pt-0" : "border-t border-line-09"
             }`}
           >
@@ -29,7 +29,7 @@ export default function BrandingProcess() {
               {step.numeral}
             </span>
             <div>
-              <h2 className="text-[clamp(20px,1.7vw,28px)]/[1.2] font-semibold tracking-[-0.015em] text-ink">
+              <h2 className="text-[clamp(1.25rem,1.7vw,1.75rem)]/[1.2] font-semibold tracking-[-0.015em] text-ink">
                 {step.title}
               </h2>
               <p className="mt-3 max-w-[58ch] font-manrope text-meta/[1.7] text-muted-2">
